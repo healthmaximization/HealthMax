@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Score Quiz</title>
     <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* General styling for the body */
         body {
@@ -39,7 +39,45 @@
             text-align: center;
             box-sizing: border-box;
             margin-bottom: 20px;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; /* For smooth transitions between screens */
         }
+
+        /* Start Screen specific transitions */
+        .start-screen.entering {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        .start-screen.entered {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .start-screen.exiting {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        .start-screen.exited {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        /* Quiz Container specific transitions */
+        .quiz-container.entering {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        .quiz-container.entered {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .quiz-container.exiting {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+        .quiz-container.exited {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
 
         /* Title styling - for premium look */
         h1 {
@@ -99,7 +137,7 @@
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             text-align: left;
         }
 
@@ -109,10 +147,13 @@
             border-color: #0a1a2f;
         }
 
+        /* Selected option animation */
         .option-button.selected {
             background-color: #0a1a2f;
             color: #ffffff;
             border-color: #0a1a2f;
+            transform: scale(1.02); /* Slight pop effect */
+            box-shadow: 0 4px 15px rgba(10, 26, 47, 0.6); /* Glow effect */
         }
 
         /* Textarea specific styling - inherits from .option-button but adds specific overrides */
@@ -129,6 +170,12 @@
             resize: vertical; /* Allow vertical resizing */
             min-height: 100px; /* Minimum height */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        textarea.open-answer-textarea:focus {
+            border-color: #0a1a2f; /* Highlight on focus */
+            box-shadow: 0 0 0 2px #0a1a2f; /* Subtle glow on focus */
+            outline: none; /* Remove default outline */
         }
 
 
@@ -241,6 +288,12 @@
             flex-direction: column;
             align-items: flex-start;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for hover effect */
+        }
+
+        .area-score-item:hover { /* Hover effect for area score items */
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow on hover */
         }
 
         .area-score-item strong {
@@ -340,6 +393,15 @@
             font-size: 1em;
             color: #c0c0c0;
             line-height: 1.6;
+        }
+
+        /* Note on result page for more specific answers */
+        .results-note {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-top: 15px;
+            text-align: center;
+            font-style: italic;
         }
 
 
@@ -624,9 +686,16 @@
             background-color: #2a2a2a; /* Match other content blocks */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            /* Enhanced styling for premium look */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset; /* Deeper shadow and subtle inset border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
             margin-bottom: 20px;
             text-align: center;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.1) inset; /* Stronger shadow and border on hover */
         }
 
         .testimonial-card p {
@@ -686,7 +755,7 @@
             margin-bottom: 10px;
             letter-spacing: 3px; /* More spacing for prominence */
             animation: pulse 1.5s infinite alternate; /* Subtle pulse animation */
-            text-align: center; /* Ensure centered */
+            text-align: center;
             width: 100%; /* Take full width to center */
         }
 
@@ -749,6 +818,63 @@
             font-style: italic;
         }
 
+        /* New styles for Benefits Section */
+        .benefits-section {
+            margin-top: 30px;
+            margin-bottom: 40px;
+            padding: 25px;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            /* Enhanced styling for premium look, similar to testimonials */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset; /* Deeper shadow and subtle inset border */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+            text-align: left;
+        }
+
+        .benefits-section:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.1) inset; /* Stronger shadow and border on hover */
+        }
+
+        .benefits-section h3 {
+            color: #f0f0f0;
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .benefits-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .benefits-section li {
+            display: flex; /* Use flexbox for better icon/text alignment */
+            align-items: flex-start; /* Align items to the top */
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #d0d0d0;
+            line-height: 1.4;
+        }
+
+        /* New style for emoji icons within list items */
+        .benefits-section li .icon-emoji {
+            font-size: 1.4em; /* Make emoji slightly larger than text */
+            line-height: 1;   /* Ensure emoji aligns properly on the line */
+            margin-right: 8px; /* Space between emoji and text */
+            min-width: 1.4em; /* Prevent text shifting with different emojis */
+            text-align: center; /* Center emoji within its minimum width */
+            color: #ffd700; /* Optional: give emoji a specific color, e.g., gold */
+        }
+
+        /* Style for normal text within list items (no extra bold) */
+        .benefits-section li span.normal-text {
+            font-weight: normal; /* Ensure text is not bold */
+            color: inherit; /* Inherit color from parent (li) */
+        }
+
     </style>
 </head>
 <body>
@@ -777,16 +903,28 @@
         <!-- User Status Bar - Entirely removed as authentication is removed -->
 
         <!-- Start Screen (visible by default) -->
-        <div id="startScreen" class="start-screen">
+        <div id="startScreen" class="start-screen entered">
             <div class="intro-text">
                 <h2>Your Health Score Journey Starts Here!</h2>
-                <p>Discover your personalized health score. This insightful, **completely free and accurate** quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
+                <p>Discover your personalized health score. This insightful, <strong>completely free and accurate</strong> quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
             </div>
-            <button id="startQuizBtn" class="next-button">Get My Score <span>(~7 min)</span></button>
+
+            <button id="startQuizBtn" class="next-button">Get My Score</button>
+
+            <!-- New Benefits Section -->
+            <div class="benefits-section">
+                <h3>Why Take Your Health Score Quiz?</h3>
+                <ul>
+                    <li><span class="icon-emoji">💡</span> <span class="normal-text">Get truly personalized insights into your unique health profile.</span></li>
+                    <li><span class="icon-emoji">📈</span> <span class="normal-text">Receive actionable steps and concrete advice for improvement.</span></li>
+                    <li><span class="icon-emoji">✅</span> <span class="normal-text">Enjoy a completely free analysis with no hidden costs.</span></li>
+                    <li><span class="icon-emoji">🚀</span> <span class="normal-text">It's quick and easy, providing results in just a few minutes.</span></li>
+                </ul>
+            </div>
 
             <!-- Testimonials Section -->
             <div class="testimonials-section">
-                <h3>What people are saying about HealthMax</h3>
+                <h3>What People Are Saying About HealthMax</h3>
                 <div class="testimonial-card">
                     <p>"This quiz gave me such clear insights! It's beautifully designed and genuinely helpful. My health journey feels much clearer now."</p>
                     <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
@@ -868,6 +1006,7 @@
             <div id="allDetailedRecommendations" class="recommendations-section">
                 <h3>Our Personalized Recommendations</h3>
                 <!-- Detailed feedback items will be appended here by JavaScript -->
+                <p class="results-note">Not satisfied with your recommendations? Try the quiz again and be more specific about your challenges to get even better insights!</p>
             </div>
 
             <!-- New Lead Magnet Section on Results Page -->
@@ -898,7 +1037,7 @@
                         ]
                     },
                     {
-                        question: "Describe your daily eating patterns:<br>- Meals, snacks, beverages.<br>- Major challenges in maintaining a healthy diet.<br>- How current choices affect your energy and mood.",
+                        question: "Please share your typical daily eating habits, including meals, snacks, and beverages. Feel free to mention any challenges or effects on your energy and mood.",
                         type: "open-text",
                         maxPoints: 25 
                     }
@@ -918,7 +1057,7 @@
                         ]
                     },
                     {
-                        question: "How do you integrate daily physical activity outside of planned workouts?<br>- Main obstacles to consistency.<br>- What motivates you most to stay active?",
+                        question: "Tell us about your physical activity: How do you typically move, what are any obstacles, and what motivates you to stay active?",
                         type: "open-text",
                         maxPoints: 25 
                     }
@@ -938,7 +1077,7 @@
                         ]
                     },
                     {
-                        question: "Describe your evening winding-down routine and sleep environment.<br>- Habits or external factors that improve or disrupt your sleep.<br>- Your biggest struggles or challenges with restful sleep.",
+                        question: "Please describe your sleep habits: What's your evening winding-down routine, what helps or hinders your sleep, and what are your biggest challenges for restful sleep?",
                         type: "open-text",
                         maxPoints: 25 
                     }
@@ -958,7 +1097,7 @@
                         ]
                     },
                     {
-                        question: "What practices do you use to manage stress or promote mental well-being?<br>- Aspect of your mental health needing most attention (e.g., anxiety, focus, resilience, mood).<br>- Your biggest mental health challenges.",
+                        question: "Please share your approach to mental well-being: What practices do you use to manage stress, and what aspect of your mental health needs the most attention? Please name your biggest challenges.",
                         type: "open-text",
                         maxPoints: 25 
                     }
@@ -1027,29 +1166,46 @@
         document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
 
         // Event Listener for Next Button
-        nextButton.addEventListener('click', () => {
+        nextButton.addEventListener('click', async () => {
             const questionData = currentQuestions[currentQuestionIndex];
+            let isValid = false;
+
             if (questionData.type === 'open-text') {
-                // Check if textarea has content for open questions
                 if (document.getElementById('openAnswerTextarea') && document.getElementById('openAnswerTextarea').value.trim() !== '') {
-                    processAnswer();
-                    currentQuestionIndex++;
-                    if (currentQuestionIndex < currentQuestions.length) {
-                        displayQuestion();
-                    } else {
-                        finishQuiz();
-                    }
+                    isValid = true;
                 }
             } else if (questionData.type === 'multiple-choice') {
-                // Check if an option is selected for multiple choice questions
                 if (selectedOption !== null) {
-                    processAnswer();
-                    currentQuestionIndex++;
-                    if (currentQuestionIndex < currentQuestions.length) {
-                        displayQuestion();
-                    } else {
-                        finishQuiz();
-                    }
+                    isValid = true;
+                }
+            }
+
+            if (isValid) {
+                processAnswer();
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuestions.length) {
+                    // Start fade out animation
+                    quizContainer.classList.remove('entered');
+                    requestAnimationFrame(() => { // Ensure styles are applied before transition
+                        quizContainer.classList.add('exiting');
+                    });
+                    await new Promise(resolve => quizContainer.addEventListener('transitionend', resolve, { once: true }));
+                    quizContainer.classList.add('hidden'); // Fully hide after exit animation
+                    
+                    // Reset to entering state for next question
+                    quizContainer.classList.remove('exiting');
+                    quizContainer.classList.add('entering');
+                    
+                    displayQuestion();
+                    
+                    // Trigger fade in animation
+                    quizContainer.classList.remove('hidden');
+                    // Force reflow to ensure animation restarts
+                    void quizContainer.offsetWidth; 
+                    quizContainer.classList.remove('entering');
+                    quizContainer.classList.add('entered');
+                } else {
+                    finishQuiz();
                 }
             }
         });
@@ -1084,10 +1240,30 @@
                 });
             });
 
-            startScreen.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            document.querySelector('.progress-bar-container').classList.remove('hidden'); // Show global progress bar
-            displayQuestion();
+            // Start fade out animation for startScreen
+            startScreen.classList.remove('entered'); // Ensure it's not in entered state
+            requestAnimationFrame(() => { // Ensure styles are applied before transition
+                startScreen.classList.add('exiting');
+            });
+
+            startScreen.addEventListener('transitionend', function handler() {
+                startScreen.removeEventListener('transitionend', handler); // Remove listener to prevent multiple calls
+                startScreen.classList.add('hidden'); // Hide completely after animation
+                startScreen.classList.remove('exiting'); // Clean up exiting class
+
+                quizContainer.classList.remove('hidden'); // Show quiz container
+                document.querySelector('.progress-bar-container').classList.remove('hidden'); // Show global progress bar
+                
+                // Initial animation for quiz container entrance
+                quizContainer.classList.remove('exited');
+                quizContainer.classList.remove('entered');
+                quizContainer.classList.add('entering');
+                void quizContainer.offsetWidth; // Trigger reflow
+                quizContainer.classList.remove('entering');
+                quizContainer.classList.add('entered');
+                
+                displayQuestion();
+            }, { once: true }); // Use { once: true } to automatically remove the listener
         }
 
         /**
@@ -1196,6 +1372,11 @@
          * Finishes the quiz, calculates overall score, and displays results.
          */
         async function finishQuiz() {
+            quizContainer.classList.remove('entered');
+            requestAnimationFrame(() => { // Ensure styles are applied before transition
+                quizContainer.classList.add('exiting');
+            });
+            await new Promise(resolve => quizContainer.addEventListener('transitionend', resolve, { once: true }));
             quizContainer.classList.add('hidden');
             document.querySelector('.progress-bar-container').classList.add('hidden'); // Hide global progress bar
 
@@ -1385,6 +1566,8 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                         errorDiv.textContent = "We couldn't generate detailed recommendations at this moment. Please try again or retake the quiz.";
                         allDetailedRecommendations.appendChild(errorDiv);
                     }
+                    console.error("Max retries reached. Failed to generate recommendations.");
+                    break; // Break the loop after max retries
                 }
             }
             hideLoading();
@@ -1400,6 +1583,11 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             document.querySelector('.progress-bar-container').classList.add('hidden');
             startScreen.classList.remove('hidden');
             allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>';
+            
+            // Re-initialize start screen for animation
+            startScreen.classList.remove('exited');
+            startScreen.classList.remove('entering');
+            startScreen.classList.add('entered'); // Ensure it's in the initial entered state for next start
         }
 
         /**
@@ -1438,9 +1626,11 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             }, 3000); 
         }
 
-        // Initialize quiz
-        // Note: No initial displayQuestion() or startQuiz() call here.
-        // The start screen handles the initial interaction.
+        // Initialize start screen to be "entered" on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            startScreen.classList.add('entered');
+        });
     </script>
 </body>
 </html>
+
