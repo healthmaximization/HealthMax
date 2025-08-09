@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Score Quiz</title>
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General styling for the body */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Green-blue gradient background for a luxurious feel */
+            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
+            color: #e0e0e0; /* Light gray text color for dark mode */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Start at the top */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Navigation bar (now empty as auth is removed) */
+        .user-status-bar {
+            display: none; /* Hide the entire status bar as auth is removed */
+        }
+
+        /* Styling for the main quiz container and screens */
+        .quiz-container, .result-container, .start-screen {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        /* Title styling - for premium look */
+        h1 {
+            color: #f0f0f0;
+            margin-bottom: 5px; /* Adjust margin for subtitle */
+            font-size: 2.8em; /* Slightly larger for premium */
+            font-weight: 700;
+            letter-spacing: 0.05em; /* Add letter spacing */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+        }
+
+        /* Subtitle for "By HealthMax" */
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            font-weight: 400;
+            text-align: center; /* Ensure centered */
+        }
+
+        /* Logo placeholder styling */
+        .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            max-width: 150px;
+            height: auto;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Questions and feedback styling */
+        h2 {
+            color: #f0f0f0;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #c0c0c0;
+            font-weight: 400;
+        }
+
+        /* Option buttons styling for multiple choice */
+        .option-button {
+            display: block;
+            width: calc(100% - 20px);
+            padding: 15px 20px;
+            margin: 10px auto;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            border: 1px solid #444444;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+            text-align: left;
+        }
+
+        .option-button:hover {
+            background-color: #3a3a3a;
+            transform: translateY(-2px);
+            border-color: #0a1a2f;
+        }
+
+        .option-button.selected {
+            background-color: #0a1a2f;
+            color: #ffffff;
+            border-color: #0a1a2f;
+        }
+
+        /* Textarea specific styling - inherits from .option-button but adds specific overrides */
+        textarea.open-answer-textarea { /* Added a class for specific targeting */
+            width: calc(100% - 30px); /* Adjust width to fit container with padding */
+            padding: 15px;
+            margin: 10px auto;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            border: 1px solid #444444;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            resize: vertical; /* Allow vertical resizing */
+            min-height: 100px; /* Minimum height */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+
+        /* 'Next' button and other primary buttons styling */
+        .next-button {
+            background-color: #0a1a2f;
+            color: #ffffff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(10, 26, 47, 0.4);
+            width: auto;
+            min-width: 150px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        
+        .next-button:hover {
+            background-color: #1a2a3f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(10, 26, 47, 0.5);
+        }
+
+        .next-button:disabled {
+            background-color: #444444;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Score and feedback in result screen styling */
+        .score-display-container {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .score-display-container h2 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #f0f0f0;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .feedback-display {
+            font-size: 1.15em;
+            margin-bottom: 30px;
+            color: #d0d0d0;
+        }
+
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important; /* Force hide the element */
+        }
+
+        /* Progress Bar Styling (Overall) */
+        .progress-bar-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            height: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
+        }
+
+        /* Specific styling for the overall health rating progress bar fill */
+        .overall-progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
+        }
+
+        /* Specific area scores display */
+        .area-scores {
+            text-align: left;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .area-scores h3 {
+            color: #f0f0f0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        /* Cleaned up area score item styling */
+        .area-score-item {
+            background-color: #2a2a2a;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .area-score-item strong {
+            color: #e0e0e0;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .area-score-item strong span {
+            /* This span will now hold the raw score */
+            margin-left: auto; /* Push score to the right */
+            font-size: 1.2em;
+            color: #e0e0e0;
+            font-weight: 700;
+            white-space: nowrap; /* Prevent wrapping for the score */
+        }
+
+        .area-score-item > p {
+            /* This paragraph will be empty as per user request */
+            display: none; /* Hide if no text is desired */
+        }
+
+        .area-progress-container {
+            width: 100%;
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .area-progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #28a745;
+            border-radius: 8px;
+            transition: width 0.6s ease-out, background-color 0.4s ease-in-out;
+        }
+
+        /* Styling for consolidated detailed recommendations */
+        .recommendations-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #3a3a3a;
+            text-align: left; /* Changed to left for flowing text */
+        }
+
+        .recommendations-section h3 {
+            color: #f0f0f0;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* The category headings are no longer needed if recommendations are one block */
+        .recommendation-category {
+            display: none; /* Hide category headings */
+        }
+
+        /* Styling for the single detailed feedback item (summary) - NOW MATCHES AREA-SCORE-ITEM */
+        .detailed-feedback {
+            padding: 15px 20px;
+            background-color: #2a2a2a; /* Match area-score-item background */
+            border-radius: 10px; /* Match area-score-item border-radius */
+            text-align: left;
+            font-size: 1.2em; /* Increased font size for recommendations */
+            color: #d0d0d0;
+            margin-bottom: 15px; /* Consistent with previous */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Match area-score-item box-shadow */
+            line-height: 1.5;
+        }
+
+        /* New styling for individual recommendation items */
+        .recommendation-item {
+            background-color: #2a2a2a; /* Match other content blocks */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            text-align: left; /* Align text to the left */
+        }
+
+        .recommendation-item h4 {
+            color: #f0f0f0;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-item p {
+            font-size: 1em;
+            color: #c0c0c0;
+            line-height: 1.6;
+        }
+
+
+        /* Dynamic Progress Bar Colors */
+        .progress-low {
+            background-color: #dc3545 !important;
+        }
+        .progress-medium {
+            background-color: #ffc107 !important;
+        }
+        .progress-high {
+            background-color: #28a745 !important;
+        }
+
+        /* Start Screen Styling */
+        /* Removed gradient and hover transform for quiz length buttons */
+        .start-screen .quiz-length-button {
+            /* This will be hidden as we only have one quiz now */
+            display: none;
+        }
+
+        /* Share Container and Buttons Styling */
+        .share-container {
+            margin-top: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .share-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .share-buttons p {
+            margin: 0;
+            font-size: 1.1em;
+            color: #e0e0e0;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .share-button {
+            background-color: #0a1a2f;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(10, 26, 47, 0.3);
+        }
+
+        .share-button:hover {
+            background-color: #1a2a3f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(10, 26, 47, 0.4);
+        }
+
+        /* Restart Quiz Button Styling */
+        .restart-quiz-button {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .restart-quiz-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+        }
+
+        /* Message for Copy Link */
+        .copy-message {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #28a745;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            font-weight: 500;
+        }
+        .copy-message.show {
+            opacity: 1;
+        }
+
+        /* Loading indicator */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* This ensures it's hidden by default on page load */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.5em;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #0a1a2f;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em; /* Adjusted for smaller screens */
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            .quiz-container, .result-container, .start-screen {
+                padding: 20px;
+            }
+            .option-button, .next-button, .start-screen .quiz-length-button {
+                font-size: 1em;
+                padding: 12px 15px;
+            }
+            .start-screen .quiz-length-button span {
+                font-size: 0.7em;
+            }
+            .area-score-item strong {
+                font-size: 1.2em; /* Keep size for the emoji and category name */
+            }
+            .area-score-item strong span {
+                font-size: 1.2em;
+                margin-left: auto;
+            }
+            .area-score-item p {
+                display: none;
+            }
+            .share-button {
+                font-size: 0.85em;
+                padding: 8px 15px;
+            }
+            .restart-quiz-button {
+                font-size: 1.1em;
+                padding: 12px 25px;
+            }
+            .share-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            .share-buttons p {
+                white-space: normal;
+            }
+            .recommendations-section h3 {
+                font-size: 1.4em;
+            }
+            .recommendation-category {
+                display: none;
+            }
+            .detailed-feedback {
+                font-size: 1.1em; /* Adjusted for smaller screens too */
+            }
+            .recommendation-item h4 {
+                font-size: 1.2em;
+            }
+            .recommendation-item p {
+                font-size: 0.95em;
+            }
+
+            /* Testimonial adjustments for mobile */
+            .testimonial-card {
+                padding: 15px;
+            }
+            .testimonial-card p {
+                font-size: 0.9em;
+            }
+            .testimonial-card .stars {
+                font-size: 1.3em;
+            }
+             .top-stars {
+                font-size: 1.8em; /* Adjust for smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em; /* Further adjustment for small phones */
+            }
+            h2 {
+                font-size: 1.1em;
+            }
+            .option-button {
+                padding: 10px 15px;
+            }
+            .next-button {
+                padding: 10px 20px;
+            }
+            .start-screen .quiz-length-button {
+                font-size: 1em;
+                padding: 12px 20px;
+            }
+            .share-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .share-button {
+                width: 100%;
+                max-width: none;
+            }
+            .score-display-container h2 {
+                font-size: 2em;
+            }
+            .feedback-display {
+                font-size: 1em;
+            }
+            .recommendations-section h3 {
+                font-size: 1.2em;
+            }
+            .recommendation-category {
+                display: none;
+            }
+            .detailed-feedback {
+                font-size: 1em; /* Adjusted for smallest screens too */
+            }
+            .recommendation-item h4 {
+                font-size: 1.1em;
+            }
+            .recommendation-item p {
+                font-size: 0.85em;
+            }
+             .top-stars {
+                font-size: 1.6em; /* Adjust for smallest screens */
+            }
+        }
+
+        /* New styles for testimonials */
+        .testimonials-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3a;
+            text-align: center;
+            width: 100%; /* Ensure it spans the container width */
+        }
+
+        .testimonials-section h3 {
+            color: #f0f0f0;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+
+        .testimonial-card {
+            background-color: #2a2a2a; /* Match other content blocks */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .testimonial-card p {
+            font-size: 1em;
+            color: #c0c0c0;
+            margin-bottom: 10px;
+        }
+
+        .testimonial-card .stars {
+            color: #ffd700; /* Gold color for stars */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            letter-spacing: 2px; /* Space out stars a bit */
+        }
+
+        .testimonial-card .author {
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #a0a0a0;
+            margin-top: 15px;
+        }
+
+        /* New Lead Magnet Section on Results Page */
+        .lead-magnet-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #3a3a3a;
+            text-align: center;
+            width: 100%;
+        }
+
+        .lead-magnet-section h3 {
+            color: #f0f0f0;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .lead-magnet-section p {
+            font-size: 1.1em;
+            color: #c0c0c0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Adjust iframe for responsiveness within its container */
+        .lead-magnet-section iframe {
+            width: 100%; /* Make iframe responsive */
+            max-width: 660px; /* Keep original max-width */
+            height: 412px; /* Maintain original height */
+        }
+
+        /* New: Top 5-star rating */
+        .top-stars {
+            color: #ffd700; /* Gold color for stars */
+            font-size: 2.5em; /* Large size */
+            margin-bottom: 10px;
+            letter-spacing: 3px; /* More spacing for prominence */
+            animation: pulse 1.5s infinite alternate; /* Subtle pulse animation */
+            text-align: center; /* Ensure centered */
+            width: 100%; /* Take full width to center */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* Specific styling for the Start Quiz Button */
+        #startQuizBtn {
+            background-color: #28a745; /* A vibrant green */
+            background-image: linear-gradient(to right, #28a745, #218838); /* Subtle gradient for depth */
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4); /* Green glow */
+            color: #ffffff;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 15px auto;
+            width: calc(100% - 20px);
+            max-width: 350px;
+            display: block;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Text shadow for better contrast */
+        }
+
+        #startQuizBtn:hover {
+            background-color: #218838; /* Darker green on hover */
+            background-image: linear-gradient(to right, #218838, #28a745); /* Reversed gradient on hover */
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5); /* Stronger glow */
+            transform: translateY(-3px); /* Lift effect */
+        }
+
+        /* Styling for the AI-Powered text and icon */
+        .ai-powered-tag {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: -10px; /* Adjust to position correctly below title */
+            margin-bottom: 20px;
+            color: #8c8c8c; /* Slightly darker than subtitle */
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .ai-powered-tag svg {
+            width: 20px;
+            height: 20px;
+            fill: #ffd700; /* Gold color for the icon */
+        }
+
+        /* New style for the tip during open-ended questions */
+        .tip-message {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #b0b0b0; /* Light grey for subtle tip */
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loadingMessage">Generating personalized insights...</p>
+    </div>
+
+    <header>
+        <!-- Place your logo URL here -->
+        <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
+        <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div> <!-- New 5-star rating -->
+        <h1>Health Score</h1>
+        <p class="subtitle">By HealthMax</p>
+        <!-- AI-Powered tag with Gemini-like icon -->
+        <div class="ai-powered-tag">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.92 14.5c-.32.32-.86.32-1.18 0l-2.48-2.48c-.32-.32-.32-.86 0-1.18l2.48-2.48c.32-.32.86-.32 1.18 0l2.48 2.48c.32.32.32.86 0 1.18l-2.48 2.48zm8.92-8.5c-.32-.32-.86-.32-1.18 0L12 12.08l-2.48-2.48c-.32-.32-.86-.32-1.18 0s-.32.86 0 1.18l3.07 3.07c.32.32.86.32 1.18 0l3.07-3.07c.32-.32.32-.86 0-1.18z"/>
+            </svg>
+            <span>AI-Powered Insights</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- User Status Bar - Entirely removed as authentication is removed -->
+
+        <!-- Start Screen (visible by default) -->
+        <div id="startScreen" class="start-screen">
+            <div class="intro-text">
+                <h2>Your Health Score Journey Starts Here!</h2>
+                <p>Discover your personalized health score. This insightful, **completely free and accurate** quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
+            </div>
+            <button id="startQuizBtn" class="next-button">Get My Score <span>(~7 min)</span></button>
+
+            <!-- Testimonials Section -->
+            <div class="testimonials-section">
+                <h3>What people are saying about HealthMax</h3>
+                <div class="testimonial-card">
+                    <p>"This quiz gave me such clear insights! It's beautifully designed and genuinely helpful. My health journey feels much clearer now."</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="author">- Sarah L.</p>
+                </div>
+                <div class="testimonial-card">
+                    <p>"A truly premium experience. The personalized recommendations are spot on and actionable. Highly recommended!"</p>
+                    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="author">- Mark T.</p>
+                </div>
+            </div>
+            <!-- Removed Beehiiv Email Form from Start Screen -->
+        </div>
+
+        <!-- Progress Bar Container (Overall quiz progress) -->
+        <div class="progress-bar-container hidden">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quizContainer" class="quiz-container hidden">
+            <h2 id="questionDisplay"></h2>
+            <div id="optionsContainer" class="options-container">
+                <!-- Question options (buttons or textarea) will be dynamically added here by JavaScript -->
+            </div>
+            <p id="quizTip" class="tip-message hidden">Tip: The more detailed your answers, the better your personalized analysis!</p>
+            <button id="nextButton" class="next-button" disabled>Next</button>
+        </div>
+
+        <!-- Result Container (initially hidden) -->
+        <div id="resultContainer" class="result-container hidden">
+            <div class="score-display-container">
+                <h2 id="overallScoreDisplay">Your Overall Health Score</h2>
+                <div class="progress-bar-container">
+                    <div id="overallProgressBarFill" class="overall-progress-fill"></div>
+                </div>
+            </div>
+            <p class="feedback-display"></p>
+
+            <div class="area-scores">
+                <h3>Your Scores by Area:</h3>
+                <div id="nutritionScore" class="area-score-item">
+                    <strong>🍎 Nutrition<span id="nutritionPoints"></span></strong>
+                    <div class="area-progress-container">
+                        <div id="nutritionProgressBarFill" class="area-progress-fill"></div>
+                    </div>
+                </div>
+                <div id="exerciseScore" class="area-score-item">
+                    <strong>🏃‍♂️ Exercise<span id="exercisePoints"></span></strong>
+                    <div class="area-progress-container">
+                        <div id="exerciseProgressBarFill" class="area-progress-fill"></div>
+                    </div>
+                </div>
+                <div id="sleepScore" class="area-score-item">
+                    <strong>😴 Sleep<span id="sleepPoints"></span></strong>
+                    <div class="area-progress-container">
+                        <div id="sleepProgressBarFill" class="area-progress-fill"></div>
+                    </div>
+                </div>
+                <div id="mentalScore" class="area-score-item">
+                    <strong>🧠 Mental Well-being<span id="mentalPoints"></span></strong>
+                    <div class="area-progress-container">
+                        <div id="mentalProgressBarFill" class="area-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="share-container">
+                <div class="share-buttons">
+                    <p>Share your results!</p>
+                    <button id="copyLinkBtn" class="share-button">Copy Link</button>
+                </div>
+                <div id="copyMessage" class="copy-message">Link copied!</div>
+            </div>
+
+            <button id="restartQuizBtn" class="restart-quiz-button">Retake Quiz</button>
+
+            <!-- Consolidated Recommendations Section -->
+            <div id="allDetailedRecommendations" class="recommendations-section">
+                <h3>Our Personalized Recommendations</h3>
+                <!-- Detailed feedback items will be appended here by JavaScript -->
+            </div>
+
+            <!-- New Lead Magnet Section on Results Page -->
+            <div id="leadMagnetSection" class="lead-magnet-section">
+                <h3>Unlock Your Full Health Potential!</h3>
+                <p>Want a personalized 7-Day Action Plan and exclusive health insights tailored just for you?</p>
+                <!-- START BEEHIIV FORM CODE -->
+                <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 660px; height: 412px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+                <!-- END BEEHIIV FORM CODE -->
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        // Define questions for each category, now multiple-choice first, then open-ended
+        const healthCategories = [
+            {
+                name: "nutrition",
+                questions: [
+                    {
+                        question: "How many servings of fruits and vegetables do you typically consume per day?",
+                        type: "multiple-choice",
+                        options: [
+                            { text: "0-1 serving", score: 5 },
+                            { text: "2-3 servings", score: 10 },
+                            { text: "4-5 servings", score: 15 },
+                            { text: "6+ servings", score: 20 }
+                        ]
+                    },
+                    {
+                        question: "Describe your daily eating patterns:<br>- Meals, snacks, beverages.<br>- Major challenges in maintaining a healthy diet.<br>- How current choices affect your energy and mood.",
+                        type: "open-text",
+                        maxPoints: 25 
+                    }
+                ]
+            },
+            {
+                name: "exercise",
+                questions: [
+                    {
+                        question: "How many days per week do you engage in moderate to intense physical activity (e.g., brisk walking, jogging, sports) for at least 30 minutes?",
+                        type: "multiple-choice",
+                        options: [
+                            { text: "0 days", score: 5 },
+                            { text: "1-2 days", score: 10 },
+                            { text: "3-4 days", score: 15 },
+                            { text: "5+ days", score: 20 }
+                        ]
+                    },
+                    {
+                        question: "How do you integrate daily physical activity outside of planned workouts?<br>- Main obstacles to consistency.<br>- What motivates you most to stay active?",
+                        type: "open-text",
+                        maxPoints: 25 
+                    }
+                ]
+            },
+            {
+                name: "sleep",
+                questions: [
+                    {
+                        question: "On average, how many hours of restful sleep do you get per night?",
+                        type: "multiple-choice",
+                        options: [
+                            { text: "Less than 5 hours", score: 5 },
+                            { text: "5-6 hours", score: 10 },
+                            { text: "7-8 hours", score: 20 },
+                            { text: "More than 9 hours", score: 15 }
+                        ]
+                    },
+                    {
+                        question: "Describe your evening winding-down routine and sleep environment.<br>- Habits or external factors that improve or disrupt your sleep.<br>- Your biggest struggles or challenges with restful sleep.",
+                        type: "open-text",
+                        maxPoints: 25 
+                    }
+                ]
+            },
+            {
+                name: "mental",
+                questions: [
+                    {
+                        question: "How often do you feel overwhelmed or highly stressed in a typical week?",
+                        type: "multiple-choice",
+                        options: [
+                            { text: "Rarely", score: 20 },
+                            { text: "Sometimes", score: 15 },
+                            { text: "Often", score: 10 },
+                            { text: "Most of the time", score: 5 }
+                        ]
+                    },
+                    {
+                        question: "What practices do you use to manage stress or promote mental well-being?<br>- Aspect of your mental health needing most attention (e.g., anxiety, focus, resilience, mood).<br>- Your biggest mental health challenges.",
+                        type: "open-text",
+                        maxPoints: 25 
+                    }
+                ]
+            }
+        ];
+
+        // Flatten the questions for sequential display
+        let currentQuestions = [];
+        healthCategories.forEach(category => {
+            category.questions.forEach(q => {
+                currentQuestions.push({ ...q, category: category.name });
+            });
+        });
+
+        // Quiz state variables
+        let currentQuestionIndex = 0;
+        let userScores = {
+            nutrition: 0,
+            exercise: 0,
+            sleep: 0,
+            mental: 0
+        };
+        let maxPossibleScores = {
+            nutrition: 0,
+            exercise: 0,
+            sleep: 0,
+            mental: 0
+        };
+        let userFeedback = {
+            nutrition: [], 
+            exercise: [],
+            sleep: [],
+            mental: []
+        };
+        let selectedOption = null; // To track selected option for multiple choice
+
+        // DOM elements
+        const startScreen = document.getElementById('startScreen');
+        const quizContainer = document.getElementById('quizContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const questionDisplay = document.getElementById('questionDisplay');
+        const optionsContainer = document.getElementById('optionsContainer'); 
+        const nextButton = document.getElementById('nextButton');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const overallProgressBarFill = document.getElementById('overallProgressBarFill');
+        const overallScoreDisplay = document.getElementById('overallScoreDisplay');
+        const feedbackDisplay = document.querySelector('.feedback-display');
+        const nutritionPointsSpan = document.getElementById('nutritionPoints');
+        const exercisePointsSpan = document.getElementById('exercisePoints');
+        const sleepPointsSpan = document.getElementById('sleepPoints');
+        const mentalPointsSpan = document.getElementById('mentalPoints');
+        const nutritionProgressBarFill = document.getElementById('nutritionProgressBarFill');
+        const exerciseProgressBarFill = document.getElementById('exerciseProgressBarFill');
+        const sleepProgressBarFill = document.getElementById('sleepProgressBarFill');
+        const mentalProgressBarFill = document.getElementById('mentalProgressBarFill');
+        const allDetailedRecommendations = document.getElementById('allDetailedRecommendations');
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const copyMessage = document.getElementById('copyMessage');
+        const restartQuizBtn = document.getElementById('restartQuizBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const quizTip = document.getElementById('quizTip'); // Get the tip element
+
+        // Event Listener for the single Start Quiz button
+        document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+
+        // Event Listener for Next Button
+        nextButton.addEventListener('click', () => {
+            const questionData = currentQuestions[currentQuestionIndex];
+            if (questionData.type === 'open-text') {
+                // Check if textarea has content for open questions
+                if (document.getElementById('openAnswerTextarea') && document.getElementById('openAnswerTextarea').value.trim() !== '') {
+                    processAnswer();
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        displayQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                }
+            } else if (questionData.type === 'multiple-choice') {
+                // Check if an option is selected for multiple choice questions
+                if (selectedOption !== null) {
+                    processAnswer();
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        displayQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                }
+            }
+        });
+
+        // Event Listener for Restart Quiz Button
+        restartQuizBtn.addEventListener('click', restartQuiz);
+
+        // Event Listener for Copy Link Button
+        copyLinkBtn.addEventListener('click', copyShareLink);
+
+        /**
+         * Initializes the quiz.
+         */
+        function startQuiz() {
+            // Reset scores and feedback for a new quiz
+            userScores = { nutrition: 0, exercise: 0, sleep: 0, mental: 0 };
+            maxPossibleScores = { nutrition: 0, exercise: 0, sleep: 0, mental: 0 };
+            userFeedback = { nutrition: [], exercise: [], sleep: [], mental: [] };
+            currentQuestionIndex = 0;
+            selectedOption = null; 
+            nextButton.disabled = true;
+
+            // Calculate max possible scores for all questions
+            healthCategories.forEach(category => {
+                category.questions.forEach(q => {
+                    if (q.type === 'open-text') {
+                        maxPossibleScores[category.name] += q.maxPoints;
+                    } else if (q.type === 'multiple-choice') {
+                        const maxOptionScore = q.options.reduce((max, opt) => Math.max(max, opt.score), 0);
+                        maxPossibleScores[category.name] += maxOptionScore;
+                    }
+                });
+            });
+
+            startScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            document.querySelector('.progress-bar-container').classList.remove('hidden'); // Show global progress bar
+            displayQuestion();
+        }
+
+        /**
+         * Displays the current question and its options (textarea for open-ended or buttons for multiple-choice).
+         */
+        function displayQuestion() {
+            const questionData = currentQuestions[currentQuestionIndex];
+            questionDisplay.innerHTML = questionData.question; // Use innerHTML to render line breaks
+            optionsContainer.innerHTML = ''; // Clear previous content
+            selectedOption = null; // Reset selected option for new question
+            nextButton.disabled = true; // Disable next button initially
+
+            if (questionData.type === 'open-text') {
+                const textarea = document.createElement('textarea');
+                textarea.id = 'openAnswerTextarea';
+                textarea.placeholder = "Type your detailed response here...";
+                textarea.rows = 6;
+                textarea.classList.add('open-answer-textarea'); // Specific class for textarea styling
+                textarea.style.textAlign = 'left';
+                textarea.style.resize = 'vertical';
+                textarea.style.minHeight = '100px';
+                textarea.style.padding = '15px';
+                optionsContainer.appendChild(textarea);
+
+                textarea.addEventListener('input', () => {
+                    nextButton.disabled = textarea.value.trim() === '';
+                });
+                nextButton.disabled = textarea.value.trim() === ''; // Set initial state based on empty textarea
+                quizTip.classList.remove('hidden'); // Show the tip for open questions
+            } else if (questionData.type === 'multiple-choice') {
+                questionData.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-button');
+                    button.textContent = option.text;
+                    button.dataset.score = option.score; // Store score in dataset
+                    button.addEventListener('click', () => {
+                        // Deselect all other buttons
+                        document.querySelectorAll('.option-button').forEach(btn => {
+                            btn.classList.remove('selected');
+                        });
+                        // Select this button
+                        button.classList.add('selected');
+                        selectedOption = option; // Store the selected option object
+                        nextButton.disabled = false; // Enable next button
+                    });
+                    optionsContainer.appendChild(button);
+                });
+                quizTip.classList.add('hidden'); // Hide the tip for multiple-choice questions
+            }
+            updateProgressBar();
+        }
+
+        /**
+         * Processes the user's answer, updates scores and feedback.
+         */
+        function processAnswer() {
+            const questionData = currentQuestions[currentQuestionIndex];
+            
+            if (questionData.type === 'open-text') {
+                const textArea = document.getElementById('openAnswerTextarea');
+                const answerText = textArea.value.trim();
+
+                userScores[questionData.category] += questionData.maxPoints; 
+                
+                userFeedback[questionData.category].push({
+                    question: questionData.question,
+                    answer: answerText,
+                    openAnswer: answerText,
+                    feedback: "Detailed insights provided by user.",
+                    scoreImpact: questionData.maxPoints,
+                    maxScoreForQuestion: questionData.maxPoints
+                });
+            } else if (questionData.type === 'multiple-choice') {
+                if (selectedOption) {
+                    userScores[questionData.category] += selectedOption.score;
+                    userFeedback[questionData.category].push({
+                        question: questionData.question,
+                        answer: selectedOption.text,
+                        feedback: `Selected: ${selectedOption.text}`,
+                        scoreImpact: selectedOption.score,
+                        maxScoreForQuestion: questionData.options.reduce((max, opt) => Math.max(max, opt.score), 0)
+                    });
+                }
+            }
+        }
+
+        /**
+         * Updates the overall quiz progress bar.
+         */
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            progressBarFill.style.width = `${progress}%`;
+            if (progress < 40) {
+                progressBarFill.classList.remove('progress-medium', 'progress-high');
+                progressBarFill.classList.add('progress-low');
+            } else if (progress < 75) {
+                progressBarFill.classList.remove('progress-low', 'progress-high');
+                progressBarFill.classList.add('progress-medium');
+            } else {
+                progressBarFill.classList.remove('progress-low', 'progress-medium');
+                progressBarFill.classList.add('progress-high');
+            }
+        }
+
+        /**
+         * Finishes the quiz, calculates overall score, and displays results.
+         */
+        async function finishQuiz() {
+            quizContainer.classList.add('hidden');
+            document.querySelector('.progress-bar-container').classList.add('hidden'); // Hide global progress bar
+
+            showLoading('Generating personalized insights...');
+
+            try {
+                let totalUserScore = 0;
+                let totalMaxScore = 0;
+                for (const category in userScores) {
+                    totalUserScore += userScores[category];
+                    totalMaxScore += maxPossibleScores[category];
+                }
+                
+                const overallScorePercentage = totalMaxScore > 0 ? Math.round((totalUserScore / totalMaxScore) * 100) : 0;
+                overallScoreDisplay.textContent = `Your Overall Health Score: ${overallScorePercentage}`; 
+                overallProgressBarFill.style.width = `${overallScorePercentage}%`;
+                updateProgressBarColor(overallProgressBarFill, overallScorePercentage);
+
+                let overallFeedback = '';
+                if (overallScorePercentage < 40) {
+                    overallFeedback = "Your current health score suggests there are several areas where small, consistent improvements can lead to significant positive changes. This is a great starting point for your health journey!";
+                } else if (overallScorePercentage < 75) {
+                    overallFeedback = "You have a solid foundation for good health! With a few targeted adjustments, you can further optimize your well-being. Focus on the areas highlighted in your personalized recommendations.";
+                } else {
+                    overallFeedback = "Outstanding work! Your health score indicates a strong commitment to your well-being. Keep up these excellent habits and explore advanced strategies to maintain your vitality.";
+                }
+                feedbackDisplay.textContent = overallFeedback;
+
+                for (const category in userScores) {
+                    const pointsSpan = document.getElementById(`${category}Points`);
+                    const progressBarFillElement = document.getElementById(`${category}ProgressBarFill`);
+                    
+                    const categoryUserScore = userScores[category];
+                    const categoryMaxScore = maxPossibleScores[category];
+                    const categoryPercentage = categoryMaxScore > 0 ? Math.round((categoryUserScore / categoryMaxScore) * 100) : 0;
+
+                    pointsSpan.textContent = categoryPercentage; 
+                    progressBarFillElement.style.width = `${categoryPercentage}%`;
+                    updateProgressBarColor(progressBarFillElement, categoryPercentage);
+                }
+
+                await generateAndDisplayDetailedRecommendations();
+
+                resultContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error("Error during quiz finalization or recommendation generation:", error);
+                loadingMessage.textContent = "An error occurred. Please try again later.";
+                setTimeout(() => {
+                    hideLoading();
+                    resultContainer.classList.remove('hidden'); 
+                }, 2000);
+            }
+        }
+
+        /**
+         * Updates the progress bar color based on the percentage.
+         * @param {HTMLElement} element - The progress bar fill element.
+         * @param {number} percentage - The percentage score.
+         */
+        function updateProgressBarColor(element, percentage) {
+            element.classList.remove('progress-low', 'progress-medium', 'progress-high');
+            if (percentage < 40) {
+                element.classList.add('progress-low');
+            } else if (percentage < 75) {
+                element.classList.add('progress-medium');
+            } else {
+                element.classList.add('progress-high');
+            }
+        }
+
+        /**
+         * Generates and displays detailed recommendations using a Gemini API call.
+         */
+        async function generateAndDisplayDetailedRecommendations() {
+            showLoading('Generating personalized recommendations...');
+            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>'; 
+
+            const promptParts = [];
+            for (const category in userFeedback) {
+                if (userFeedback[category].length > 0) {
+                    const categoryUserScore = userScores[category];
+                    const categoryMaxScore = maxPossibleScores[category];
+                    const categoryPercentage = categoryMaxScore > 0 ? Math.round((categoryUserScore / categoryMaxScore) * 100) : 0;
+
+                    promptParts.push(`\n---`); 
+                    promptParts.push(`For the ${category} category, the user's overall score was ${categoryPercentage} (a numerical value representing percentage).`);
+                    
+                    userFeedback[category].forEach(item => {
+                        promptParts.push(`- Question: "${item.question.replace(/<br>/g, ' ')}"`); // Remove <br> for prompt clarity
+                        promptParts.push(`  User's response: "${item.answer}"`); 
+                    });
+                }
+            }
+
+            const prompt = `Based on the following quiz results and the user's detailed responses, provide a concise, consolidated, and encouraging summary of personalized health recommendations.
+Format your response as a JSON array of objects. Each object in the array should have two properties:
+1.  "title": A concise heading for the recommendation (e.g., "Nutrition Focus", "Improved Sleep Hygiene").
+2.  "recommendation": A brief and actionable explanation of the advice.
+
+The overall JSON output should contain 3-5 distinct recommendations. Focus on highlighting key areas for improvement and offering actionable, general advice across all areas combined. Crucially, your advice should emphasize identifying areas for improvement and providing concrete, actionable steps to address any challenges or weaknesses explicitly mentioned or implicitly suggested by the user's detailed answers. Do not shy away from constructively highlighting where progress can be made, even if a category's overall numerical score appears high. Your tone should remain supportive and encouraging, but firmly focused on growth and optimization. The scores mentioned in the input are numerical values representing percentages. Do not explicitly use the word "percentage" or the "%" symbol in your generated recommendations, and integrate the score information naturally into the text if relevant.
+
+Here are the user's detailed results:\n\n` + promptParts.join('\n');
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json", // Request JSON output
+                    maxOutputTokens: 4096 // Increased maxOutputTokens
+                }
+            };
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            let response;
+            let result;
+            const maxRetries = 5;
+            let attempt = 0;
+
+            while (attempt < maxRetries) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0 &&
+                        result.candidates[0].content.parts[0].text) { 
+                        const summaryText = result.candidates[0].content.parts[0].text;
+                        
+                        try {
+                            const recommendations = JSON.parse(summaryText);
+                            if (Array.isArray(recommendations)) {
+                                recommendations.forEach(rec => {
+                                    const recItem = document.createElement('div');
+                                    recItem.classList.add('recommendation-item');
+
+                                    const recTitle = document.createElement('h4');
+                                    recTitle.textContent = rec.title;
+                                    recItem.appendChild(recTitle);
+
+                                    const recDescription = document.createElement('p');
+                                    recDescription.textContent = rec.recommendation;
+                                    recItem.appendChild(recDescription);
+
+                                    allDetailedRecommendations.appendChild(recItem);
+                                });
+                            } else {
+                                // Fallback if AI returns JSON but not an array
+                                console.warn("AI returned JSON, but it's not an array:", recommendations);
+                                const feedbackItem = document.createElement('p');
+                                feedbackItem.classList.add('detailed-feedback');
+                                feedbackItem.textContent = summaryText;
+                                allDetailedRecommendations.appendChild(feedbackItem);
+                            }
+                        } catch (jsonError) {
+                            // Fallback if AI does not return valid JSON
+                            console.error("Failed to parse AI response as JSON:", jsonError);
+                            const feedbackItem = document.createElement('p');
+                            feedbackItem.classList.add('detailed-feedback');
+                            feedbackItem.textContent = summaryText; // Display as plain text
+                            allDetailedRecommendations.appendChild(feedbackItem);
+                        }
+                        break; 
+                    } else {
+                        console.error("Unexpected API response structure or missing text content:", result);
+                        throw new Error("Invalid API response format: Missing text content.");
+                    }
+                } catch (error) {
+                    console.error(`API call attempt ${attempt + 1} failed:`, error);
+                    attempt++;
+                    if (attempt < maxRetries) {
+                        const delay = Math.pow(2, attempt) * 1000; 
+                        await new Promise(res => setTimeout(res, delay));
+                    } else {
+                        console.error("Max retries reached. Failed to generate recommendations.");
+                        const errorDiv = document.createElement('p');
+                        errorDiv.classList.add('detailed-feedback');
+                        errorDiv.style.borderColor = '#dc3545';
+                        errorDiv.textContent = "We couldn't generate detailed recommendations at this moment. Please try again or retake the quiz.";
+                        allDetailedRecommendations.appendChild(errorDiv);
+                    }
+                }
+            }
+            hideLoading();
+        }
+
+
+        /**
+         * Resets the quiz to the start screen.
+         */
+        function restartQuiz() {
+            quizContainer.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            document.querySelector('.progress-bar-container').classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>';
+        }
+
+        /**
+         * Shows the loading overlay with an optional message.
+         * @param {string} message - The message to display during loading.
+         */
+        function showLoading(message = 'Loading...') {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.style.display = 'flex'; 
+        }
+
+        /**
+         * Hides the loading overlay.
+         */
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+            loadingOverlay.style.display = 'none'; 
+        }
+
+        /**
+         * Copies the current page URL to the clipboard.
+         */
+        function copyShareLink() {
+            const currentUrl = window.location.href;
+            const tempInput = document.createElement('input');
+            document.body.appendChild(tempInput);
+            tempInput.value = currentUrl;
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            copyMessage.classList.add('show');
+            setTimeout(() => {
+                copyMessage.classList.remove('show');
+            }, 3000); 
+        }
+
+        // Initialize quiz
+        // Note: No initial displayQuestion() or startQuiz() call here.
+        // The start screen handles the initial interaction.
+    </script>
+</body>
+</html>
