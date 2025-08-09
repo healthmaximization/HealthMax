@@ -1181,7 +1181,15 @@
             }
 
             if (isValid) {
-                processAnswer();
+                // If it's an open-text question, we need to await the scoring
+                if (questionData.type === 'open-text') {
+                    showLoading('Evaluating your answer with AI...'); // Specific loading message
+                    await processAnswer(); // Await the async function
+                    hideLoading(); // Hide loading after scoring
+                } else {
+                    processAnswer();
+                }
+
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
                     // Start fade out animation
@@ -1318,37 +1326,128 @@
 
         /**
          * Processes the user's answer, updates scores and feedback.
+         * Now an async function to accommodate AI scoring.
          */
-        function processAnswer() {
+        async function processAnswer() {
             const questionData = currentQuestions[currentQuestionIndex];
-            
+            let scoreEarned = 0; // Initialize score earned for the current question
+
             if (questionData.type === 'open-text') {
                 const textArea = document.getElementById('openAnswerTextarea');
                 const answerText = textArea.value.trim();
+                const textLength = answerText.length;
 
-                userScores[questionData.category] += questionData.maxPoints; 
+                if (textLength < 20) {
+                    scoreEarned = Math.floor(questionData.maxPoints * 0.1); // 10% for very brief answers
+                } else if (textLength < 100) {
+                    scoreEarned = Math.floor(questionData.maxPoints * 0.3); // 30% for moderately brief answers
+                } else {
+                    // For 100+ characters, use AI for qualitative scoring
+                    try {
+                        const aiScore = await getAiQualityScore(questionData.question, answerText); // Await AI score
+                        scoreEarned = Math.floor(questionData.maxPoints * aiScore);
+                    } catch (error) {
+                        console.error("Error getting AI quality score:", error);
+                        scoreEarned = Math.floor(questionData.maxPoints * 0.1); // Fallback to a very low score on AI error
+                        loadingMessage.textContent = "AI scoring failed. Assigning minimal points for this answer.";
+                        setTimeout(() => { hideLoading(); }, 2000); // Show message briefly
+                    }
+                }
+
+                userScores[questionData.category] += scoreEarned; 
                 
                 userFeedback[questionData.category].push({
                     question: questionData.question,
                     answer: answerText,
                     openAnswer: answerText,
                     feedback: "Detailed insights provided by user.",
-                    scoreImpact: questionData.maxPoints,
+                    scoreImpact: scoreEarned, 
                     maxScoreForQuestion: questionData.maxPoints
                 });
             } else if (questionData.type === 'multiple-choice') {
                 if (selectedOption) {
-                    userScores[questionData.category] += selectedOption.score;
+                    scoreEarned = selectedOption.score;
+                    userScores[questionData.category] += scoreEarned;
                     userFeedback[questionData.category].push({
                         question: questionData.question,
                         answer: selectedOption.text,
                         feedback: `Selected: ${selectedOption.text}`,
-                        scoreImpact: selectedOption.score,
+                        scoreImpact: scoreEarned,
                         maxScoreForQuestion: questionData.options.reduce((max, opt) => Math.max(max, opt.score), 0)
                     });
                 }
             }
         }
+
+        /**
+         * Calls the Gemini API to get a qualitative score for an open-ended answer.
+         * @param {string} question - The original question text.
+         * @param {string} answer - The user's answer text.
+         * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
+         */
+        async function getAiQualityScore(question, answer) {
+            const prompt = `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
+Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
+
+Original Question: "${question}"
+User Answer: "${answer}"
+
+Provide only a JSON object with a single key 'score' and its numerical value (float). Example: { "score": 0.75 }`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    maxOutputTokens: 50 // Expecting a small JSON object
+                }
+            };
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const maxRetries = 3;
+            let attempt = 0;
+
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0 &&
+                        result.candidates[0].content.parts[0].text) {
+                        const jsonString = result.candidates[0].content.parts[0].text;
+                        const parsed = JSON.parse(jsonString);
+                        if (typeof parsed.score === 'number') {
+                            return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
+                        } else {
+                            console.warn("AI response did not contain a valid 'score' number:", parsed);
+                            throw new Error("Invalid AI score format.");
+                        }
+                    } else {
+                        console.error("Unexpected AI response structure:", result);
+                        throw new Error("AI response missing content.");
+                    }
+                } catch (error) {
+                    console.error(`AI scoring API call attempt ${attempt + 1} failed:`, error);
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        throw new Error("Failed to get AI score after multiple retries.");
+                    }
+                    const delay = Math.pow(2, attempt) * 1000; 
+                    await new Promise(res => setTimeout(res, delay));
+                }
+            }
+        }
+
 
         /**
          * Updates the overall quiz progress bar.
@@ -1555,19 +1654,11 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                 } catch (error) {
                     console.error(`API call attempt ${attempt + 1} failed:`, error);
                     attempt++;
-                    if (attempt < maxRetries) {
-                        const delay = Math.pow(2, attempt) * 1000; 
-                        await new Promise(res => setTimeout(res, delay));
-                    } else {
-                        console.error("Max retries reached. Failed to generate recommendations.");
-                        const errorDiv = document.createElement('p');
-                        errorDiv.classList.add('detailed-feedback');
-                        errorDiv.style.borderColor = '#dc3545';
-                        errorDiv.textContent = "We couldn't generate detailed recommendations at this moment. Please try again or retake the quiz.";
-                        allDetailedRecommendations.appendChild(errorDiv);
+                    if (attempt >= maxRetries) {
+                        throw new Error("Max retries reached. Failed to generate recommendations.");
                     }
-                    console.error("Max retries reached. Failed to generate recommendations.");
-                    break; // Break the loop after max retries
+                    const delay = Math.pow(2, attempt) * 1000; 
+                    await new Promise(res => setTimeout(res, delay));
                 }
             }
             hideLoading();
@@ -1633,4 +1724,3 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
     </script>
 </body>
 </html>
-
