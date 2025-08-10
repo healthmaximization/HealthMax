@@ -6,11 +6,24 @@
     <title>HealthMax - Your Journey to Optimal Health</title>
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WR8QD6X56N');
+    </script>
+
     <style>
         /* General styling for the body */
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364); /* Green-blue gradient */
+            background-size: 600% 600%; /* Make the background much larger for more movement */
+            animation: gradientAnimation 20s ease infinite; /* Apply animation - longer duration for smoother flow */
             color: #e0e0e0; /* Light gray text */
             display: flex;
             flex-direction: column;
@@ -20,6 +33,25 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        /* Keyframe animation for the background gradient - more dynamic movement */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 50% 100%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            75% {
+                background-position: 50% 0%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Container styling consistent with quiz */
@@ -165,9 +197,6 @@
             background-color: transparent;
         }
 
-        /* Testimonials Section (removed) */
-
-
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
             h1 { font-size: 2.2em; }
@@ -227,7 +256,7 @@
                 src="https://www.youtube.com/embed?listType=channel&list=UCq7q2g5N4k-x2Q1x4wQ8YdA&autoplay=0"
                 title="HealthMaximization YouTube Channel"
                 frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-in; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen>
             </iframe>
