@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Score Quiz</title>
     <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* General styling for the body */
         body {
@@ -1431,7 +1431,7 @@
         async function getAiQualityScore(question, answer) {
             // Dit is de URL van je Netlify Function. De naam van het bestand is 'gemini-proxy.js',
             // dus de endpoint wordt '/.netlify/functions/gemini-proxy'.
-            const functionUrl = '/.netlify/functions/gemini-proxy';
+            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`; // Fixed: Use absolute URL
 
             // Je stuurt de prompt naar je Netlify Function
             const payload = {
@@ -1630,7 +1630,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             // *** IMPORTANT: Now call the Netlify Function instead of direct Gemini API ***
-            const functionUrl = '/.netlify/functions/gemini-recommendations-proxy'; // Updated function name
+            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-recommendations-proxy`; // Fixed: Use absolute URL
             
             let response;
             let result;
@@ -1721,7 +1721,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
 
         /**
          * Shows the loading overlay with an optional message.
-         * @param {string} message - The message to display during loading.
+         * @param {string} message = 'Loading...' - The message to display during loading.
          */
         function showLoading(message = 'Loading...') {
             loadingMessage.textContent = message;
