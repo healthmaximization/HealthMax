@@ -717,7 +717,7 @@
         .testimonial-card .author-container {
             display: flex;
             align-items: center;
-            justify-content: center; /* Center the icon and text */
+            justify-content: center;
             margin-top: 15px;
             gap: 8px; /* Space between icon and name */
         }
@@ -904,6 +904,51 @@
             color: inherit; /* Inherit color from parent (li) */
         }
 
+        /* Styling for the main navigation */
+        .main-nav {
+            background-color: #1a1a1a;
+            width: 100%;
+            max-width: 600px; /* Same as quiz/page-section max-width */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px; /* Space below navigation */
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .main-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-nav a:hover {
+            background-color: #0a1a2f;
+            color: #ffffff;
+        }
+        
+        .main-nav a.active {
+            background-color: #0a1a2f;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .main-nav { 
+                flex-direction: column; 
+                gap: 10px; 
+            }
+            .main-nav a { 
+                width: calc(100% - 40px); /* Adjust width for full mobile width with padding */
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -927,6 +972,12 @@
             <span>AI-Powered Insights</span>
         </div>
     </header>
+
+    <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/tools/healthscore/" class="active">Tools</a>
+        <!-- Meer links kunnen hier komen (bijv. /blog/, /contact/) -->
+    </nav>
 
     <main>
         <!-- User Status Bar - Entirely removed as authentication is removed -->
