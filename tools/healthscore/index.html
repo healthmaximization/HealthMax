@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Score Quiz</title>
     <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WR8QD6X56N');
+    </script>
+
     <style>
         /* General styling for the body */
         body {
             font-family: 'Inter', sans-serif;
             /* Green-blue gradient background for a luxurious feel */
             background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
+            background-size: 600% 600%; /* Make the background much larger for smooth, subtle movement */
+            animation: gradientAnimation 20s ease infinite; /* Apply animation - longer duration for smoother flow */
             color: #e0e0e0; /* Light gray text color for dark mode */
             display: flex;
             flex-direction: column;
@@ -21,6 +34,19 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+        }
+
+        /* Keyframe animation for the background gradient - simplified for smoother effect */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Navigation bar (now empty as auth is removed) */
@@ -1690,8 +1716,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
 
             while (attempt < maxRetries) {
                 try {
-                    // Send the prompt to your Netlify Function
-                    response = await fetch(functionUrl, {
+                    const response = await fetch(functionUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ prompt: prompt }) // Send the full prompt in the body
