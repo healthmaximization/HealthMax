@@ -691,6 +691,9 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
             margin-bottom: 20px;
             text-align: center;
+            display: flex; /* Use flexbox to align icon and text */
+            flex-direction: column;
+            align-items: center;
         }
 
         .testimonial-card:hover {
@@ -711,12 +714,38 @@
             letter-spacing: 2px; /* Space out stars a bit */
         }
 
-        .testimonial-card .author {
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #a0a0a0;
+        .testimonial-card .author-container {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the icon and text */
             margin-top: 15px;
+            gap: 8px; /* Space between icon and name */
         }
+
+        .author-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em; /* Size of the initial/emoji inside the circle */
+            color: #ffffff; /* Color of the initial/emoji */
+            font-weight: 600;
+        }
+
+        .author-icon svg {
+            width: 60%; /* Make SVG fill the circle */
+            height: 60%; /* Make SVG fill the circle */
+            fill: currentColor; /* Inherit color from parent (author-icon) */
+        }
+
+        /* Specific colors for icons */
+        .icon-blue { background-color: #3498db; }
+        .icon-green { background-color: #2ecc71; }
+        .icon-purple { background-color: #9b59b6; }
+        .icon-orange { background-color: #e67e22; }
+
 
         /* New Lead Magnet Section on Results Page */
         .lead-magnet-section {
@@ -928,12 +957,26 @@
                 <div class="testimonial-card">
                     <p>"This quiz gave me such clear insights! It's beautifully designed and genuinely helpful. My health journey feels much clearer now."</p>
                     <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <p class="author">- Sarah L.</p>
+                    <div class="author-container">
+                        <span class="author-icon icon-blue">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4C14.21 4 16 5.79 16 8C16 10.21 14.21 12 12 12C9.79 12 8 10.21 8 8C8 5.79 9.79 4 12 4ZM12 14C16.42 14 20 15.79 20 20V22H4V20C4 15.79 7.58 14 12 14Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <p class="author">- Sarah L.</p>
+                    </div>
                 </div>
                 <div class="testimonial-card">
                     <p>"A truly premium experience. The personalized recommendations are spot on and actionable. Highly recommended!"</p>
                     <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <p class="author">- Mark T.</p>
+                    <div class="author-container">
+                        <span class="author-icon icon-green">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4C14.21 4 16 5.79 16 8C16 10.21 14.21 12 12 12C9.79 12 8 10.21 8 8C8 5.79 9.79 4 12 4ZM12 14C16.42 14 20 15.79 20 20V22H4V20C4 15.79 7.58 14 12 14Z" fill="currentColor"/>
+                            </svg>
+                        </span>
+                        <p class="author">- Mark T.</p>
+                    </div>
                 </div>
             </div>
             <!-- Removed Beehiiv Email Form from Start Screen -->
@@ -1724,3 +1767,4 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
     </script>
 </body>
 </html>
+
