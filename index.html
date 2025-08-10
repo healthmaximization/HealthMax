@@ -37,7 +37,7 @@
             max-width: 600px;
             width: 100%;
             text-align: center;
-            box-sizing: border-box;
+            box-sizing: border-sizing;
             margin-bottom: 20px;
             transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out; /* For smooth transitions between screens */
         }
@@ -1423,67 +1423,59 @@
         }
 
         /**
-         * Calls the Gemini API to get a qualitative score for an open-ended answer.
+         * Calls the Netlify Function to get a qualitative score for an open-ended answer.
          * @param {string} question - The original question text.
          * @param {string} answer - The user's answer text.
          * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
          */
         async function getAiQualityScore(question, answer) {
-            const prompt = `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
+            // Dit is de URL van je Netlify Function. De naam van het bestand is 'gemini-proxy.js',
+            // dus de endpoint wordt '/.netlify/functions/gemini-proxy'.
+            const functionUrl = '/.netlify/functions/gemini-proxy';
+
+            // Je stuurt de prompt naar je Netlify Function
+            const payload = {
+                prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
 Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
 
 Original Question: "${question}"
 User Answer: "${answer}"
 
-Provide only a JSON object with a single key 'score' and its numerical value (float). Example: { "score": 0.75 }`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-
-            const payload = {
-                contents: chatHistory,
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    maxOutputTokens: 50 // Expecting a small JSON object
-                }
+Provide only a JSON object with a single key 'score' and its numerical value (float). Example: { "score": 0.75 }`
             };
-
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const maxRetries = 3;
             let attempt = 0;
 
             while (attempt < maxRetries) {
                 try {
-                    const response = await fetch(apiUrl, {
+                    const response = await fetch(functionUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
+                    
                     const result = await response.json();
 
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0 &&
-                        result.candidates[0].content.parts[0].text) {
-                        const jsonString = result.candidates[0].content.parts[0].text;
+                    if (response.ok && result.success && typeof result.response === 'string') {
+                        // The 'response' from the Netlify Function is the JSON string from Gemini
+                        const jsonString = result.response;
                         const parsed = JSON.parse(jsonString);
                         if (typeof parsed.score === 'number') {
                             return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
                         } else {
-                            console.warn("AI response did not contain a valid 'score' number:", parsed);
+                            console.warn("AI returned invalid score format via Netlify Function:", parsed);
                             throw new Error("Invalid AI score format.");
                         }
                     } else {
-                        console.error("Unexpected AI response structure:", result);
-                        throw new Error("AI response missing content.");
+                        console.error("Netlify Function error or unexpected response:", result);
+                        throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
                     }
                 } catch (error) {
-                    console.error(`AI scoring API call attempt ${attempt + 1} failed:`, error);
+                    console.error(`Netlify Function call attempt ${attempt + 1} failed:`, error);
                     attempt++;
                     if (attempt >= maxRetries) {
-                        throw new Error("Failed to get AI score after multiple retries.");
+                        throw new Error("Failed to get AI score via Netlify Function after multiple retries.");
                     }
                     const delay = Math.pow(2, attempt) * 1000; 
                     await new Promise(res => setTimeout(res, delay));
@@ -1633,9 +1625,13 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                 }
             };
 
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            // This API key is no longer needed directly in the frontend
+            // const apiKey = ""; 
+            // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
+            // *** IMPORTANT: Now call the Netlify Function instead of direct Gemini API ***
+            const functionUrl = '/.netlify/functions/gemini-recommendations-proxy'; // Updated function name
+            
             let response;
             let result;
             const maxRetries = 5;
@@ -1643,18 +1639,17 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
 
             while (attempt < maxRetries) {
                 try {
-                    response = await fetch(apiUrl, {
+                    // Send the prompt to your Netlify Function
+                    response = await fetch(functionUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({ prompt: prompt }) // Send the full prompt in the body
                     });
                     result = await response.json();
 
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0 &&
-                        result.candidates[0].content.parts[0].text) { 
-                        const summaryText = result.candidates[0].content.parts[0].text;
+                    if (response.ok && result.success && typeof result.response === 'string') {
+                        // The 'response' from the Netlify Function is the JSON string from Gemini
+                        const summaryText = result.response;
                         
                         try {
                             const recommendations = JSON.parse(summaryText);
@@ -1691,8 +1686,8 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                         }
                         break; 
                     } else {
-                        console.error("Unexpected API response structure or missing text content:", result);
-                        throw new Error("Invalid API response format: Missing text content.");
+                        console.error("Netlify Function error or unexpected response:", result);
+                        throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
                     }
                 } catch (error) {
                     console.error(`API call attempt ${attempt + 1} failed:`, error);
@@ -1767,4 +1762,3 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
     </script>
 </body>
 </html>
-
