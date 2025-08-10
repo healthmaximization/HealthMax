@@ -1,1 +1,9 @@
 
+[build]
+  publish = "." # The directory where your built site is located (e.g., HTML, CSS, JS)
+  functions = "netlify/functions" # The directory where your serverless functions are
+
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
