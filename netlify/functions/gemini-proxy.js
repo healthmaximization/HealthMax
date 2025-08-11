@@ -1,15 +1,10 @@
 // netlify/functions/gemini-proxy.js
-// This function acts as a proxy to the Gemini API for scoring open-ended questions.
-const fetch = require('node-fetch'); // 'node-fetch' is commonly available in Netlify Functions runtime
+import fetch from 'node-fetch'; // 'node-fetch' is commonly available in Netlify Functions runtime
 
-// Main function that Netlify will execute when this endpoint is called
+// This is the main function that Netlify will execute when your endpoint is called
 exports.handler = async function(event, context) {
-    // ADDED THIS LINE FOR DEBUGGING - IT SHOULD BE THE FIRST THING TO LOG
-    console.log("gemini-proxy function handler starting..."); 
-
-    // Ensure the request method is POST
+    // Check if the request method is POST
     if (event.httpMethod !== 'POST') {
-        console.warn("Received non-POST request to gemini-proxy."); // Also log this
         return {
             statusCode: 405, // Method Not Allowed
             body: JSON.stringify({ message: "Only POST requests are allowed." }),
@@ -19,7 +14,6 @@ exports.handler = async function(event, context) {
 
     // Ensure there's a body to parse
     if (!event.body) {
-        console.warn("Request body is missing for gemini-proxy."); // Also log this
         return {
             statusCode: 400, // Bad Request
             body: JSON.stringify({ message: "Request body is missing." }),
@@ -31,8 +25,6 @@ exports.handler = async function(event, context) {
         // Parse the request body coming from your frontend
         const requestBody = JSON.parse(event.body);
         const { prompt } = requestBody; // Assuming your frontend sends { prompt: "..." }
-
-        console.log("Received prompt for gemini-proxy:", prompt ? prompt.substring(0, 100) + "..." : "empty"); // Log received prompt (truncated for brevity)
 
         // Get your API key securely from Netlify environment variables
         // This variable name must match the one you set in Netlify dashboard
@@ -48,21 +40,17 @@ exports.handler = async function(event, context) {
         }
 
         // Prepare the payload for the Gemini API call
+        // Explicitly tell Gemini to return raw JSON without markdown formatting
         const geminiPayload = {
             contents: [{ role: "user", parts: [{ text: prompt }] }],
-            // The responseMimeType is NOT set to application/json here
-            // because the prompt explicitly asks Gemini to return a JSON string
-            // as part of its text response (e.g., '{ "score": 0.75 }').
-            // We want Gemini's *text* output to *contain* JSON.
-            // If we set responseMimeType: "application/json" here, Gemini would
-            // try to fit the entire response into a structured JSON object directly,
-            // which can be more restrictive for natural language scoring.
+            generationConfig: {
+                responseMimeType: "application/json", // This hints to Gemini to return JSON
+                maxOutputTokens: 4096 
+            }
         };
 
         // Construct the Gemini API URL
         const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`;
-
-        console.log("Making call to Gemini API..."); // Log before API call
 
         // Make the call to the Gemini API
         const response = await fetch(geminiApiUrl, {
@@ -71,22 +59,34 @@ exports.handler = async function(event, context) {
             body: JSON.stringify(geminiPayload)
         });
 
-        console.log("Received response from Gemini API, status:", response.status); // Log API response status
-
         const result = await response.json();
 
-        // Check for successful response from Gemini and return its content
+        // Check for successful response from Gemini
         if (result.candidates && result.candidates.length > 0 &&
             result.candidates[0].content && result.candidates[0].content.parts &&
             result.candidates[0].content.parts.length > 0 &&
             result.candidates[0].content.parts[0].text) {
             
-            console.log("Successfully processed Gemini response."); // Log success
-            // Return the raw text from Gemini, which should be a JSON string like "{ "score": 0.75 }"
-            // The frontend will then parse this string.
+            let aiResponseText = result.candidates[0].content.parts[0].text;
+            
+            // --- NEW: Strip markdown code block wrappers ---
+            // Example: "```json\n{ \"score\": 0.75 }\n```" -> "{ \"score\": 0.75 }"
+            const jsonStartMarker = '```json';
+            const jsonEndMarker = '```';
+
+            if (aiResponseText.startsWith(jsonStartMarker)) {
+                aiResponseText = aiResponseText.substring(jsonStartMarker.length);
+            }
+            if (aiResponseText.endsWith(jsonEndMarker)) {
+                aiResponseText = aiResponseText.substring(0, aiResponseText.length - jsonEndMarker.length);
+            }
+            aiResponseText = aiResponseText.trim(); // Trim any remaining whitespace/newlines
+            // --- END NEW ---
+
             return {
                 statusCode: 200,
-                body: JSON.stringify({ success: true, response: result.candidates[0].content.parts[0].text }),
+                // Return the cleaned JSON string
+                body: JSON.stringify({ success: true, response: aiResponseText }),
                 headers: { 'Content-Type': 'application/json' },
             };
         } else {
