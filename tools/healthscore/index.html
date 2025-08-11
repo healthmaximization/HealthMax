@@ -1103,7 +1103,7 @@
             <h3>Unlock Your Full Health Report!</h3>
             <p>Subscribe to our newsletter and get instant access to your personalized health report with actionable recommendations!</p>
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 300px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 304px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
 
             <div class="terms-checkbox">
@@ -1263,7 +1263,7 @@
             <!-- <div id="leadMagnetSection" class="lead-magnet-section">
                 <h3>Unlock Your Full Health Potential!</h3>
                 <p>Want a personalized 7-Day Action Plan and exclusive health insights tailored just for you?</p>
-                <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 660px; height: 412px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+                <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 660px; height: 304px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             </div> -->
         </div>
     </main>
@@ -1437,13 +1437,17 @@
                 if (questionData.type === 'open-text') {
                     showLoading('Evaluating your answer with AI...'); // Specific loading message
                     await processAnswer(); // Await the async function
-                    // hideLoading() is called by processAnswer or its catch block
                 } else {
                     processAnswer();
                 }
 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
+                    // Hide loading after processing the answer, unless it's the very last question.
+                    // If processAnswer called AI, hideLoading will be called in its error handling.
+                    // If processAnswer did NOT call AI (short text), hideLoading needs to happen here.
+                    hideLoading(); // <--- OPLOSSING: Verberg de laadoverlay hier!
+
                     // Start fade out animation
                     quizContainer.classList.remove('entered');
                     requestAnimationFrame(() => { // Ensure styles are applied before transition
@@ -1614,7 +1618,6 @@
                     } catch (error) {
                         console.error("Error getting AI quality score:", error);
                         scoreEarned = Math.floor(questionData.maxPoints * 0.1); // Fallback to a very low score on AI error
-                        // No hideLoading here, as the outer caller's finally block handles it.
                     }
                 }
 
@@ -1654,13 +1657,14 @@
             // Updated to use window.location.origin for robustness in Canvas and deployed environments
             const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
             const payload = {
+                // Modified prompt to explicitly ask for raw JSON
                 prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
 Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
 
 Original Question: "${question}"
 User Answer: "${answer}"
 
-Provide only a JSON object with a single key 'score' and its numerical value (float). Example: { "score": 0.75 }`
+Provide only a raw JSON object with a single key 'score' and its numerical value (float), with no surrounding text, markdown formatting, or code block delimiters. Example: { "score": 0.75 }`
             };
 
             const maxRetries = 3;
@@ -1735,7 +1739,7 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                 }
             } finally {
                 if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
-                // hideLoading() is handled by processAnswer's caller (nextButton click)
+                // hideLoading() is now handled by the nextButton click listener after processAnswer.
             }
         }
 
@@ -1863,7 +1867,7 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
             }
 
             const prompt = `Based on the following quiz results and the user's detailed responses, provide a concise, consolidated, and encouraging summary of personalized health recommendations.
-Format your response as a JSON array of objects. Each object in the array should have two properties:
+Format your response as a raw JSON array of objects, with no surrounding text, markdown formatting, or code block delimiters. Each object in the array should have two properties:
 1.  "title": A concise heading for the recommendation (e.g., "Nutrition Focus", "Improved Sleep Hygiene").
 2.  "recommendation": A brief and actionable explanation of the advice.
 
@@ -1918,7 +1922,20 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                         const parsedFunctionResponse = JSON.parse(responseText);
 
                         if (parsedFunctionResponse.success && typeof parsedFunctionResponse.response === 'string') {
-                            const summaryText = parsedFunctionResponse.response;
+                            let summaryText = parsedFunctionResponse.response;
+                            // --- NEW: Strip markdown code block wrappers from recommendations ---
+                            const jsonStartMarkerRecs = '```json';
+                            const jsonEndMarkerRecs = '```';
+
+                            if (summaryText.startsWith(jsonStartMarkerRecs)) {
+                                summaryText = summaryText.substring(jsonStartMarkerRecs.length);
+                            }
+                            if (summaryText.endsWith(jsonEndMarkerRecs)) {
+                                summaryText = summaryText.substring(0, summaryText.length - jsonEndMarkerRecs.length);
+                            }
+                            summaryText = summaryText.trim(); // Trim any remaining whitespace/newlines
+                            // --- END NEW ---
+
                             try {
                                 const recommendations = JSON.parse(summaryText);
                                 if (Array.isArray(recommendations)) {
@@ -2072,5 +2089,3 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
     </script>
 </body>
 </html>
-
-
