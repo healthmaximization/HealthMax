@@ -1,109 +1,113 @@
 // netlify/functions/gemini-proxy.js
-import fetch from 'node-fetch'; // 'node-fetch' is commonly available in Netlify Functions runtime
-
-// This is the main function that Netlify will execute when your endpoint is called
-exports.handler = async function(event, context) {
-    // Check if the request method is POST
+/**
+ * Dit is een Netlify Serverless Function die fungeert als een proxy
+ * voor aanvragen aan de Google Gemini API.
+ * Het voorkomt blootstelling van de API-sleutel aan de client-side
+ * en omzeilt eventuele CORS-beperkingen.
+ */
+exports.handler = async (event) => {
+    // 1. Controleer de HTTP-methode
+    // Deze functie accepteert alleen POST-aanvragen.
     if (event.httpMethod !== 'POST') {
         return {
-            statusCode: 405, // Method Not Allowed
-            body: JSON.stringify({ message: "Only POST requests are allowed." }),
-            headers: { 'Content-Type': 'application/json' },
+            statusCode: 405, // Methode niet toegestaan
+            body: JSON.stringify({ success: false, message: 'Method Not Allowed. Only POST requests are supported.' }),
+            headers: { "Content-Type": "application/json" }
         };
     }
 
-    // Ensure there's a body to parse
-    if (!event.body) {
+    let requestBody;
+    try {
+        // 2. Parse de aanvraagbody
+        // De aanvraagbody wordt verwacht als een JSON-string.
+        requestBody = JSON.parse(event.body);
+    } catch (error) {
+        console.error("Error parsing request body:", error);
         return {
-            statusCode: 400, // Bad Request
-            body: JSON.stringify({ message: "Request body is missing." }),
-            headers: { 'Content-Type': 'application/json' },
+            statusCode: 400, // Slechte aanvraag
+            body: JSON.stringify({ success: false, message: 'Invalid JSON in request body.' }),
+            headers: { "Content-Type": "application/json" }
         };
     }
+
+    // 3. Controleer op de aanwezigheid van de 'prompt' in de body
+    // De client-side code stuurt een object met een 'prompt' property.
+    const { prompt } = requestBody;
+    if (!prompt) {
+        return {
+            statusCode: 400, // Slechte aanvraag
+            body: JSON.stringify({ success: false, message: 'Missing "prompt" in request body.' }),
+            headers: { "Content-Type": "application/json" }
+        };
+    }
+
+    // 4. Haal de Gemini API-sleutel op uit de Netlify omgevingsvariabelen
+    // BELANGRIJK: Zorg ervoor dat je deze variabele instelt in je Netlify site-instellingen.
+    // Ga naar: Site settings -> Build & deploy -> Environment variables
+    // Voeg een nieuwe variabele toe: KEY = GEMINI_API_KEY, VALUE = jouw Gemini API-sleutel
+    const apiKey = process.env.GEMINI_API_KEY; 
+    if (!apiKey) {
+        console.error("GEMINI_API_KEY environment variable is not set.");
+        return {
+            statusCode: 500, // Interne serverfout
+            body: JSON.stringify({ success: false, message: 'Server configuration error: Gemini API Key is not set.' }),
+            headers: { "Content-Type": "application/json" }
+        };
+    }
+
+    // 5. Definieer het Gemini API-eindpunt
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     try {
-        // Parse the request body coming from your frontend
-        const requestBody = JSON.parse(event.body);
-        const { prompt } = requestBody; // Assuming your frontend sends { prompt: "..." }
-
-        // Get your API key securely from Netlify environment variables
-        // This variable name must match the one you set in Netlify dashboard
-        const geminiApiKey = process.env.GEMINI_API_KEY; 
-
-        if (!geminiApiKey) {
-            console.error("GEMINI_API_KEY is not set in Netlify environment variables.");
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "Server configuration error: API key missing." }),
-                headers: { 'Content-Type': 'application/json' },
-            };
-        }
-
-        // Prepare the payload for the Gemini API call
-        // Explicitly tell Gemini to return raw JSON without markdown formatting
-        const geminiPayload = {
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
+        // 6. Bereid de payload voor de Gemini API-aanvraag voor
+        // De structuur moet overeenkomen met wat de Gemini API verwacht.
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
-                responseMimeType: "application/json", // This hints to Gemini to return JSON
-                maxOutputTokens: 4096 
+                responseMimeType: "application/json", // Vraag JSON-output aan
+                maxOutputTokens: 4096 // Limiet voor de lengte van het antwoord
             }
         };
 
-        // Construct the Gemini API URL
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`;
-
-        // Make the call to the Gemini API
-        const response = await fetch(geminiApiUrl, {
+        // 7. Voer de aanroep naar de Gemini API uit
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(geminiPayload)
+            body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
+        const result = await response.json(); // Parse de respons van Gemini
 
-        // Check for successful response from Gemini
-        if (result.candidates && result.candidates.length > 0 &&
-            result.candidates[0].content && result.candidates[0].content.parts &&
-            result.candidates[0].content.parts.length > 0 &&
-            result.candidates[0].content.parts[0].text) {
+        // 8. Controleer op succesvolle respons van de Gemini API
+        if (response.ok && result.candidates && result.candidates.length > 0 && 
+            result.candidates[0].content && result.candidates[0].content.parts && 
+            result.candidates[0].content.parts.length > 0) {
             
-            let aiResponseText = result.candidates[0].content.parts[0].text;
-            
-            // --- NEW: Strip markdown code block wrappers ---
-            // Example: "```json\n{ \"score\": 0.75 }\n```" -> "{ \"score\": 0.75 }"
-            const jsonStartMarker = '```json';
-            const jsonEndMarker = '```';
+            // Haal de gegenereerde tekst op
+            const aiText = result.candidates[0].content.parts[0].text;
 
-            if (aiResponseText.startsWith(jsonStartMarker)) {
-                aiResponseText = aiResponseText.substring(jsonStartMarker.length);
-            }
-            if (aiResponseText.endsWith(jsonEndMarker)) {
-                aiResponseText = aiResponseText.substring(0, aiResponseText.length - jsonEndMarker.length);
-            }
-            aiResponseText = aiResponseText.trim(); // Trim any remaining whitespace/newlines
-            // --- END NEW ---
-
+            // Stuur een succesrespons terug naar de client
             return {
                 statusCode: 200,
-                // Return the cleaned JSON string
-                body: JSON.stringify({ success: true, response: aiResponseText }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ success: true, response: aiText })
             };
         } else {
-            console.error("Unexpected Gemini API response structure:", result);
+            // Log de fout en stuur een passende foutrespons terug
+            console.error("Gemini API response error or unexpected format:", result);
             return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "Failed to get a valid response from Gemini API.", details: result }),
-                headers: { 'Content-Type': 'application/json' },
+                statusCode: response.status || 500, // Gebruik de status van Gemini of 500
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ success: false, message: result.error?.message || 'Unexpected response from Gemini API.' })
             };
         }
-
     } catch (error) {
-        console.error("Error in Netlify function:", error);
+        // Vang netwerkfouten of andere uitzonderingen op tijdens de aanroep
+        console.error("Error in Netlify function calling Gemini API:", error);
         return {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Internal server error.", error: error.message }),
-            headers: { 'Content-Type': 'application/json' },
+            statusCode: 500, // Interne serverfout
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ success: false, message: error.message || 'Internal Server Error during API call.' })
         };
     }
 };
