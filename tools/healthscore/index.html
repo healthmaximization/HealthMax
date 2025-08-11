@@ -37,6 +37,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            overflow-y: auto; /* Ensure body is scrollable by default */
         }
 
         /* Keyframe animation for the background gradient - simplified for smoother effect */
@@ -577,7 +578,7 @@
             h2 {
                 font-size: 1.3em;
             }
-            .quiz-container, .result-container, .start-screen {
+            .quiz-container, .result-container, .start-screen, .newsletter-gate-modal-content { /* Changed modal target */
                 padding: 20px;
             }
             .option-button, .next-button, .start-screen .quiz-length-button {
@@ -978,13 +979,137 @@
             }
         }
 
+        /* New styles for the Newsletter Gate Modal */
+        .newsletter-gate-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Higher than loading overlay */
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            flex-direction: column; /* Centered content */
+            padding: 20px; /* Consistent padding */
+            box-sizing: border-box;
+            overflow-y: auto; /* Allow scrolling within the modal if content is long */
+        }
+
+        .newsletter-gate-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .newsletter-gate-content {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            transform: translateY(20px);
+            transition: transform 0.3s ease-out;
+        }
+
+        .newsletter-gate-modal.visible .newsletter-gate-content {
+            transform: translateY(0);
+        }
+
+        .newsletter-gate-content h3 {
+            color: #f0f0f0;
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .newsletter-gate-content p {
+            font-size: 1.1em;
+            color: #c0c0c0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .newsletter-gate-content .beehiiv-embed {
+            margin: 20px auto; /* Centered embed */
+            max-width: 100%; /* Ensure responsiveness */
+            height: 300px; /* Fixed height for the Beehiiv iframe in modal */
+        }
+        
+        .newsletter-gate-content .terms-checkbox {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the checkbox and text */
+            font-size: 0.9em;
+            color: #a0a0a0;
+        }
+
+        .newsletter-gate-content .terms-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: #28a745; /* Green accent color */
+            cursor: pointer;
+        }
+
+        .newsletter-gate-content button {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+            width: auto;
+            min-width: 200px;
+        }
+
+        .newsletter-gate-content button:hover:not(:disabled) {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+        }
+
+        .newsletter-gate-content button:disabled {
+            background-color: #444444;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
     </style>
 </head>
 <body>
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
-        <p id="loadingMessage">Bezig met laden...</p>
+        <p id="loadingMessage">Loading...</p>
+    </div>
+
+    <!-- Newsletter Gate Modal (Hidden by default) -->
+    <div id="newsletterGateModal" class="newsletter-gate-modal">
+        <div class="newsletter-gate-content">
+            <h3>Unlock Your Full Health Report!</h3>
+            <p>Subscribe to our newsletter and get instant access to your personalized health report with actionable recommendations!</p>
+            <!-- START BEEHIIV FORM CODE -->
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 300px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <!-- END BEEHIIV FORM CODE -->
+
+            <div class="terms-checkbox">
+                <input type="checkbox" id="subscribedConfirm">
+                <label for="subscribedConfirm">I have subscribed to the newsletter and agree to the terms.</label>
+            </div>
+            <button id="viewResultsButton" disabled>View My Results</button>
+        </div>
     </div>
 
     <header>
@@ -1005,7 +1130,7 @@
     <nav class="main-nav">
         <a href="/">Home</a>
         <a href="/tools/healthscore/" class="active">Tools</a>
-        <!-- Meer links kunnen hier komen (bijv. /blog/, /contact/) -->
+        <!-- More links can go here (e.g., /blog/, /contact/) -->
     </nav>
 
     <main>
@@ -1132,14 +1257,12 @@
                 <p class="results-note">Not satisfied with your recommendations? Try the quiz again and be more specific about your challenges to get even better insights!</p>
             </div>
 
-            <!-- New Lead Magnet Section on Results Page -->
-            <div id="leadMagnetSection" class="lead-magnet-section">
+            <!-- Lead Magnet Section is now handled by the modal -->
+            <!-- <div id="leadMagnetSection" class="lead-magnet-section">
                 <h3>Unlock Your Full Health Potential!</h3>
                 <p>Want a personalized 7-Day Action Plan and exclusive health insights tailored just for you?</p>
-                <!-- START BEEHIIV FORM CODE -->
                 <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 660px; height: 412px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-                <!-- END BEEHIIV FORM CODE -->
-            </div>
+            </div> -->
         </div>
     </main>
 
@@ -1257,11 +1380,15 @@
             mental: []
         };
         let selectedOption = null; // To track selected option for multiple choice
+        let hasTriggeredNewsletterModal = false; // New flag to control modal display
 
         // DOM elements
         const startScreen = document.getElementById('startScreen');
         const quizContainer = document.getElementById('quizContainer');
         const resultContainer = document.getElementById('resultContainer');
+        const newsletterGateModal = document.getElementById('newsletterGateModal'); // New modal element
+        const subscribedConfirmCheckbox = document.getElementById('subscribedConfirm'); // New checkbox
+        const viewResultsButton = document.getElementById('viewResultsButton'); // New button
         const questionDisplay = document.getElementById('questionDisplay');
         const optionsContainer = document.getElementById('optionsContainer'); 
         const nextButton = document.getElementById('nextButton');
@@ -1306,7 +1433,7 @@
             if (isValid) {
                 // If it's an open-text question, we need to await the scoring
                 if (questionData.type === 'open-text') {
-                    showLoading('Bezig met het evalueren van je antwoord met AI...'); // Specific loading message
+                    showLoading('Evaluating your answer with AI...'); // Specific loading message
                     await processAnswer(); // Await the async function
                     hideLoading(); // Hide loading after scoring
                 } else {
@@ -1347,6 +1474,18 @@
         // Event Listener for Copy Link Button
         copyLinkBtn.addEventListener('click', copyShareLink);
 
+        // Event Listener for Newsletter Gate: Checkbox and Button
+        subscribedConfirmCheckbox.addEventListener('change', () => {
+            viewResultsButton.disabled = !subscribedConfirmCheckbox.checked;
+        });
+
+        viewResultsButton.addEventListener('click', () => {
+            if (subscribedConfirmCheckbox.checked) {
+                newsletterGateModal.classList.remove('visible'); // Hide the modal
+                document.body.style.overflow = ''; // Re-enable scrolling on the body
+            }
+        });
+
         /**
          * Initializes the quiz.
          */
@@ -1358,6 +1497,7 @@
             currentQuestionIndex = 0;
             selectedOption = null; 
             nextButton.disabled = true;
+            hasTriggeredNewsletterModal = false; // Reset the flag for new quiz session
 
             // Calculate max possible scores for all questions
             healthCategories.forEach(category => {
@@ -1509,11 +1649,11 @@
          * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
          */
         async function getAiQualityScore(question, answer) {
-            // Dit is de URL van je Netlify Function. De naam van het bestand is 'gemini-proxy.js',
-            // dus de endpoint wordt '/.netlify/functions/gemini-proxy'.
-            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`; // Fixed: Use absolute URL
+            // This is the URL of your Netlify Function. The file name is 'gemini-proxy.js',
+            // so the endpoint will be '/.netlify/functions/gemini-proxy'.
+            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
 
-            // Je stuurt de prompt naar je Netlify Function
+            // Prepare the payload for your Netlify Function
             const payload = {
                 prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
 Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
@@ -1534,10 +1674,20 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    
-                    const result = await response.json();
 
-                    if (response.ok && result.success && typeof result.response === 'string') {
+                    // Log response details for debugging
+                    console.log(`API call for getAiQualityScore - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
+                    const responseText = await response.text();
+                    console.log("Raw response from Netlify Function (getAiQualityScore):", responseText);
+
+                    if (!response.ok) {
+                        throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
+                    }
+
+                    // Attempt to parse JSON
+                    const result = JSON.parse(responseText);
+
+                    if (result.success && typeof result.response === 'string') {
                         // The 'response' from the Netlify Function is the JSON string from Gemini
                         const jsonString = result.response;
                         const parsed = JSON.parse(jsonString);
@@ -1545,14 +1695,14 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                             return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
                         } else {
                             console.warn("AI returned invalid score format via Netlify Function:", parsed);
-                            throw new Error("Invalid AI score format.");
+                            throw new Error("Invalid AI score format from internal response.");
                         }
                     } else {
-                        console.error("Netlify Function error or unexpected response:", result);
+                        console.error("Netlify Function did not indicate success or response was not a string:", result);
                         throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
                     }
                 } catch (error) {
-                    console.error(`Netlify Function call attempt ${attempt + 1} failed:`, error);
+                    console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
                     attempt++;
                     if (attempt >= maxRetries) {
                         throw new Error("Failed to get AI score via Netlify Function after multiple retries.");
@@ -1586,15 +1736,10 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
          * Finishes the quiz, calculates overall score, and displays results.
          */
         async function finishQuiz() {
-            quizContainer.classList.remove('entered');
-            requestAnimationFrame(() => { // Ensure styles are applied before transition
-                quizContainer.classList.add('exiting');
-            });
-            await new Promise(resolve => quizContainer.addEventListener('transitionend', resolve, { once: true }));
-            quizContainer.classList.add('hidden');
+            quizContainer.classList.add('hidden'); // Hide quiz container immediately
             document.querySelector('.progress-bar-container').classList.add('hidden'); // Hide global progress bar
 
-            showLoading('Bezig met het berekenen van je algemene score...'); // Initial loading message for the result calculation
+            showLoading('Calculating your overall score...'); // Initial loading message for the result calculation
 
             try {
                 let totalUserScore = 0;
@@ -1605,17 +1750,17 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                 }
                 
                 const overallScorePercentage = totalMaxScore > 0 ? Math.round((totalUserScore / totalMaxScore) * 100) : 0;
-                overallScoreDisplay.textContent = `Je Algemene Gezondheidsscore: ${overallScorePercentage}`; 
+                overallScoreDisplay.textContent = `Your Overall Health Score: ${overallScorePercentage}`; 
                 overallProgressBarFill.style.width = `${overallScorePercentage}%`;
                 updateProgressBarColor(overallProgressBarFill, overallScorePercentage);
 
                 let overallFeedback = '';
                 if (overallScorePercentage < 40) {
-                    overallFeedback = "Je huidige gezondheidsscore suggereert dat er verschillende gebieden zijn waar kleine, consistente verbeteringen kunnen leiden tot aanzienlijke positieve veranderingen. Dit is een geweldig startpunt voor je gezondheidsreis!";
+                    overallFeedback = "Your current health score suggests there are several areas where small, consistent improvements can lead to significant positive changes. This is a great starting point for your health journey!";
                 } else if (overallScorePercentage < 75) {
-                    overallFeedback = "Je hebt een solide basis voor een goede gezondheid! Met een paar gerichte aanpassingen kun je je welzijn verder optimaliseren. Concentreer je op de gebieden die in je gepersonaliseerde aanbevelingen worden benadrukt.";
+                    overallFeedback = "You have a solid foundation for good health! With a few targeted adjustments, you can further optimize your well-being. Focus on the areas highlighted in your personalized recommendations.";
                 } else {
-                    overallFeedback = "Uitstekend werk! Je gezondheidsscore wijst op een sterke toewijding aan je welzijn. Blijf deze uitstekende gewoonten volhouden en verken geavanceerde strategieën om je vitaliteit te behouden.";
+                    overallFeedback = "Excellent work! Your health score indicates a strong commitment to your well-being. Keep up these great habits and explore advanced strategies to maintain your vitality.";
                 }
                 feedbackDisplay.textContent = overallFeedback;
 
@@ -1634,13 +1779,20 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
 
                 await generateAndDisplayDetailedRecommendations();
 
+                hideLoading(); // Hide loading after results are ready
+
+                // Show the result container first
                 resultContainer.classList.remove('hidden');
+                
+                // Then set up the scroll listener to trigger the modal
+                setupScrollToTriggerModal();
 
             } catch (error) {
-                console.error("Fout tijdens afronding quiz of genereren aanbevelingen:", error);
-                loadingMessage.textContent = "Oeps! Er is een onverwachte fout opgetreden bij het berekenen van de resultaten. Probeer het later opnieuw.";
+                console.error("Error during quiz completion or recommendation generation:", error);
+                loadingMessage.textContent = "Oops! An unexpected error occurred while calculating results. Please try again later.";
                 setTimeout(() => { hideLoading(); }, 2000); 
-                resultContainer.classList.remove('hidden'); 
+                // In case of error, still allow user to proceed or try again, perhaps with a simpler message.
+                // For now, it will just show the error and keep the loading overlay.
             }
         }
 
@@ -1664,8 +1816,8 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
          * Generates and displays detailed recommendations using a Gemini API call.
          */
         async function generateAndDisplayDetailedRecommendations() {
-            showLoading('Bezig met het genereren van gepersonaliseerde aanbevelingen...'); // Initial loading for this specific step
-            allDetailedRecommendations.innerHTML = '<h3>Onze Gepersonaliseerde Aanbevelingen</h3>'; 
+            showLoading('Generating personalized recommendations...'); // Initial loading for this specific step
+            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>'; 
 
             const promptParts = [];
             for (const category in userFeedback) {
@@ -1719,10 +1871,21 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ prompt: prompt })
                         });
-                        result = await response.json();
+                        
+                        // Log response details for debugging
+                        console.log(`API call for generateAndDisplayDetailedRecommendations - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
+                        const responseText = await response.text();
+                        console.log("Raw response from Netlify Function (generateAndDisplayDetailedRecommendations):", responseText);
 
-                        if (response.ok && result.success && typeof result.response === 'string') {
-                            const summaryText = result.response;
+                        if (!response.ok) {
+                            throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
+                        }
+
+                        // Attempt to parse JSON
+                        const parsedFunctionResponse = JSON.parse(responseText);
+
+                        if (parsedFunctionResponse.success && typeof parsedFunctionResponse.response === 'string') {
+                            const summaryText = parsedFunctionResponse.response;
                             try {
                                 const recommendations = JSON.parse(summaryText);
                                 if (Array.isArray(recommendations)) {
@@ -1738,7 +1901,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                                         allDetailedRecommendations.appendChild(recItem);
                                     });
                                 } else {
-                                    console.warn("AI returned JSON, but it's not an array:", recommendations);
+                                    console.warn("AI returned JSON, but it's not an array of recommendations:", recommendations);
                                     const feedbackItem = document.createElement('p');
                                     feedbackItem.classList.add('detailed-feedback');
                                     feedbackItem.textContent = summaryText;
@@ -1746,7 +1909,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                                 }
                                 break; // Exit retry loop on success
                             } catch (jsonError) {
-                                console.error("Failed to parse AI response as JSON:", jsonError);
+                                console.error("Failed to parse AI response as JSON from the function's 'response' field:", jsonError);
                                 const feedbackItem = document.createElement('p');
                                 feedbackItem.classList.add('detailed-feedback');
                                 feedbackItem.textContent = summaryText;
@@ -1754,11 +1917,11 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                                 break; // Exit retry loop even on JSON parse error, as raw text is displayed
                             }
                         } else {
-                            console.error("Netlify Function error or unexpected response:", result);
-                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
+                            console.error("Netlify Function did not indicate success or response was not a string:", parsedFunctionResponse);
+                            throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}`);
                         }
                     } catch (error) {
-                        console.error(`API call attempt ${attempt + 1} failed:`, error);
+                        console.error(`API call attempt ${attempt + 1} failed for generateAndDisplayDetailedRecommendations:`, error);
                         attempt++;
                         if (attempt >= maxRetries) {
                             throw error; // Re-throw error if max retries reached
@@ -1768,12 +1931,41 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                     }
                 }
             } catch (error) {
-                loadingMessage.textContent = "Oeps! Kon geen gepersonaliseerde aanbevelingen genereren. Probeer het later opnieuw.";
-                console.error("Fout bij het genereren van aanbevelingen:", error);
+                loadingMessage.textContent = "Oops! Could not generate personalized recommendations. Please try again later.";
+                console.error("Error generating recommendations:", error);
                 throw error; // Re-throw to propagate to finishQuiz catch block
             } finally {
-                hideLoading(); // Always hide loading when this function finishes, regardless of success or failure
+                // We hide loading in finishQuiz() after this async call completes.
             }
+        }
+
+        /**
+         * Sets up a scroll event listener to trigger the newsletter modal.
+         * The modal will appear once the user scrolls down a certain amount.
+         */
+        function setupScrollToTriggerModal() {
+            // Only set up if the modal hasn't been triggered yet this session
+            if (hasTriggeredNewsletterModal) {
+                return;
+            }
+
+            const scrollThreshold = 100; // Pixels scrolled down before modal appears
+
+            const handleScroll = () => {
+                if (window.scrollY > scrollThreshold && !hasTriggeredNewsletterModal) {
+                    hasTriggeredNewsletterModal = true; // Set flag to true
+                    newsletterGateModal.classList.add('visible'); // Show the modal
+                    subscribedConfirmCheckbox.checked = false; // Reset checkbox state
+                    viewResultsButton.disabled = true; // Disable button initially
+                    document.body.style.overflow = 'hidden'; // Disable background scrolling
+                    
+                    // Remove the event listener after it's triggered once
+                    window.removeEventListener('scroll', handleScroll);
+                }
+            };
+
+            // Add the scroll listener
+            window.addEventListener('scroll', handleScroll);
         }
 
 
@@ -1783,21 +1975,25 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
         function restartQuiz() {
             quizContainer.classList.add('hidden');
             resultContainer.classList.add('hidden');
+            newsletterGateModal.classList.remove('visible'); // Ensure modal is hidden
             document.querySelector('.progress-bar-container').classList.add('hidden');
             startScreen.classList.remove('hidden');
-            allDetailedRecommendations.innerHTML = '<h3>Onze Gepersonaliseerde Aanbevelingen</h3>';
+            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>';
             
             // Re-initialize start screen for animation
             startScreen.classList.remove('exited');
             startScreen.classList.remove('entering');
             startScreen.classList.add('entered'); // Ensure it's in the initial entered state for next start
+            
+            hasTriggeredNewsletterModal = false; // Reset flag for new quiz session
+            document.body.style.overflow = ''; // Re-enable scrolling on the body
         }
 
         /**
          * Shows the loading overlay with an optional message.
          * @param {string} message = 'Loading...' - The message to display during loading.
          */
-        function showLoading(message = 'Bezig met laden...') {
+        function showLoading(message = 'Loading...') {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
             loadingOverlay.style.display = 'flex'; 
