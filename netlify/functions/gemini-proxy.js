@@ -1,6 +1,6 @@
 // netlify/functions/gemini-proxy.js
 // This function acts as a proxy to the Gemini API for scoring open-ended questions.
-import fetch from 'node-fetch'; // 'node-fetch' is commonly available in Netlify Functions runtime
+const fetch = require('node-fetch'); // 'node-fetch' is commonly available in Netlify Functions runtime
 
 // Main function that Netlify will execute when this endpoint is called
 exports.handler = async function(event, context) {
