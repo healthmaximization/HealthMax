@@ -1,6 +1,5 @@
-
 // netlify/functions/gemini-recommendations-proxy.js
-import fetch from 'node-fetch'; // 'node-fetch' is commonly available in Netlify Functions runtime
+const fetch = require('node-fetch'); // 'node-fetch' is commonly available in Netlify Functions runtime
 
 // This is the main function that Netlify will execute when your endpoint is called
 exports.handler = async function(event, context) {
@@ -44,7 +43,7 @@ exports.handler = async function(event, context) {
         const geminiPayload = {
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
-                responseMimeType: "application/json",
+                responseMimeType: "application/json", // <-- Cruciaal verschil hier!
                 maxOutputTokens: 4096 // Make sure this matches your requirements
             }
         };
