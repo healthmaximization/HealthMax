@@ -578,7 +578,7 @@
             h2 {
                 font-size: 1.3em;
             }
-            .quiz-container, .result-container, .start-screen, .newsletter-gate-modal-content { /* Changed modal target */
+            .quiz-container, .result-container, .start-screen, .newsletter-gate-content { /* Changed modal target */
                 padding: 20px;
             }
             .option-button, .next-button, .start-screen .quiz-length-button {
@@ -1024,7 +1024,7 @@
 
         .newsletter-gate-content h3 {
             color: #f0f0f0;
-            font-size: 2.2em;
+            font-size: 2.2em; /* Slightly larger for impact */
             margin-bottom: 15px;
             font-weight: 700;
         }
@@ -1040,6 +1040,8 @@
             margin: 20px auto; /* Centered embed */
             max-width: 100%; /* Ensure responsiveness */
             height: 300px; /* Fixed height for the Beehiiv iframe in modal */
+            border: 1px solid #444; /* Subtle border for the iframe */
+            border-radius: 8px; /* Rounded corners for the iframe */
         }
         
         .newsletter-gate-content .terms-checkbox {
@@ -1106,7 +1108,7 @@
 
             <div class="terms-checkbox">
                 <input type="checkbox" id="subscribedConfirm">
-                <label for="subscribedConfirm">I have subscribed to the newsletter and agree to the terms.</label>
+                <label for="subscribedConfirm">I confirm I have submitted my email above and wish to view my results.</label>
             </div>
             <button id="viewResultsButton" disabled>View My Results</button>
         </div>
@@ -1435,7 +1437,7 @@
                 if (questionData.type === 'open-text') {
                     showLoading('Evaluating your answer with AI...'); // Specific loading message
                     await processAnswer(); // Await the async function
-                    hideLoading(); // Hide loading after scoring
+                    // hideLoading() is called by processAnswer or its catch block
                 } else {
                     processAnswer();
                 }
@@ -1612,8 +1614,7 @@
                     } catch (error) {
                         console.error("Error getting AI quality score:", error);
                         scoreEarned = Math.floor(questionData.maxPoints * 0.1); // Fallback to a very low score on AI error
-                        loadingMessage.textContent = "AI scoring failed. Assigning minimal points for this answer.";
-                        setTimeout(() => { hideLoading(); }, 2000); // Show message briefly
+                        // No hideLoading here, as the outer caller's finally block handles it.
                     }
                 }
 
@@ -1644,16 +1645,13 @@
 
         /**
          * Calls the Netlify Function to get a qualitative score for an open-ended answer.
+         * Includes timeout and robust error logging.
          * @param {string} question - The original question text.
          * @param {string} answer - The user's answer text.
          * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
          */
         async function getAiQualityScore(question, answer) {
-            // This is the URL of your Netlify Function. The file name is 'gemini-proxy.js',
-            // so the endpoint will be '/.netlify/functions/gemini-proxy'.
             const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
-
-            // Prepare the payload for your Netlify Function
             const payload = {
                 prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
 Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
@@ -1666,50 +1664,62 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
 
             const maxRetries = 3;
             let attempt = 0;
+            const controller = new AbortController();
+            let timeoutId;
 
-            while (attempt < maxRetries) {
-                try {
-                    const response = await fetch(functionUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+            try {
+                while (attempt < maxRetries) {
+                    try {
+                        timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+                        const response = await fetch(functionUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload),
+                            signal: controller.signal // Link the signal
+                        });
 
-                    // Log response details for debugging
-                    console.log(`API call for getAiQualityScore - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
-                    const responseText = await response.text();
-                    console.log("Raw response from Netlify Function (getAiQualityScore):", responseText);
+                        clearTimeout(timeoutId); // Clear timeout if fetch completes in time
 
-                    if (!response.ok) {
-                        throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
-                    }
+                        console.log(`API call for getAiQualityScore - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
+                        const responseText = await response.text();
+                        console.log("Raw response from Netlify Function (getAiQualityScore):", responseText);
 
-                    // Attempt to parse JSON
-                    const result = JSON.parse(responseText);
-
-                    if (result.success && typeof result.response === 'string') {
-                        // The 'response' from the Netlify Function is the JSON string from Gemini
-                        const jsonString = result.response;
-                        const parsed = JSON.parse(jsonString);
-                        if (typeof parsed.score === 'number') {
-                            return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
-                        } else {
-                            console.warn("AI returned invalid score format via Netlify Function:", parsed);
-                            throw new Error("Invalid AI score format from internal response.");
+                        if (!response.ok) {
+                            throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
                         }
-                    } else {
-                        console.error("Netlify Function did not indicate success or response was not a string:", result);
-                        throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
+
+                        // Attempt to parse JSON
+                        const result = JSON.parse(responseText);
+
+                        if (result.success && typeof result.response === 'string') {
+                            const jsonString = result.response;
+                            const parsed = JSON.parse(jsonString);
+                            if (typeof parsed.score === 'number') {
+                                return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
+                            } else {
+                                console.warn("AI returned invalid score format via Netlify Function:", parsed);
+                                throw new Error("Invalid AI score format from internal response.");
+                            }
+                        } else {
+                            console.error("Netlify Function did not indicate success or response was not a string:", result);
+                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
+                        }
+                    } catch (error) {
+                        if (error.name === 'AbortError') {
+                            console.error(`API call timed out for getAiQualityScore (Attempt ${attempt + 1}):`, error);
+                            throw new Error('API call timed out. Please try again.'); // Re-throw to be caught by outer catch
+                        }
+                        console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
+                        attempt++;
+                        if (attempt >= maxRetries) {
+                            throw new Error("Failed to get AI score via Netlify Function after multiple retries.");
+                        }
+                        const delay = Math.pow(2, attempt) * 1000; 
+                        await new Promise(res => setTimeout(res, delay));
                     }
-                } catch (error) {
-                    console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
-                    attempt++;
-                    if (attempt >= maxRetries) {
-                        throw new Error("Failed to get AI score via Netlify Function after multiple retries.");
-                    }
-                    const delay = Math.pow(2, attempt) * 1000; 
-                    await new Promise(res => setTimeout(res, delay));
                 }
+            } finally {
+                if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
             }
         }
 
@@ -1789,10 +1799,10 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
 
             } catch (error) {
                 console.error("Error during quiz completion or recommendation generation:", error);
-                loadingMessage.textContent = "Oops! An unexpected error occurred while calculating results. Please try again later.";
-                setTimeout(() => { hideLoading(); }, 2000); 
-                // In case of error, still allow user to proceed or try again, perhaps with a simpler message.
-                // For now, it will just show the error and keep the loading overlay.
+                loadingMessage.textContent = `Oops! An error occurred: ${error.message || 'Unknown error'}. Please try again later.`; // More specific error message
+                setTimeout(() => { hideLoading(); }, 3000); // Keep message for 3 seconds
+                // Ensure loading overlay is hidden even if setTimeout is cleared
+                hideLoading(); // This might be redundant if setTimeout always fires, but safe.
             }
         }
 
@@ -1862,17 +1872,22 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             let result;
             const maxRetries = 5;
             let attempt = 0;
+            const controller = new AbortController();
+            let timeoutId;
 
             try {
                 while (attempt < maxRetries) {
                     try {
+                        timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
                         response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ prompt: prompt })
+                            body: JSON.stringify({ prompt: prompt }),
+                            signal: controller.signal // Link the signal
                         });
                         
-                        // Log response details for debugging
+                        clearTimeout(timeoutId); // Clear timeout if fetch completes in time
+
                         console.log(`API call for generateAndDisplayDetailedRecommendations - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
                         const responseText = await response.text();
                         console.log("Raw response from Netlify Function (generateAndDisplayDetailedRecommendations):", responseText);
@@ -1921,6 +1936,10 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                             throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}`);
                         }
                     } catch (error) {
+                        if (error.name === 'AbortError') {
+                            console.error(`API call timed out for generateAndDisplayDetailedRecommendations (Attempt ${attempt + 1}):`, error);
+                            throw new Error('API call timed out. Please try again.'); // Re-throw to be caught by outer catch
+                        }
                         console.error(`API call attempt ${attempt + 1} failed for generateAndDisplayDetailedRecommendations:`, error);
                         attempt++;
                         if (attempt >= maxRetries) {
@@ -1931,11 +1950,12 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                     }
                 }
             } catch (error) {
-                loadingMessage.textContent = "Oops! Could not generate personalized recommendations. Please try again later.";
+                loadingMessage.textContent = `Oops! Could not generate personalized recommendations. Error: ${error.message || 'Unknown error'}. Please try again later.`; // More specific error message
                 console.error("Error generating recommendations:", error);
                 throw error; // Re-throw to propagate to finishQuiz catch block
             } finally {
-                // We hide loading in finishQuiz() after this async call completes.
+                if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
+                // hideLoading() is called by finishQuiz() after this async call completes.
             }
         }
 
