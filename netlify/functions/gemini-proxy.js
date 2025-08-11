@@ -4,8 +4,12 @@ const fetch = require('node-fetch'); // 'node-fetch' is commonly available in Ne
 
 // Main function that Netlify will execute when this endpoint is called
 exports.handler = async function(event, context) {
+    // ADDED THIS LINE FOR DEBUGGING - IT SHOULD BE THE FIRST THING TO LOG
+    console.log("gemini-proxy function handler starting..."); 
+
     // Ensure the request method is POST
     if (event.httpMethod !== 'POST') {
+        console.warn("Received non-POST request to gemini-proxy."); // Also log this
         return {
             statusCode: 405, // Method Not Allowed
             body: JSON.stringify({ message: "Only POST requests are allowed." }),
@@ -13,8 +17,9 @@ exports.handler = async function(event, context) {
         };
     }
 
-    // Ensure there's a request body
+    // Ensure there's a body to parse
     if (!event.body) {
+        console.warn("Request body is missing for gemini-proxy."); // Also log this
         return {
             statusCode: 400, // Bad Request
             body: JSON.stringify({ message: "Request body is missing." }),
@@ -26,6 +31,8 @@ exports.handler = async function(event, context) {
         // Parse the request body coming from your frontend
         const requestBody = JSON.parse(event.body);
         const { prompt } = requestBody; // Assuming your frontend sends { prompt: "..." }
+
+        console.log("Received prompt for gemini-proxy:", prompt ? prompt.substring(0, 100) + "..." : "empty"); // Log received prompt (truncated for brevity)
 
         // Get your API key securely from Netlify environment variables
         // This variable name must match the one you set in Netlify dashboard
@@ -55,12 +62,16 @@ exports.handler = async function(event, context) {
         // Construct the Gemini API URL
         const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`;
 
+        console.log("Making call to Gemini API..."); // Log before API call
+
         // Make the call to the Gemini API
         const response = await fetch(geminiApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(geminiPayload)
         });
+
+        console.log("Received response from Gemini API, status:", response.status); // Log API response status
 
         const result = await response.json();
 
@@ -70,6 +81,7 @@ exports.handler = async function(event, context) {
             result.candidates[0].content.parts.length > 0 &&
             result.candidates[0].content.parts[0].text) {
             
+            console.log("Successfully processed Gemini response."); // Log success
             // Return the raw text from Gemini, which should be a JSON string like "{ "score": 0.75 }"
             // The frontend will then parse this string.
             return {
