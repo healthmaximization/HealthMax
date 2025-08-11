@@ -1142,7 +1142,7 @@
         <div id="startScreen" class="start-screen entered">
             <div class="intro-text">
                 <h2>Your Health Score Journey Starts Here!</h2>
-                <p>Discover your personalized health score. This insightful, <strong>completely free and accurate</strong> quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
+                <p>Discover your personalized health score. This insightful, **completely free and accurate** quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
             </div>
 
             <button id="startQuizBtn" class="next-button">Get My Score</button>
@@ -1651,6 +1651,7 @@
          * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
          */
         async function getAiQualityScore(question, answer) {
+            // Updated to use window.location.origin for robustness in Canvas and deployed environments
             const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
             const payload = {
                 prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
@@ -1670,7 +1671,7 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
             try {
                 while (attempt < maxRetries) {
                     try {
-                        timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+                        timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout for fetch
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1685,7 +1686,10 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                         console.log("Raw response from Netlify Function (getAiQualityScore):", responseText);
 
                         if (!response.ok) {
-                            throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
+                            // If response is not OK (e.g., 4xx or 5xx status)
+                            // Log the full response text if it's an error from the server
+                            console.error(`Netlify Function returned status ${response.status}. Full response: ${responseText}`);
+                            throw new Error(`Netlify Function error: ${response.status}. Details in console.`);
                         }
 
                         // Attempt to parse JSON
@@ -1693,33 +1697,45 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
 
                         if (result.success && typeof result.response === 'string') {
                             const jsonString = result.response;
-                            const parsed = JSON.parse(jsonString);
-                            if (typeof parsed.score === 'number') {
-                                return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
-                            } else {
-                                console.warn("AI returned invalid score format via Netlify Function:", parsed);
-                                throw new Error("Invalid AI score format from internal response.");
+                            try {
+                                const parsed = JSON.parse(jsonString);
+                                if (typeof parsed.score === 'number') {
+                                    return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
+                                } else {
+                                    console.warn("AI returned invalid score format via Netlify Function:", parsed);
+                                    throw new Error("Invalid AI score format from internal response.");
+                                }
+                            } catch (jsonParseError) {
+                                console.error("Failed to parse AI's score JSON from the function's 'response' field:", jsonParseError, "Raw AI response:", jsonString);
+                                throw new Error("AI response parsing error. Details in console.");
                             }
                         } else {
                             console.error("Netlify Function did not indicate success or response was not a string:", result);
-                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
+                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}. Details in console.`);
                         }
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             console.error(`API call timed out for getAiQualityScore (Attempt ${attempt + 1}):`, error);
-                            throw new Error('API call timed out. Please try again.'); // Re-throw to be caught by outer catch
+                            // Set a specific message for the user overlay
+                            loadingMessage.textContent = "Time-out bereikt: De AI-evaluatie duurt te lang. Probeer het opnieuw met een korter antwoord of later.";
+                            await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
+                            throw new Error('API call timed out. Please try again.'); 
                         }
                         console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
+                        // Set a specific message for the user overlay for general errors
+                        loadingMessage.textContent = `Fout bij AI-evaluatie: ${error.message || 'Onbekende fout'}. Controleer de console.`;
+                        await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                         attempt++;
                         if (attempt >= maxRetries) {
-                            throw new Error("Failed to get AI score via Netlify Function after multiple retries.");
+                            throw new Error("Mislukt om AI-score te krijgen na meerdere pogingen.");
                         }
-                        const delay = Math.pow(2, attempt) * 1000; 
+                        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
                         await new Promise(res => setTimeout(res, delay));
                     }
                 }
             } finally {
                 if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
+                // hideLoading() is handled by processAnswer's caller (nextButton click)
             }
         }
 
@@ -1851,7 +1867,7 @@ Format your response as a JSON array of objects. Each object in the array should
 1.  "title": A concise heading for the recommendation (e.g., "Nutrition Focus", "Improved Sleep Hygiene").
 2.  "recommendation": A brief and actionable explanation of the advice.
 
-The overall JSON output should contain 3-5 distinct recommendations. Focus on highlighting key areas for improvement and offering actionable, general advice across all areas combined. Crucially, your advice should emphasize identifying areas for improvement and providing concrete, actionable steps to address any challenges or weaknesses explicitly mentioned or implicitly suggested by the user's detailed answers. Do not shy away from constructively highlighting where progress can be made, even if a category's overall numerical score appears high. Your tone should remain supportive and encouraging, but firmly focused on growth and optimization. The scores mentioned in the input are numerical values representing percentages. Do not explicitly use the word "percentage" or the "%" symbol in your generated recommendations, and integrate the score information naturally into the text if relevant.
+The overall JSON output should contain 3-5 distinct recommendations. Focus on highlighting key areas for improvement and offering actionable, general advice across all areas combined. Crucially, your advice should emphasize identifying areas for improvement and providing concrete, actionable steps to address any challenges or weaknesses explicitly mentioned or implicitly suggested by the user's detailed answers. Do not shy from constructively highlighting where progress can be made, even if a category's overall numerical score appears high. Your tone should remain supportive and encouraging, but firmly focused on growth and optimization. The scores mentioned in the input are numerical values representing percentages. Do not explicitly use the word "percentage" or the "%" symbol in your generated recommendations, and integrate the score information naturally into the text if relevant.
 
 Here are the user's detailed results:\n\n` + promptParts.join('\n');
 
@@ -1893,7 +1909,9 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                         console.log("Raw response from Netlify Function (generateAndDisplayDetailedRecommendations):", responseText);
 
                         if (!response.ok) {
-                            throw new Error(`Netlify Function returned status ${response.status}. Check Netlify function logs for errors.`);
+                            // If response is not OK (e.g., 4xx or 5xx status)
+                            console.error(`Netlify Function returned status ${response.status}. Full response: ${responseText}`);
+                            throw new Error(`Netlify Function error: ${response.status}. Details in console.`);
                         }
 
                         // Attempt to parse JSON
@@ -1924,23 +1942,25 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                                 }
                                 break; // Exit retry loop on success
                             } catch (jsonError) {
-                                console.error("Failed to parse AI response as JSON from the function's 'response' field:", jsonError);
-                                const feedbackItem = document.createElement('p');
-                                feedbackItem.classList.add('detailed-feedback');
-                                feedbackItem.textContent = summaryText;
-                                allDetailedRecommendations.appendChild(feedbackItem);
-                                break; // Exit retry loop even on JSON parse error, as raw text is displayed
+                                console.error("Failed to parse AI response as JSON from the function's 'response' field:", jsonError, "Raw AI response:", summaryText);
+                                throw new Error("AI response parsing error. Details in console.");
                             }
                         } else {
                             console.error("Netlify Function did not indicate success or response was not a string:", parsedFunctionResponse);
-                            throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}`);
+                            throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}. Details in console.`);
                         }
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             console.error(`API call timed out for generateAndDisplayDetailedRecommendations (Attempt ${attempt + 1}):`, error);
-                            throw new Error('API call timed out. Please try again.'); // Re-throw to be caught by outer catch
+                             // Set a specific message for the user overlay
+                            loadingMessage.textContent = "Time-out bereikt: De AI-aanbevelingen duren te lang. Probeer het opnieuw of later.";
+                            await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
+                            throw new Error('API call timed out. Please try again.');
                         }
                         console.error(`API call attempt ${attempt + 1} failed for generateAndDisplayDetailedRecommendations:`, error);
+                        // Set a specific message for the user overlay for general errors
+                        loadingMessage.textContent = `Fout bij AI-aanbevelingen: ${error.message || 'Onbekende fout'}. Controleer de console.`;
+                        await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                         attempt++;
                         if (attempt >= maxRetries) {
                             throw error; // Re-throw error if max retries reached
@@ -1950,7 +1970,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                     }
                 }
             } catch (error) {
-                loadingMessage.textContent = `Oops! Could not generate personalized recommendations. Error: ${error.message || 'Unknown error'}. Please try again later.`; // More specific error message
+                loadingMessage.textContent = `Oops! Kon geen gepersonaliseerde aanbevelingen genereren. Fout: ${error.message || 'Onbekende fout'}. Probeer het later opnieuw.`; // More specific error message
                 console.error("Error generating recommendations:", error);
                 throw error; // Re-throw to propagate to finishQuiz catch block
             } finally {
@@ -2052,4 +2072,5 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
     </script>
 </body>
 </html>
+
 
