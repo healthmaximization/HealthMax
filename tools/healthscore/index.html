@@ -7,6 +7,9 @@
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Favicon Link -->
+    <link rel="icon" type="image/png" href="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
     <script>
@@ -981,7 +984,7 @@
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
-        <p id="loadingMessage">Generating personalized insights...</p>
+        <p id="loadingMessage">Bezig met laden...</p>
     </div>
 
     <header>
@@ -1303,7 +1306,7 @@
             if (isValid) {
                 // If it's an open-text question, we need to await the scoring
                 if (questionData.type === 'open-text') {
-                    showLoading('Evaluating your answer with AI...'); // Specific loading message
+                    showLoading('Bezig met het evalueren van je antwoord met AI...'); // Specific loading message
                     await processAnswer(); // Await the async function
                     hideLoading(); // Hide loading after scoring
                 } else {
@@ -1591,7 +1594,7 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
             quizContainer.classList.add('hidden');
             document.querySelector('.progress-bar-container').classList.add('hidden'); // Hide global progress bar
 
-            showLoading('Generating personalized insights...');
+            showLoading('Bezig met het berekenen van je algemene score...'); // Initial loading message for the result calculation
 
             try {
                 let totalUserScore = 0;
@@ -1602,17 +1605,17 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                 }
                 
                 const overallScorePercentage = totalMaxScore > 0 ? Math.round((totalUserScore / totalMaxScore) * 100) : 0;
-                overallScoreDisplay.textContent = `Your Overall Health Score: ${overallScorePercentage}`; 
+                overallScoreDisplay.textContent = `Je Algemene Gezondheidsscore: ${overallScorePercentage}`; 
                 overallProgressBarFill.style.width = `${overallScorePercentage}%`;
                 updateProgressBarColor(overallProgressBarFill, overallScorePercentage);
 
                 let overallFeedback = '';
                 if (overallScorePercentage < 40) {
-                    overallFeedback = "Your current health score suggests there are several areas where small, consistent improvements can lead to significant positive changes. This is a great starting point for your health journey!";
+                    overallFeedback = "Je huidige gezondheidsscore suggereert dat er verschillende gebieden zijn waar kleine, consistente verbeteringen kunnen leiden tot aanzienlijke positieve veranderingen. Dit is een geweldig startpunt voor je gezondheidsreis!";
                 } else if (overallScorePercentage < 75) {
-                    overallFeedback = "You have a solid foundation for good health! With a few targeted adjustments, you can further optimize your well-being. Focus on the areas highlighted in your personalized recommendations.";
+                    overallFeedback = "Je hebt een solide basis voor een goede gezondheid! Met een paar gerichte aanpassingen kun je je welzijn verder optimaliseren. Concentreer je op de gebieden die in je gepersonaliseerde aanbevelingen worden benadrukt.";
                 } else {
-                    overallFeedback = "Outstanding work! Your health score indicates a strong commitment to your well-being. Keep up these excellent habits and explore advanced strategies to maintain your vitality.";
+                    overallFeedback = "Uitstekend werk! Je gezondheidsscore wijst op een sterke toewijding aan je welzijn. Blijf deze uitstekende gewoonten volhouden en verken geavanceerde strategieën om je vitaliteit te behouden.";
                 }
                 feedbackDisplay.textContent = overallFeedback;
 
@@ -1632,13 +1635,12 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                 await generateAndDisplayDetailedRecommendations();
 
                 resultContainer.classList.remove('hidden');
+
             } catch (error) {
-                console.error("Error during quiz finalization or recommendation generation:", error);
-                loadingMessage.textContent = "An error occurred. Please try again later.";
-                setTimeout(() => {
-                    hideLoading();
-                    resultContainer.classList.remove('hidden'); 
-                }, 2000);
+                console.error("Fout tijdens afronding quiz of genereren aanbevelingen:", error);
+                loadingMessage.textContent = "Oeps! Er is een onverwachte fout opgetreden bij het berekenen van de resultaten. Probeer het later opnieuw.";
+                setTimeout(() => { hideLoading(); }, 2000); 
+                resultContainer.classList.remove('hidden'); 
             }
         }
 
@@ -1662,8 +1664,8 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
          * Generates and displays detailed recommendations using a Gemini API call.
          */
         async function generateAndDisplayDetailedRecommendations() {
-            showLoading('Generating personalized recommendations...');
-            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>'; 
+            showLoading('Bezig met het genereren van gepersonaliseerde aanbevelingen...'); // Initial loading for this specific step
+            allDetailedRecommendations.innerHTML = '<h3>Onze Gepersonaliseerde Aanbevelingen</h3>'; 
 
             const promptParts = [];
             for (const category in userFeedback) {
@@ -1676,7 +1678,7 @@ Provide only a JSON object with a single key 'score' and its numerical value (fl
                     promptParts.push(`For the ${category} category, the user's overall score was ${categoryPercentage} (a numerical value representing percentage).`);
                     
                     userFeedback[category].forEach(item => {
-                        promptParts.push(`- Question: "${item.question.replace(/<br>/g, ' ')}"`); // Remove <br> for prompt clarity
+                        promptParts.push(`- Question: "${item.question.replace(/<br>/g, ' ')}"`);
                         promptParts.push(`  User's response: "${item.answer}"`); 
                     });
                 }
@@ -1697,85 +1699,81 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             const payload = {
                 contents: chatHistory,
                 generationConfig: {
-                    responseMimeType: "application/json", // Request JSON output
-                    maxOutputTokens: 4096 // Increased maxOutputTokens
+                    responseMimeType: "application/json",
+                    maxOutputTokens: 4096
                 }
             };
 
-            // This API key is no longer needed directly in the frontend
-            // const apiKey = ""; 
-            // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            // *** IMPORTANT: Now call the Netlify Function instead of direct Gemini API ***
-            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-recommendations-proxy`; // Fixed: Use absolute URL
+            const functionUrl = `${window.location.origin}/.netlify/functions/gemini-recommendations-proxy`;
             
             let response;
             let result;
             const maxRetries = 5;
             let attempt = 0;
 
-            while (attempt < maxRetries) {
-                try {
-                    const response = await fetch(functionUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prompt: prompt }) // Send the full prompt in the body
-                    });
-                    result = await response.json();
+            try {
+                while (attempt < maxRetries) {
+                    try {
+                        response = await fetch(functionUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: prompt })
+                        });
+                        result = await response.json();
 
-                    if (response.ok && result.success && typeof result.response === 'string') {
-                        // The 'response' from the Netlify Function is the JSON string from Gemini
-                        const summaryText = result.response;
-                        
-                        try {
-                            const recommendations = JSON.parse(summaryText);
-                            if (Array.isArray(recommendations)) {
-                                recommendations.forEach(rec => {
-                                    const recItem = document.createElement('div');
-                                    recItem.classList.add('recommendation-item');
-
-                                    const recTitle = document.createElement('h4');
-                                    recTitle.textContent = rec.title;
-                                    recItem.appendChild(recTitle);
-
-                                    const recDescription = document.createElement('p');
-                                    recDescription.textContent = rec.recommendation;
-                                    recItem.appendChild(recDescription);
-
-                                    allDetailedRecommendations.appendChild(recItem);
-                                });
-                            } else {
-                                // Fallback if AI returns JSON but not an array
-                                console.warn("AI returned JSON, but it's not an array:", recommendations);
+                        if (response.ok && result.success && typeof result.response === 'string') {
+                            const summaryText = result.response;
+                            try {
+                                const recommendations = JSON.parse(summaryText);
+                                if (Array.isArray(recommendations)) {
+                                    recommendations.forEach(rec => {
+                                        const recItem = document.createElement('div');
+                                        recItem.classList.add('recommendation-item');
+                                        const recTitle = document.createElement('h4');
+                                        recTitle.textContent = rec.title;
+                                        recItem.appendChild(recTitle);
+                                        const recDescription = document.createElement('p');
+                                        recDescription.textContent = rec.recommendation;
+                                        recItem.appendChild(recDescription);
+                                        allDetailedRecommendations.appendChild(recItem);
+                                    });
+                                } else {
+                                    console.warn("AI returned JSON, but it's not an array:", recommendations);
+                                    const feedbackItem = document.createElement('p');
+                                    feedbackItem.classList.add('detailed-feedback');
+                                    feedbackItem.textContent = summaryText;
+                                    allDetailedRecommendations.appendChild(feedbackItem);
+                                }
+                                break; // Exit retry loop on success
+                            } catch (jsonError) {
+                                console.error("Failed to parse AI response as JSON:", jsonError);
                                 const feedbackItem = document.createElement('p');
                                 feedbackItem.classList.add('detailed-feedback');
                                 feedbackItem.textContent = summaryText;
                                 allDetailedRecommendations.appendChild(feedbackItem);
+                                break; // Exit retry loop even on JSON parse error, as raw text is displayed
                             }
-                        } catch (jsonError) {
-                            // Fallback if AI does not return valid JSON
-                            console.error("Failed to parse AI response as JSON:", jsonError);
-                            const feedbackItem = document.createElement('p');
-                            feedbackItem.classList.add('detailed-feedback');
-                            feedbackItem.textContent = summaryText; // Display as plain text
-                            allDetailedRecommendations.appendChild(feedbackItem);
+                        } else {
+                            console.error("Netlify Function error or unexpected response:", result);
+                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
                         }
-                        break; 
-                    } else {
-                        console.error("Netlify Function error or unexpected response:", result);
-                        throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}`);
+                    } catch (error) {
+                        console.error(`API call attempt ${attempt + 1} failed:`, error);
+                        attempt++;
+                        if (attempt >= maxRetries) {
+                            throw error; // Re-throw error if max retries reached
+                        }
+                        const delay = Math.pow(2, attempt) * 1000; 
+                        await new Promise(res => setTimeout(res, delay));
                     }
-                } catch (error) {
-                    console.error(`API call attempt ${attempt + 1} failed:`, error);
-                    attempt++;
-                    if (attempt >= maxRetries) {
-                        throw new Error("Max retries reached. Failed to generate recommendations.");
-                    }
-                    const delay = Math.pow(2, attempt) * 1000; 
-                    await new Promise(res => setTimeout(res, delay));
                 }
+            } catch (error) {
+                loadingMessage.textContent = "Oeps! Kon geen gepersonaliseerde aanbevelingen genereren. Probeer het later opnieuw.";
+                console.error("Fout bij het genereren van aanbevelingen:", error);
+                throw error; // Re-throw to propagate to finishQuiz catch block
+            } finally {
+                hideLoading(); // Always hide loading when this function finishes, regardless of success or failure
             }
-            hideLoading();
         }
 
 
@@ -1787,7 +1785,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             resultContainer.classList.add('hidden');
             document.querySelector('.progress-bar-container').classList.add('hidden');
             startScreen.classList.remove('hidden');
-            allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>';
+            allDetailedRecommendations.innerHTML = '<h3>Onze Gepersonaliseerde Aanbevelingen</h3>';
             
             // Re-initialize start screen for animation
             startScreen.classList.remove('exited');
@@ -1799,7 +1797,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
          * Shows the loading overlay with an optional message.
          * @param {string} message = 'Loading...' - The message to display during loading.
          */
-        function showLoading(message = 'Loading...') {
+        function showLoading(message = 'Bezig met laden...') {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
             loadingOverlay.style.display = 'flex'; 
