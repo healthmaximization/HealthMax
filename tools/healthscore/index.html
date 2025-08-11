@@ -1523,28 +1523,29 @@
 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
-                    hideLoading(); // <--- VERBORG DE LAADOVERLAY HIER!
+                    hideLoading(); // Verberg de laadoverlay na het verwerken van het antwoord
 
                     // Start fade out animation
                     quizContainer.classList.remove('entered');
-                    requestAnimationFrame(() => { // Ensure styles are applied before transition
-                        quizContainer.classList.add('exiting');
-                    });
-                    await new Promise(resolve => quizContainer.addEventListener('transitionend', resolve, { once: true }));
-                    quizContainer.classList.add('hidden'); // Fully hide after exit animation
-                    
-                    // Reset to entering state for next question
-                    quizContainer.classList.remove('exiting');
-                    quizContainer.classList.add('entering');
-                    
-                    displayQuestion();
-                    
-                    // Trigger fade in animation
-                    quizContainer.classList.remove('hidden');
-                    // Force reflow to ensure animation restarts
-                    void quizContainer.offsetWidth; 
-                    quizContainer.classList.remove('entering');
-                    quizContainer.classList.add('entered');
+                    quizContainer.classList.add('exiting');
+
+                    // Gebruik setTimeout om de content te wijzigen en de container opnieuw in beeld te brengen
+                    // na de verwachte duur van de exit-animatie (0.5s CSS transition).
+                    setTimeout(() => {
+                        quizContainer.classList.add('hidden'); // Zorg ervoor dat het volledig verborgen is voordat nieuwe content wordt gerenderd
+                        quizContainer.classList.remove('exiting'); // Ruim de 'exiting' klasse op
+
+                        displayQuestion(); // Render de nieuwe vraag content
+
+                        // Bereid voor op de fade-in animatie
+                        quizContainer.classList.remove('hidden');
+                        quizContainer.classList.add('entering');
+                        // Forceer reflow om ervoor te zorgen dat de animatie opnieuw start
+                        void quizContainer.offsetWidth; 
+                        // Activeer de fade-in animatie
+                        quizContainer.classList.remove('entering');
+                        quizContainer.classList.add('entered');
+                    }, 550); // Iets langer dan de 0.5s CSS transitieduur
                 } else {
                     finishQuiz();
                 }
