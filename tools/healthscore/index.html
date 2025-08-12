@@ -1000,6 +1000,8 @@
             flex-direction: column; /* Gecentreerde inhoud */
             padding: 20px; /* Consistente padding */
             box-sizing: border-box;
+            /* Removed overflow-y: auto here to prevent modal itself from scrolling, 
+               instead the content inside should be managed to fit. */
         }
 
         .newsletter-gate-modal.visible {
@@ -1009,7 +1011,7 @@
 
         .newsletter-gate-content {
             background-color: #1e1e1e;
-            padding: 40px; /* Meer padding */
+            padding: 25px; /* Reduced padding for more compact design */
             border-radius: 15px;
             /* Subtielere, premium schaduw */
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
@@ -1022,15 +1024,15 @@
             position: relative; /* Zorgt ervoor dat logo absoluut gepositioneerd kan worden */
             overflow: hidden; /* Zorgt ervoor dat schaduw/rondingen niet worden afgesneden */
             
-            /* NEW: Add max-height and overflow-y for inner scrolling */
-            max-height: 90vh; /* Max height to prevent content going off screen */
-            overflow-y: auto; /* Enable scrolling for content within the modal */
+            /* NEW: Explicitly control height to avoid internal scrolling for default content */
+            max-height: calc(100vh - 40px); /* Adjust max height for viewport, considering body padding */
+            overflow-y: auto; /* Allow scrolling for content *within* the modal if it still overflows */
         }
         
         /* Nieuw: Logo boven de popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            margin: -25px auto 25px auto; /* Negatieve marge om iets boven de rand uit te steken */
+            margin: -25px auto 20px auto; /* Reduced bottom margin for more compactness */
             max-width: 120px; /* Iets kleiner dan hoofdpagina logo */
             height: auto;
             border-radius: 50%;
@@ -1047,45 +1049,45 @@
 
         .newsletter-gate-content h3 {
             color: #f0f0f0;
-            font-size: 2.2em; /* Iets groter voor impact */
-            margin-bottom: 15px;
+            font-size: 2em; /* Slightly smaller for compactness */
+            margin-bottom: 10px; /* Reduced margin */
             font-weight: 700;
         }
 
         /* Nieuw: Promotionele tekststijlen */
         .newsletter-gate-content .promo-text {
-            font-size: 1.15em;
+            font-size: 1.05em; /* Slightly smaller font for compactness */
             color: #d0d0d0;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            margin-bottom: 15px; /* Reduced margin */
+            line-height: 1.5;
         }
 
         .newsletter-gate-content .promo-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 25px 0; /* Marge onder de lijst */
+            margin: 0 0 15px 0; /* Reduced margin below the list */
             text-align: left;
         }
 
         .newsletter-gate-content .promo-list li {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 10px;
-            font-size: 1em;
+            margin-bottom: 8px; /* Reduced margin */
+            font-size: 0.95em; /* Slightly smaller font */
             color: #c0c0c0;
         }
 
         .newsletter-gate-content .promo-list li .icon-emoji {
-            font-size: 1.3em;
-            margin-right: 8px;
-            min-width: 1.3em;
+            font-size: 1.2em; /* Adjusted size */
+            margin-right: 6px; /* Reduced margin */
+            min-width: 1.2em;
             text-align: center;
             color: #ffd700; /* Goudkleur voor iconen */
         }
 
 
         .newsletter-gate-content .beehiiv-embed {
-            margin: 20px auto; /* Gecentreerde embed */
+            margin: 15px auto; /* Adjusted margin */
             width: 100%; /* Zorg voor responsiviteit */
             max-width: 660px; /* Keep original max-width from the iframe src */
             height: 304px; /* Oorspronkelijke hoogte behouden */
@@ -1096,35 +1098,35 @@
         }
         
         .newsletter-gate-content .terms-checkbox {
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 15px; /* Reduced margin */
+            margin-bottom: 15px; /* Reduced margin */
             display: flex;
             align-items: center;
             justify-content: center; /* Centreer checkbox en tekst */
-            font-size: 0.9em;
+            font-size: 0.85em; /* Slightly smaller font */
             color: #a0a0a0;
         }
 
         .newsletter-gate-content .terms-checkbox input[type="checkbox"] {
-            margin-right: 8px;
+            margin-right: 6px; /* Reduced margin */
             accent-color: #28a745; /* Groene accentkleur */
             cursor: pointer;
-            transform: scale(1.2); /* Iets grotere checkbox */
+            transform: scale(1.1); /* Slightly smaller checkbox */
         }
 
         .newsletter-gate-content button {
             background-color: #28a745;
             color: #ffffff;
-            padding: 15px 30px;
+            padding: 12px 25px; /* Reduced padding for button */
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 1.2em;
+            font-size: 1.1em; /* Slightly smaller font */
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
             width: auto;
-            min-width: 200px;
+            min-width: 180px; /* Adjusted min-width */
         }
 
         .newsletter-gate-content button:hover:not(:disabled) {
@@ -1143,23 +1145,24 @@
         /* Responsive aanpassingen voor de popup */
         @media (max-width: 480px) {
             .newsletter-gate-content {
-                padding: 30px 20px; /* Iets minder padding op kleine schermen */
+                padding: 20px 15px; /* Further reduced padding on small screens */
             }
             .newsletter-gate-content h3 {
-                font-size: 1.8em;
+                font-size: 1.6em;
             }
             .newsletter-gate-content .promo-text {
-                font-size: 1em;
-            }
-            .newsletter-gate-content .promo-list li {
                 font-size: 0.95em;
             }
+            .newsletter-gate-content .promo-list li {
+                font-size: 0.9em;
+            }
             .newsletter-gate-content button {
-                padding: 12px 25px;
-                font-size: 1.1em;
+                padding: 10px 20px;
+                font-size: 1em;
             }
             .newsletter-gate-content .logo-modal {
-                max-width: 100px;
+                max-width: 90px; /* Slightly smaller logo */
+                margin-bottom: 15px; /* Adjusted margin */
             }
         }
 
