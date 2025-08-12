@@ -176,18 +176,27 @@
             text-align: center;
         }
 
-        .embed-container h3 {
+        /* Removed h3 for embed container since it's now internal to the embed */
+        /* .embed-container h3 {
             color: #f0f0f0;
             margin-bottom: 15px;
             font-size: 1.8em;
             font-weight: 700;
-        }
+        } */
 
-        /* Consistent iframe styling */
+        /* Removed p for embed container for the same reason */
+        /* .embed-container p {
+            font-size: 1.1em;
+            color: #c0c0c0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        } */
+
+        /* Consistent iframe styling, adjusted height/max-width for the new embed */
         .embed-container iframe {
             width: 100%;
-            max-width: 660px; /* Consistent with quiz */
-            height: 412px; /* Consistent with quiz */
+            max-width: 814px; /* Adjusted max-width to match the new embed */
+            height: 420px; /* Adjusted height to match the new embed */
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
@@ -200,7 +209,7 @@
             h2 { font-size: 1.3em; }
             .page-section { padding: 20px; }
             .main-nav a { font-size: 1em; padding: 10px 15px; }
-            .embed-container h3 { font-size: 1.4em; }
+            /* .embed-container h3 { font-size: 1.4em; } */ /* Removed */
         }
 
         @media (max-width: 480px) {
@@ -208,7 +217,7 @@
             h2 { font-size: 1.1em; }
             .main-nav { flex-direction: column; gap: 10px; }
             .main-nav a { width: calc(100% - 40px); }
-            .embed-container iframe { height: 250px; } /* Smaller height for small screens */
+            .embed-container iframe { height: 320px; } /* Adjust height for smaller screens on new embed */
         }
 
     </style>
@@ -238,25 +247,9 @@
         <p>Explore our tools or join our community to start transforming your health today!</p>
 
         <div class="embed-container">
-            <h3>Join Our Newsletter!</h3>
-            <p>Get exclusive health tips, new tool updates, and special offers delivered straight to your inbox.</p>
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 660px; height: 412px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/740cadbc-063d-4325-9f3b-c1909384bfc7" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 814px; height: 420px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
-        </div>
-
-        <div class="embed-container">
-            <h3>Subscribe to HealthMaximization on YouTube!</h3>
-            <p>Join our community for in-depth guides, health challenges, and interviews with experts. Don't miss out!</p>
-            <!-- YouTube Subscribe Embed - Using the channel ID for a subscribe button -->
-            <iframe
-                src="https://www.youtube.com/embed?listType=channel&list=UCq7q2g5N4k-x2Q1x4wQ8YdA&autoplay=0"
-                title="HealthMaximization YouTube Channel"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen>
-            </iframe>
         </div>
     </main>
 </body>
