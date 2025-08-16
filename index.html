@@ -25,8 +25,8 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364); /* Green-blue gradient */
-            background-size: 600% 600%; /* Make the background much larger for more movement */
-            animation: gradientAnimation 20s ease infinite; /* Apply animation - longer duration for smoother flow */
+            background-size: 400% 400%; /* Slightly smaller size for more noticeable movement */
+            animation: gradientAnimation 15s ease infinite; /* Faster animation for more dynamism */
             color: #e0e0e0; /* Light gray text */
             display: flex;
             flex-direction: column;
@@ -36,6 +36,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
         /* Keyframe animation for the background gradient - more dynamic movement */
@@ -54,20 +55,25 @@
         /* Container styling consistent with quiz */
         .page-section {
             background-color: #1e1e1e;
-            padding: 30px;
+            padding: 40px; /* Increased padding for more space */
             border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            max-width: 600px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7); /* Deeper shadow for more presence */
+            max-width: 650px; /* Slightly wider */
             width: 100%;
             text-align: center;
             box-sizing: border-box;
             margin-bottom: 20px;
-            /* Flexbox properties to vertically and horizontally center content */
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center content vertically */
-            align-items: center; /* Center content horizontally */
-            flex-grow: 1; /* Allow it to grow and fill available space */
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transition for hover */
+        }
+
+        .page-section:hover {
+            transform: translateY(-8px); /* Lift effect on hover */
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9); /* More intense shadow on hover */
         }
 
         /* Header styling */
@@ -86,46 +92,26 @@
             height: auto;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); /* Enhanced logo shadow */
         }
 
         h1 {
             color: #f0f0f0;
             margin-bottom: 5px;
-            font-size: 2.8em;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 3.2em; /* Larger title */
+            font-weight: 800; /* Bolder title */
+            letter-spacing: 0.08em; /* More letter spacing */
+            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); /* Stronger text shadow */
         }
 
         .subtitle {
-            color: #a0a0a0;
-            font-size: 0.9em;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            font-weight: 400;
+            color: #b0b0b0; /* Slightly brighter subtitle */
+            font-size: 1.1em; /* Larger subtitle */
+            margin-top: 10px; /* More space above subtitle */
+            margin-bottom: 25px; /* More space below subtitle */
+            font-weight: 500; /* Medium weight */
+            letter-spacing: 0.02em;
         }
-
-        /* De AI-Powered Insights tag is verwijderd zoals gevraagd */
-        /*
-        .ai-powered-tag {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: -10px;
-            margin-bottom: 20px;
-            color: #8c8c8c;
-            font-size: 0.95em;
-            font-weight: 500;
-        }
-
-        .ai-powered-tag svg {
-            width: 20px;
-            height: 20px;
-            fill: #ffd700;
-        }
-        */
 
         /* Navigation styling */
         .main-nav {
@@ -133,7 +119,7 @@
             width: 100%;
             max-width: 600px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Enhanced nav shadow */
             margin-bottom: 30px;
             padding: 15px 0;
             display: flex;
@@ -148,12 +134,13 @@
             font-weight: 500;
             padding: 10px 20px;
             border-radius: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Added transform to transition */
         }
 
         .main-nav a:hover {
-            background-color: #0a1a2f;
+            background-color: #0d2a4f; /* Darker blue on hover */
             color: #ffffff;
+            transform: translateY(-3px); /* Subtle lift on hover */
         }
         
         .main-nav a.active {
@@ -170,42 +157,41 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
-            /* Padding for visual spacing around the embed, less aggressive than before */
-            padding: 10px; 
+            padding: 20px; /* Increased padding around the embed */
             box-sizing: border-box;
         }
 
-        /* Styling for the Beehiiv iframe itself - reverted to more stable version */
+        /* Styling for the Beehiiv iframe itself - keep minimal to avoid glitches */
         .embed-container iframe {
             width: 100%;
             max-width: 814px; /* Max-width from Beehiiv for optimal display */
             height: 420px; /* Height from Beehiiv */
             border: none;
-            border-radius: 10px; /* Reverted to 10px for consistency/stability */
-            /* Reverted box-shadow to a more subtle one */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Reverted box-shadow for stability */
             background-color: transparent;
-            /* Removed !important from margin/display, letting Beehiiv's inline styles handle their own */
             margin: 0 auto; 
             display: block;
-            /* Removed all hover effects and transitions that might have caused issues */
         }
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
-            h1 { font-size: 2.2em; }
-            .page-section { padding: 20px; }
-            .main-nav a { font-size: 1em; padding: 10px 15px; }
+            h1 { font-size: 2.5em; }
+            .subtitle { font-size: 1em; }
+            .page-section { padding: 30px; max-width: 90%; }
+            .main-nav a { font-size: 1em; padding: 8px 15px; }
             .embed-container iframe { height: 380px; }
-            .embed-container { padding: 10px; } 
+            .embed-container { padding: 15px; } 
         }
 
         @media (max-width: 480px) {
-            h1 { font-size: 2em; }
-            .main-nav { flex-direction: column; gap: 10px; }
-            .main-nav a { width: calc(100% - 40px); }
-            .embed-container iframe { height: 320px; }
-            .embed-container { padding: 5px; } /* Further adjust padding for very small screens */
+            h1 { font-size: 2em; letter-spacing: 0.05em; }
+            .subtitle { font-size: 0.9em; }
+            .main-nav { flex-direction: column; gap: 8px; }
+            .main-nav a { width: calc(100% - 30px); padding: 8px 10px; }
+            .page-section { padding: 20px; border-radius: 10px; margin-bottom: 15px;}
+            .embed-container iframe { height: 300px; }
+            .embed-container { padding: 10px; } 
         }
     </style>
 </head>
