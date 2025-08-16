@@ -62,6 +62,12 @@
             text-align: center;
             box-sizing: border-box;
             margin-bottom: 20px;
+            /* Flexbox properties to vertically and horizontally center content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
+            flex-grow: 1; /* Allow it to grow and fill available space */
         }
 
         /* Header styling */
@@ -100,6 +106,8 @@
             font-weight: 400;
         }
 
+        /* De AI-Powered Insights tag is verwijderd zoals gevraagd */
+        /*
         .ai-powered-tag {
             display: flex;
             align-items: center;
@@ -117,6 +125,7 @@
             height: 20px;
             fill: #ffd700;
         }
+        */
 
         /* Navigation styling */
         .main-nav {
@@ -153,73 +162,51 @@
             font-weight: 600;
         }
 
-
-        /* Main content styling */
-        h2 {
-            color: #f0f0f0;
-            margin-bottom: 25px;
-            font-size: 1.5em;
-            font-weight: 600;
-        }
-
-        p {
-            line-height: 1.6;
-            color: #c0c0c0;
-            font-weight: 400;
-        }
-
         /* Embed container styling */
         .embed-container {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #3a3a3a;
             text-align: center;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            /* Padding for visual spacing around the embed, less aggressive than before */
+            padding: 10px; 
+            box-sizing: border-box;
         }
 
-        /* Removed h3 for embed container since it's now internal to the embed */
-        /* .embed-container h3 {
-            color: #f0f0f0;
-            margin-bottom: 15px;
-            font-size: 1.8em;
-            font-weight: 700;
-        } */
-
-        /* Removed p for embed container for the same reason */
-        /* .embed-container p {
-            font-size: 1.1em;
-            color: #c0c0c0;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        } */
-
-        /* Consistent iframe styling, adjusted height/max-width for the new embed */
+        /* Styling for the Beehiiv iframe itself - reverted to more stable version */
         .embed-container iframe {
             width: 100%;
-            max-width: 814px; /* Adjusted max-width to match the new embed */
-            height: 420px; /* Adjusted height to match the new embed */
+            max-width: 814px; /* Max-width from Beehiiv for optimal display */
+            height: 420px; /* Height from Beehiiv */
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border-radius: 10px; /* Reverted to 10px for consistency/stability */
+            /* Reverted box-shadow to a more subtle one */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
             background-color: transparent;
+            /* Removed !important from margin/display, letting Beehiiv's inline styles handle their own */
+            margin: 0 auto; 
+            display: block;
+            /* Removed all hover effects and transitions that might have caused issues */
         }
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
             h1 { font-size: 2.2em; }
-            h2 { font-size: 1.3em; }
             .page-section { padding: 20px; }
             .main-nav a { font-size: 1em; padding: 10px 15px; }
-            /* .embed-container h3 { font-size: 1.4em; } */ /* Removed */
+            .embed-container iframe { height: 380px; }
+            .embed-container { padding: 10px; } 
         }
 
         @media (max-width: 480px) {
             h1 { font-size: 2em; }
-            h2 { font-size: 1.1em; }
             .main-nav { flex-direction: column; gap: 10px; }
             .main-nav a { width: calc(100% - 40px); }
-            .embed-container iframe { height: 320px; } /* Adjust height for smaller screens on new embed */
+            .embed-container iframe { height: 320px; }
+            .embed-container { padding: 5px; } /* Further adjust padding for very small screens */
         }
-
     </style>
 </head>
 <body>
@@ -227,12 +214,7 @@
         <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
         <h1>HealthMax</h1>
         <p class="subtitle">Your Journey to Optimal Health</p>
-        <div class="ai-powered-tag">
-            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.92 14.5c-.32.32-.86.32-1.18 0l-2.48-2.48c-.32-.32-.32-.86 0-1.18l2.48-2.48c.32-.32.86-.32 1.18 0l2.48 2.48c.32.32.32.86 0 1.18l-2.48 2.48zm8.92-8.5c-.32-.32-.86-.32-1.18 0L12 12.08l-2.48-2.48c-.32-.32-.86-.32-1.18 0s-.32.86 0 1.18l3.07 3.07c.32.32.86.32 1.18 0l3.07-3.07c.32-.32.32-.86 0-1.18z"/>
-            </svg>
-            <span>AI-Powered Insights</span>
-        </div>
+        <!-- De AI-Powered Insights tag is verwijderd zoals gevraagd -->
     </header>
 
     <nav class="main-nav">
@@ -242,10 +224,6 @@
     </nav>
 
     <main class="page-section">
-        <h2>Welcome to HealthMax!</h2>
-        <p>Discover personalized insights to optimize your nutrition, exercise, sleep, and mental well-being. Our AI-powered tools are designed to guide you on your journey to a healthier, happier you.</p>
-        <p>Explore our tools or join our community to start transforming your health today!</p>
-
         <div class="embed-container">
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/740cadbc-063d-4325-9f3b-c1909384bfc7" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 814px; height: 420px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
