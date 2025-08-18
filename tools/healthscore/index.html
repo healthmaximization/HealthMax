@@ -1226,6 +1226,12 @@
             line-height: 1.6;
         }
 
+        /* Apply gold color to strong tags within this section */
+        .product-offer-section strong {
+            color: #ffd700; /* Gold color for emphasized text within the offer */
+            font-weight: 700; /* Ensure it's bold */
+        }
+
         .product-image-container {
             margin: 30px auto;
             max-width: 300px; /* Adjust as needed for image size */
@@ -1599,26 +1605,26 @@
                     <img src="https://public-files.gumroad.com/xz4symwybt89n2jsz9p3f3q7iia5" alt="The Morning Protocol E-book Cover" class="product-cover-image">
                 </div>
 
-                <p class="offer-solution">Imagine a life where you effortlessly tackle your goals, radiate positive energy, and achieve more before lunch than most people do all day. This isn't a pipe dream. It's the reality for thousands who've leveraged the power of a *structured, intentional morning routine*.</p>
+                <p class="offer-solution">Imagine a life where you effortlessly tackle your goals, radiate positive energy, and achieve more before lunch than most people do all day. This isn't a pipe dream. It's the reality for thousands who've leveraged the power of a <em>structured, intentional morning routine</em>.</p>
 
                 <div class="benefits-list">
                     <h4>With The Morning Protocol, you will:</h4>
                     <ul>
-                        <li><span class="bullet-icon">&#10003;</span> **Skyrocket your energy levels** from the moment you open your eyes.</li>
-                        <li><span class="bullet-icon">&#10003;</span> **Crush procrastination** and build unstoppable momentum.</li>
-                        <li><span class="bullet-icon">&#10003;</span> **Sharpen your focus** and clarity throughout the day.</li>
-                        <li><span class="bullet-icon">&#10003;</span> **Reduce stress** and cultivate a powerful, positive mindset.</li>
-                        <li><span class="bullet-icon">&#10003;</span> **Achieve more** in your life, both personally and professionally.</li>
+                        <li><span class="bullet-icon">&#10003;</span> <strong>Skyrocket your energy levels</strong> from the moment you open your eyes.</li>
+                        <li><span class="bullet-icon">&#10003;</span> <strong>Crush procrastination</strong> and build unstoppable momentum.</li>
+                        <li><span class="bullet-icon">&#10003;</span> <strong>Sharpen your focus</strong> and clarity throughout the day.</li>
+                        <li><span class="bullet-icon">&#10003;</span> <strong>Reduce stress</strong> and cultivate a powerful, positive mindset.</li>
+                        <li><span class="bullet-icon">&#10003;</span> <strong>Achieve more</strong> in your life, both personally and professionally.</li>
                     </ul>
                 </div>
 
-                <p class="offer-value">This isn't a complex, theoretical tome. It's a **concise, actionable system** designed for *immediate results*.</p>
+                <p class="offer-value">This isn't a complex, theoretical tome. It's a <strong>concise, actionable system</strong> designed for <em>immediate results</em>.</p>
 
                 <div class="offer-details">
                     <p class="original-price">Normally: <span class="strike-through">$18</span></p>
                     <p class="special-price">YOUR SPECIAL PRICE: <span class="highlight-price">$9!</span></p>
                     <p class="coupon-info">Use coupon code: <span class="coupon-code">TMP50</span> at checkout for 50% OFF!</p>
-                    <p class="urgency-scarcity">🔥 **Limited Time Offer!** Only available for the **first 10 HealthMax members!** Don't miss out on this exclusive opportunity to redefine your mornings.</p>
+                    <p class="urgency-scarcity">🔥 <strong>Limited Time Offer!</strong> Only available for the <strong>first 10 HealthMax members!</strong> Don't miss out on this exclusive opportunity to redefine your mornings.</p>
                 </div>
 
                 <a href="https://store.healthmaximization.com/l/themorningprotocol" target="_blank" class="cta-button">
@@ -1630,6 +1636,9 @@
 
         </div>
     </main>
+    
+    <!-- Hidden input for clipboard operations - positioned here to avoid dynamic DOM manipulation issues -->
+    <input type="text" id="shareLinkInput" style="position: absolute; left: -9999px; top: -9999px; opacity: 0;">
 
     <script type="module">
         // Define questions for each category, now multiple-choice first, then open-ended
@@ -2438,18 +2447,40 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
          * Copies the current page URL to the clipboard.
          */
         function copyShareLink() {
+            console.log("Attempting to copy share link.");
             const currentUrl = window.location.href;
-            const tempInput = document.createElement('input');
-            document.body.appendChild(tempInput);
+            const tempInput = document.getElementById('shareLinkInput'); // Get the pre-existing hidden input
             tempInput.value = currentUrl;
             tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-
-            copyMessage.classList.add('show');
-            setTimeout(() => {
-                copyMessage.classList.remove('show');
-            }, 3000); 
+            
+            try {
+                // Attempt to execute the copy command
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('Copy command successful.');
+                    copyMessage.classList.add('show');
+                    setTimeout(() => {
+                        copyMessage.classList.remove('show');
+                    }, 3000); 
+                } else {
+                    console.warn('Copy command unsuccessful, falling back to manual copy.');
+                    copyMessage.textContent = 'Copy failed. Please manually copy the link: ' + currentUrl;
+                    copyMessage.classList.add('show');
+                    setTimeout(() => {
+                        copyMessage.classList.remove('show');
+                        copyMessage.textContent = 'Link copied!'; 
+                    }, 5000); 
+                }
+            } catch (err) {
+                console.error('Error executing copy command:', err);
+                copyMessage.textContent = 'Error copying. Please manually copy the link: ' + currentUrl;
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                    copyMessage.textContent = 'Link copied!'; 
+                }, 5000); 
+            }
+            console.log("Copy share link function finished.");
         }
 
         /**
