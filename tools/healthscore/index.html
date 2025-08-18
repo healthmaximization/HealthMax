@@ -1012,28 +1012,27 @@
             padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
-            max-width: 600px; 
-            width: 90%; 
+            max-width: 600px; /* Max-width voor de popup */
+            width: 90%; /* Zorgt ervoor dat de popup responsief is op kleinere schermen */
             text-align: center;
             box-sizing: border-box;
             transform: translateY(20px); /* Start slightly lower */
             transition: transform 0.4s ease-out; /* Smooth transformation */
             position: relative; 
-            overflow: visible; /* Fixed: Ensure content doesn't get clipped for logo */
-            max-height: calc(100vh - 40px); /* Fixed: Max height remains to prevent it from becoming too tall */
-            /* Removed overflow-y: auto to address "geen slider" request directly. */
+            overflow: visible; /* Zorgt ervoor dat het logo niet afgekapt wordt */
+            /* Removed max-height and overflow-y: auto to eliminate scrollbar and allow content to dictate height */
+            /* max-height: calc(100vh - 40px); */
 
             display: flex; 
             flex-direction: column;
-            align-items: center; /* Center items horizontally */
-            /* Removed justify-content: center so content aligns to the top inside the modal */
+            align-items: center; /* Centreer items horizontaal */
+            justify-content: flex-start; /* Zorgt dat de inhoud bovenaan uitlijnt */
         }
         
         /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            /* Fixed: Adjusted margin-top to prevent cropping of the logo */
-            margin: -40px auto 15px auto; 
+            margin: -30px auto 15px auto; /* Aangepaste margin-top voor betere positionering van het logo */
             max-width: 120px; 
             height: auto;
             border-radius: 50%;
@@ -1044,8 +1043,8 @@
             z-index: 10; 
         }
 
-        /* New: Styles for popup headings/text */
-        .newsletter-gate-content h2 { 
+        /* Fixed: Removed specific styles for h2 and p.modal-description because the Beehiiv embed provides its own text. */
+        /* .newsletter-gate-content h2 { 
             color: #f0f0f0;
             margin-top: 15px; 
             margin-bottom: 10px;
@@ -1053,23 +1052,23 @@
             font-weight: 700;
         }
 
-        .newsletter-gate-content p.modal-description { /* Added a class for specific targeting */
+        .newsletter-gate-content p.modal-description { 
             color: #c0c0c0;
             font-size: 1.1em;
             line-height: 1.5;
             margin-bottom: 20px;
             padding: 0 15px; 
-        }
+        } */
 
         .newsletter-gate-modal.visible .newsletter-gate-content {
             transform: translateY(0); /* Slide up to final position */
         }
 
         .newsletter-gate-content .beehiiv-embed {
-            margin: 0 auto; /* Fixed: Explicitly set margin auto for centering */
-            width: 100%; 
-            height: auto; 
-            min-height: 280px; 
+            margin: 0 auto; /* Zorgt voor centrering */
+            width: 100%; /* Zorgt dat de embed de volledige breedte van de parent inneemt */
+            height: auto; /* Zorgt ervoor dat de hoogte zich aanpast aan de inhoud van de embed */
+            min-height: 280px; /* Minimum hoogte voor de embed */
             border: none; 
             border-radius: 10px !important; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
@@ -1165,12 +1164,13 @@
             .newsletter-gate-content .terms-checkbox {
                 font-size: 0.8em; 
             }
-            .newsletter-gate-content h2 {
+            /* Fixed: Removed font size adjustments for h2 and p.modal-description for mobile */
+            /* .newsletter-gate-content h2 {
                 font-size: 1.5em;
             }
             .newsletter-gate-content p.modal-description {
                 font-size: 1em;
-            }
+            } */
         }
 
         /* Styling for the emphasized 'Free' text */
@@ -1208,9 +1208,9 @@
             <!-- HealthMax logo in the popup -->
             <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo-modal">
 
-            <!-- Added title and description for the popup -->
-            <h2>Unlock Your Full Health Report!</h2>
-            <p class="modal-description">Subscribe to our newsletter and get instant access to your personalized health report, exclusive tips, and actionable strategies directly in your inbox.</p>
+            <!-- Removed fixed title and description, as Beehiiv embed handles its own text -->
+            <!-- <h2>Unlock Your Full Health Report!</h2>
+            <p class="modal-description">Subscribe to our newsletter and get instant access to your personalized health report, exclusive tips, and actionable strategies directly in your inbox.</p> -->
 
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);"></iframe>
@@ -1769,7 +1769,7 @@
             const payload = {
                 // Modified prompt to explicitly ask for raw JSON
                 prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
-Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it addresses all parts of the original question.
+Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it. addresses all parts of the original question.
 
 Original Question: "${question}"
 User Answer: "${answer}"
