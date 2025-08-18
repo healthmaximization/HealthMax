@@ -991,13 +991,13 @@
             backdrop-filter: blur(10px); /* Stronger blur effect */
             -webkit-backdrop-filter: blur(10px); /* For Safari */
             display: flex;
+            flex-direction: column; /* Changed to column for logo and content stacking */
             justify-content: center;
             align-items: center;
             z-index: 1001; /* Higher than loading overlay */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Smoother transition */
-            flex-direction: column; 
             padding: 20px; 
             box-sizing: border-box;
         }
@@ -1007,52 +1007,51 @@
             visibility: visible;
         }
 
+        /* New: Logo above the popup */
+        .newsletter-gate-modal .logo-modal-top {
+            display: block;
+            max-width: 120px; 
+            height: auto;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); 
+            border: 4px solid #0a1a2f; 
+            z-index: 10; 
+            margin-bottom: -60px; /* Pull the content up */
+        }
+
         .newsletter-gate-content {
             background-color: #1e1e1e;
             padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
             max-width: 700px; /* Increased max-width for better fit of Beehiiv embed */
-            width: 90%; /* Zorgt ervoor dat de popup responsief is op kleinere schermen */
+            width: 90%; 
             text-align: center;
             box-sizing: border-box;
-            transform: translateY(20px); /* Start slightly lower */
-            transition: transform 0.4s ease-out; /* Smooth transformation */
+            transform: translateY(20px); 
+            transition: transform 0.4s ease-out; 
             position: relative; 
-            overflow: visible; /* Zorgt ervoor dat het logo niet afgekapt wordt */
+            overflow: visible; 
             overflow-x: hidden; /* Prevent horizontal scrollbar on the modal content itself */
-
             display: flex; 
             flex-direction: column;
-            align-items: center; /* Centreer items horizontaal */
-            justify-content: flex-start; /* Zorgt dat de inhoud bovenaan uitlijnt */
+            align-items: center; 
+            justify-content: flex-start; 
+            
+            padding-top: 85px; /* Adjust padding-top to make space for the overlapping logo */
         }
         
-        /* New: Logo above the popup */
-        .newsletter-gate-content .logo-modal {
-            display: block;
-            /* Aangepaste margin-top voor betere positionering van het logo */
-            margin: -150px auto 15px auto; 
-            max-width: 120px; 
-            height: auto;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Shadow for the logo */
-            border: 4px solid #0a1a2f; /* Premium border */
-            position: relative;
-            z-index: 10; 
-        }
-
         .newsletter-gate-modal.visible .newsletter-gate-content {
             transform: translateY(0); /* Slide up to final position */
         }
 
         .newsletter-gate-content .beehiiv-embed {
-            margin: 0 auto; /* Zorgt voor centrering */
-            width: 100%; /* Zorgt dat de embed de volledige breedte van de parent inneemt */
-            max-width: 660px; /* NEW: Added max-width to explicitly control embed size */
-            height: auto; /* Zorgt ervoor dat de hoogte zich aanpast aan de inhoud van de embed */
-            min-height: 280px; /* Minimum hoogte voor de embed */
+            margin: 0 auto; 
+            width: 100%; 
+            max-width: 660px; 
+            height: auto; 
+            min-height: 280px; 
             border: none; 
             border-radius: 10px !important; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
@@ -1135,16 +1134,15 @@
             .newsletter-gate-content {
                 padding: 15px; 
                 max-width: 95%; 
+                padding-top: 60px; /* Adjust padding for smaller logo on mobile */
             }
             .newsletter-gate-content button {
                 padding: 10px 20px; 
                 font-size: 1em; 
             }
-            .newsletter-gate-content .logo-modal {
+            .newsletter-gate-modal .logo-modal-top {
                 max-width: 80px; 
-                /* Aangepaste margin-top voor mobiel */
-                margin-top: -70px; 
-                margin-bottom: 10px;
+                margin-bottom: -40px; /* Adjust for smaller size */
             }
             .newsletter-gate-content .terms-checkbox {
                 font-size: 0.8em; 
@@ -1182,10 +1180,9 @@
 
     <!-- Newsletter Gate Modal (Hidden by default) -->
     <div id="newsletterGateModal" class="newsletter-gate-modal">
+        <!-- HealthMax logo, now a direct sibling to newsletter-gate-content -->
+        <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo-modal-top">
         <div class="newsletter-gate-content">
-            <!-- HealthMax logo in the popup -->
-            <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo-modal">
-
             <!-- Removed fixed title and description, as Beehiiv embed handles its own text -->
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); max-width: 660px;"></iframe>
