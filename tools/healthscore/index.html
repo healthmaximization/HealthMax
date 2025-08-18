@@ -1012,29 +1012,28 @@
             padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
-            max-width: 600px; /* Fixed: VERBREED DE POPUP */
-            width: 90%; /* Fixed: Ensure it takes a percentage width on mobile */
+            max-width: 600px; 
+            width: 90%; 
             text-align: center;
             box-sizing: border-box;
             transform: translateY(20px); /* Start slightly lower */
             transition: transform 0.4s ease-out; /* Smooth transformation */
             position: relative; 
-            /* Fixed: Ensure content doesn't get clipped. Changed from overflow: hidden */
-            overflow: visible; 
-            max-height: calc(100vh - 40px); 
-            overflow-y: auto; 
+            overflow: visible; /* Fixed: Ensure content doesn't get clipped for logo */
+            max-height: calc(100vh - 40px); /* Fixed: Max height remains to prevent it from becoming too tall */
+            /* Removed overflow-y: auto to address "geen slider" request directly. */
 
-            display: flex; /* Fixed: Use flexbox for internal layout */
+            display: flex; 
             flex-direction: column;
             align-items: center; /* Center items horizontally */
-            justify-content: center; /* Center items vertically if there's extra space */
+            /* Removed justify-content: center so content aligns to the top inside the modal */
         }
         
         /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            /* Fixed: Adjust negative margin to prevent cropping */
-            margin: -60px auto 15px auto; 
+            /* Fixed: Adjusted margin-top to prevent cropping of the logo */
+            margin: -40px auto 15px auto; 
             max-width: 120px; 
             height: auto;
             border-radius: 50%;
@@ -1046,20 +1045,20 @@
         }
 
         /* New: Styles for popup headings/text */
-        .newsletter-gate-content h2 { /* Fixed: Added H2 for popup title */
+        .newsletter-gate-content h2 { 
             color: #f0f0f0;
-            margin-top: 15px; /* Space below logo */
+            margin-top: 15px; 
             margin-bottom: 10px;
             font-size: 1.8em;
             font-weight: 700;
         }
 
-        .newsletter-gate-content p { /* Fixed: Added paragraph for description */
+        .newsletter-gate-content p.modal-description { /* Added a class for specific targeting */
             color: #c0c0c0;
             font-size: 1.1em;
             line-height: 1.5;
             margin-bottom: 20px;
-            padding: 0 15px; /* Add some horizontal padding for text */
+            padding: 0 15px; 
         }
 
         .newsletter-gate-modal.visible .newsletter-gate-content {
@@ -1067,13 +1066,13 @@
         }
 
         .newsletter-gate-content .beehiiv-embed {
-            margin: 15px auto; /* Centered */
-            width: 100%; /* Fixed: Ensure embed takes full width */
-            height: auto; /* Allow height to adjust based on content */
+            margin: 0 auto; /* Fixed: Explicitly set margin auto for centering */
+            width: 100%; 
+            height: auto; 
             min-height: 280px; 
             border: none; 
-            border-radius: 10px !important; /* Added border-radius to match popup style */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Added subtle shadow */
+            border-radius: 10px !important; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
             background-color: transparent;
         }
         
@@ -1123,7 +1122,7 @@
         .newsletter-gate-content button {
             background-color: #28a745;
             color: #ffffff;
-            padding: 12px 25px; /* Larger padding for button */
+            padding: 12px 25px; 
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -1152,7 +1151,7 @@
         @media (max-width: 480px) {
             .newsletter-gate-content {
                 padding: 15px; 
-                max-width: 95%; /* Wider on small screens */
+                max-width: 95%; 
             }
             .newsletter-gate-content button {
                 padding: 10px 20px; 
@@ -1160,28 +1159,27 @@
             }
             .newsletter-gate-content .logo-modal {
                 max-width: 80px; 
-                margin-top: -55px; /* Adjusted negative margin */
+                margin-top: -55px; 
                 margin-bottom: 10px;
             }
             .newsletter-gate-content .terms-checkbox {
                 font-size: 0.8em; 
             }
-            /* Fixed: Adjust font sizes for popup text on small screens */
             .newsletter-gate-content h2 {
                 font-size: 1.5em;
             }
-            .newsletter-gate-content p {
+            .newsletter-gate-content p.modal-description {
                 font-size: 1em;
             }
         }
 
-        /* Styling for the emphasized 'Free' text - NU WEER GOUD */
+        /* Styling for the emphasized 'Free' text */
         .highlight-free {
-            font-weight: 800; /* Extra bold */
-            text-transform: uppercase; /* Hoofdletters */
-            color: #ffd700; /* Goudkleur */
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); /* Subtle glow */
-            animation: pulse-free 2s infinite alternate; /* Gentle pulse effect */
+            font-weight: 800; 
+            text-transform: uppercase; 
+            color: #ffd700; 
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); 
+            animation: pulse-free 2s infinite alternate; 
         }
         
         /* Keyframe animation for the 'Free' pulse */
@@ -1191,7 +1189,6 @@
         }
 
         .intro-text p strong {
-            /* Zorgt dat de woorden die al sterk waren bold blijven */
             font-weight: 700;
         }
 
@@ -1211,9 +1208,9 @@
             <!-- HealthMax logo in the popup -->
             <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo-modal">
 
-            <!-- Fixed: Added title and description for the popup -->
+            <!-- Added title and description for the popup -->
             <h2>Unlock Your Full Health Report!</h2>
-            <p>Subscribe to our newsletter and get instant access to your personalized health report, exclusive tips, and actionable strategies directly in your inbox.</p>
+            <p class="modal-description">Subscribe to our newsletter and get instant access to your personalized health report, exclusive tips, and actionable strategies directly in your inbox.</p>
 
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);"></iframe>
