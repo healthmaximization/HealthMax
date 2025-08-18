@@ -986,22 +986,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Semi-transparante achtergrond met blur effect */
-            background-color: rgba(0, 0, 0, 0.65); /* Minder donker dan 0.85 */
-            backdrop-filter: blur(8px); /* Sterker blur effect */
-            -webkit-backdrop-filter: blur(8px); /* Voor Safari */
+            /* Semi-transparent background with blur effect */
+            background-color: rgba(0, 0, 0, 0.65); 
+            backdrop-filter: blur(10px); /* Stronger blur effect */
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1001; /* Hoger dan loading overlay */
-            transition: opacity 0.3s ease-in-out;
+            z-index: 1001; /* Higher than loading overlay */
             opacity: 0;
             visibility: hidden;
-            flex-direction: column; /* Gecentreerde inhoud */
-            padding: 20px; /* Consistente padding */
+            transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Smoother transition */
+            flex-direction: column; 
+            padding: 20px; 
             box-sizing: border-box;
-            /* Removed overflow-y: auto here to prevent modal itself from scrolling, 
-               instead the content inside should be managed to fit. */
         }
 
         .newsletter-gate-modal.visible {
@@ -1011,92 +1009,80 @@
 
         .newsletter-gate-content {
             background-color: #1e1e1e;
-            padding: 15px; /* Further reduced padding for more compact design */
+            padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
-            /* Subtielere, premium schaduw */
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-            max-width: 600px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
+            max-width: 500px; /* Slightly narrower for a more compact, premium look */
             width: 100%;
             text-align: center;
             box-sizing: border-box;
-            transform: translateY(20px);
-            transition: transform 0.3s ease-out;
-            position: relative; /* Zorgt ervoor dat logo absoluut gepositioneerd kan worden */
-            overflow: hidden; /* Zorgt ervoor dat schaduw/rondingen niet worden afgesneden */
-            
-            /* NEW: Explicitly control height to avoid internal scrolling for default content */
-            max-height: calc(100vh - 40px); /* Adjust max height for viewport, considering body padding */
-            overflow-y: auto; /* Allow scrolling for content *within* the modal if it still overflows */
+            transform: translateY(20px); /* Start slightly lower */
+            transition: transform 0.4s ease-out; /* Smooth transformation */
+            position: relative; 
+            overflow: hidden; 
+            max-height: calc(100vh - 40px); 
+            overflow-y: auto; 
         }
         
-        /* Nieuw: Logo boven de popup */
+        /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            margin: -25px auto 5px auto; /* Reduced bottom margin even more for super compactness */
-            max-width: 120px; /* Iets kleiner dan hoofdpagina logo */
+            margin: -65px auto 15px auto; /* Negative top margin and increased bottom margin to position logo above the popup */
+            max-width: 100px; /* Size of logo in popup */
             height: auto;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: 3px solid #0a1a2f; /* Premium rand */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Shadow for the logo */
+            border: 4px solid #0a1a2f; /* Premium border */
             position: relative;
-            z-index: 10; /* Zorg dat het boven de inhoud ligt */
+            z-index: 10; 
         }
 
         .newsletter-gate-modal.visible .newsletter-gate-content {
-            transform: translateY(0);
+            transform: translateY(0); /* Slide up to final position */
         }
 
-        /* Removed all styling for promotional text and lists as they are no longer in HTML */
-        /*
-        .newsletter-gate-content h3 { ... }
-        .newsletter-gate-content .promo-text { ... }
-        .newsletter-gate-content .promo-list { ... }
-        .newsletter-gate-content .promo-list li { ... }
-        .newsletter-gate-content .promo-list li .icon-emoji { ... }
-        */
-
         .newsletter-gate-content .beehiiv-embed {
-            margin: 5px auto; /* Reduced top margin to pull embed up, kept auto for horizontal centering */
-            width: 100%; /* Zorg voor responsiviteit */
-            max-width: 660px; /* Keep original max-width from the iframe src */
-            height: 304px; /* Oorspronkelijke hoogte behouden */
-            border: none; /* Explicitly remove border */
-            border-radius: 0px; /* Ensure no border-radius for the iframe */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Lichte schaduw behouden */
+            margin: 15px auto; /* More margin to detach embed */
+            width: 100%; 
+            max-width: 660px; 
+            height: 304px; 
+            border: none; 
+            border-radius: 0px; 
+            box-shadow: none; /* No shadow for the embed itself */
             background-color: transparent;
         }
         
         .newsletter-gate-content .terms-checkbox {
-            margin-top: 5px; /* Reduced margin to bring closer to embed */
-            margin-bottom: 5px; /* Reduced margin to bring closer to button */
+            margin-top: 20px; 
+            margin-bottom: 20px; 
             display: flex;
             align-items: center;
-            justify-content: center; /* Centreer checkbox en tekst */
-            font-size: 0.8em; /* Further reduced font size */
+            justify-content: center; 
+            font-size: 0.9em; 
             color: #a0a0a0;
         }
 
         .newsletter-gate-content .terms-checkbox input[type="checkbox"] {
-            margin-right: 5px; /* Further reduced margin */
-            accent-color: #28a745; /* Groene accentkleur */
+            margin-right: 8px; /* More space to the right of checkbox */
+            accent-color: #28a745; 
             cursor: pointer;
-            transform: scale(1.05); /* Slightly smaller checkbox */
+            transform: scale(1.1); /* Slightly larger checkbox */
         }
 
         .newsletter-gate-content button {
             background-color: #28a745;
             color: #ffffff;
-            padding: 10px 20px; /* Further reduced padding for button */
+            padding: 12px 25px; /* Larger padding for button */
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 1em; /* Further reduced font size */
+            font-size: 1.1em; 
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
             width: auto;
-            min-width: 160px; /* Adjusted min-width */
+            min-width: 180px; 
         }
 
         .newsletter-gate-content button:hover:not(:disabled) {
@@ -1112,27 +1098,23 @@
             transform: none;
         }
 
-        /* Responsive aanpassingen voor de popup */
+        /* Responsive adjustments for the popup */
         @media (max-width: 480px) {
             .newsletter-gate-content {
-                padding: 10px; /* Even more reduced padding on small screens */
+                padding: 15px; 
+                max-width: 95%; /* Wider on small screens */
             }
-            /* Removed h3, promo-text, promo-list styles as they are gone from HTML */
-            /*
-            .newsletter-gate-content h3 { ... }
-            .newsletter-gate-content .promo-text { ... }
-            .newsletter-gate-content .promo-list li { ... }
-            */
             .newsletter-gate-content button {
-                padding: 8px 15px; /* Smaller on mobile */
-                font-size: 0.9em; /* Smaller on mobile */
+                padding: 10px 20px; 
+                font-size: 1em; 
             }
             .newsletter-gate-content .logo-modal {
-                max-width: 80px; /* Slightly smaller logo */
-                margin-bottom: 5px; /* Adjusted margin */
+                max-width: 80px; 
+                margin-top: -55px; /* Adjusted negative margin */
+                margin-bottom: 10px;
             }
             .newsletter-gate-content .terms-checkbox {
-                font-size: 0.75em; /* Smaller on mobile */
+                font-size: 0.8em; 
             }
         }
 
@@ -1181,7 +1163,7 @@
     <nav class="main-nav">
         <a href="/">Home</a>
         <a href="/tools/healthscore/" class="active">Tools</a>
-        <a href="https://store.healthmaximization.com/" target="_blank">Store</a> <!-- Nieuw toegevoegd: Store tab -->
+        <a href="https://store.healthmaximization.com/" target="_blank">Store</a> <!-- Newly added: Store tab -->
     </nav>
 
     <main>
@@ -1454,7 +1436,7 @@
         const mentalPointsSpan = document.getElementById('mentalPoints');
         const nutritionProgressBarFill = document.getElementById('nutritionProgressBarFill');
         const exerciseProgressBarFill = document.getElementById('exerciseProgressBarFill');
-        const mentalProgressBarFill = document.getElementById('mentalProgressBarFill');
+        const mentalProgressBarFill = document.getElementById('mentalProgressBarFill'); // Corrected this line
         const allDetailedRecommendations = document.getElementById('allDetailedRecommendations');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const copyMessage = document.getElementById('copyMessage');
@@ -1761,14 +1743,14 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                                 throw new Error("AI response parsing error. Details in console.");
                             }
                         } else {
-                            console.error("Netlify Function did not indicate success or response was not a string:", parsedFunctionResponse);
-                            throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}. Details in console.`);
+                            console.error("Netlify Function did not indicate success or response was not a string:", result);
+                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}. Details in console.`);
                         }
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             console.error(`API call timed out for getAiQualityScore (Attempt ${attempt + 1}):`, error);
                             // Set a specific message for the user overlay
-                            loadingMessage.textContent = "Time-out reached: AI evaluation is taking too long. Please try again with a shorter answer or later.";
+                            loadingMessage.textContent = "Timeout reached: AI evaluation is taking too long. Please try again with a shorter answer or later.";
                             await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                             throw new Error('API call timed out. Please try again.'); 
                         }
