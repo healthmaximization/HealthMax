@@ -1755,6 +1755,7 @@
         };
         let selectedOption = null; // To track selected option for multiple choice
         let hasTriggeredNewsletterModal = false; // New flag to control modal display
+        let pendingAiScorePromises = []; // Array to hold promises for background AI scoring
 
         // DOM elements
         const startScreen = document.getElementById('startScreen');
@@ -1806,18 +1807,11 @@
             }
 
             if (isValid) {
-                // If it's an open-text question, we need to await the scoring
-                if (questionData.type === 'open-text') {
-                    showLoading('Evaluating your answer with AI...'); // Specific loading message
-                    await processAnswer(); // Await the async function
-                } else {
-                    processAnswer();
-                }
+                // Process the answer, which now might start an async AI call without awaiting
+                await processAnswer(); // Still await processAnswer to ensure provisional score/feedback is recorded before moving on
 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
-                    hideLoading(); // Hide the loading overlay after processing the answer
-
                     // Start fade out animation
                     quizContainer.classList.remove('entered');
                     quizContainer.classList.add('exiting');
@@ -1875,6 +1869,7 @@
             selectedOption = null; 
             nextButton.disabled = true;
             hasTriggeredNewsletterModal = false; // Reset the flag for new quiz session
+            pendingAiScorePromises = []; // Clear pending promises for new quiz session
 
             // Calculate max possible scores for all questions
             healthCategories.forEach(category => {
@@ -1966,45 +1961,66 @@
 
         /**
          * Processes the user's answer, updates scores and feedback.
-         * Now an async function to accommodate AI scoring.
+         * Now starts AI processing in the background.
          */
         async function processAnswer() {
             const questionData = currentQuestions[currentQuestionIndex];
-            let scoreEarned = 0; 
+            let provisionalScore = 0; // Score based on simple metrics, updated by AI later
 
             if (questionData.type === 'open-text') {
                 const textArea = document.getElementById('openAnswerTextarea');
                 const answerText = textArea.value.trim();
                 const textLength = answerText.length;
 
+                // Calculate provisional score based on length for immediate display/progress
                 if (textLength < 20) {
-                    scoreEarned = Math.floor(questionData.maxPoints * 0.1); 
+                    provisionalScore = Math.floor(questionData.maxPoints * 0.1);
                 } else if (textLength < 100) {
-                    scoreEarned = Math.floor(questionData.maxPoints * 0.3); 
+                    provisionalScore = Math.floor(questionData.maxPoints * 0.3);
                 } else {
-                    
-                    try {
-                        const aiScore = await getAiQualityScore(questionData.question, answerText); 
-                        scoreEarned = Math.floor(questionData.maxPoints * aiScore);
-                    } catch (error) {
-                        console.error("Error getting AI quality score:", error);
-                        scoreEarned = Math.floor(questionData.maxPoints * 0.1); 
-                    }
+                    provisionalScore = Math.floor(questionData.maxPoints * 0.5); // Assume a baseline good score for longer answers
                 }
-
-                userScores[questionData.category] += scoreEarned; 
                 
+                // Add provisional score to userScores immediately
+                userScores[questionData.category] += provisionalScore; 
+
+                // Store feedback with provisional score for now
                 userFeedback[questionData.category].push({
                     question: questionData.question,
                     answer: answerText,
                     openAnswer: answerText,
                     feedback: "Detailed insights provided by user.",
-                    scoreImpact: scoreEarned, 
+                    scoreImpact: provisionalScore, 
                     maxScoreForQuestion: questionData.maxPoints
                 });
+
+                // Start AI evaluation in the background, update score when it resolves
+                const aiPromise = getAiQualityScore(questionData.question, answerText, questionData.category)
+                    .then(aiResult => {
+                        // When AI score comes back, update the actual score for the category
+                        // We need to subtract the provisional score and add the AI-driven score.
+                        const aiScoreEarned = Math.floor(questionData.maxPoints * aiResult.score);
+                        userScores[aiResult.category] -= provisionalScore; // Subtract provisional score
+                        userScores[aiResult.category] += aiScoreEarned; // Add actual AI score
+
+                        // Also update the scoreImpact in userFeedback for accuracy in final display
+                        const feedbackEntry = userFeedback[aiResult.category].find(f => f.openAnswer === answerText); 
+                        if (feedbackEntry) {
+                            feedbackEntry.scoreImpact = aiScoreEarned; 
+                        }
+                        console.log(`AI score for ${aiResult.category} resolved: ${aiScoreEarned}. Current total for category: ${userScores[aiResult.category]}`);
+                    })
+                    .catch(error => {
+                        console.error(`Error processing AI score for ${questionData.category}:`, error);
+                        // If AI fails, the provisional score remains as the category score.
+                        // Optionally, add a user-facing message about AI failure.
+                    });
+                
+                pendingAiScorePromises.push(aiPromise); // Keep track of the promise
+                
             } else if (questionData.type === 'multiple-choice') {
                 if (selectedOption) {
-                    scoreEarned = selectedOption.score;
+                    const scoreEarned = selectedOption.score;
                     userScores[questionData.category] += scoreEarned;
                     userFeedback[questionData.category].push({
                         question: questionData.question,
@@ -2019,18 +2035,17 @@
 
         /**
          * Calls the Netlify Function to get a qualitative score for an open-ended answer.
-         * Includes timeout and robust error logging.
          * @param {string} question - The original question text.
          * @param {string} answer - The user's answer text.
-         * @returns {Promise<number>} - A promise that resolves to the AI's score (0.0 to 1.0).
+         * @param {string} category - The category this question belongs to.
+         * @returns {Promise<{score: number, category: string}>} - A promise that resolves to the AI's score (0.0 to 1.0) and the category.
          */
-        async function getAiQualityScore(question, answer) {
-            // Updated to use window.location.origin for robustness in Canvas and deployed environments
+        async function getAiQualityScore(question, answer, category) {
             const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
             const payload = {
-                // Modified prompt to explicitly ask for raw JSON
-                prompt: `You are a health quiz evaluator. Your task is to strictly assess the quality, relevance, and detail of a user's answer to a health-related question.
-Rate the following user answer from 0.0 to 1.0, where 1.0 is a perfectly comprehensive and relevant answer, and 0.0 is completely irrelevant or lacking any useful information. Be very strict in your evaluation. Focus on depth, specific examples where applicable, and how well it. addresses all parts of the original question.
+                // Modified prompt to score based on perceived healthiness of the described habits
+                prompt: `You are a health quiz evaluator. Your task is to objectively assess the healthiness of the lifestyle habits and practices described in the user's answer to a health-related question.
+Rate the following user answer from 0.0 to 1.0, where 1.0 indicates highly healthy, optimal habits, and 0.0 indicates significantly unhealthy or non-existent habits. Base your score purely on the *implied health impact* of the activities, routines, or challenges the user describes, assuming a standard understanding of healthy living (e.g., balanced diet, regular exercise, sufficient sleep, effective stress management).
 
 Original Question: "${question}"
 User Answer: "${answer}"
@@ -2041,7 +2056,6 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
             const maxRetries = 3;
             let attempt = 0;
             const controller = new AbortController();
-            // Increased timeout from 15000ms (15s) to 30000ms (30s)
             let timeoutDuration = 30000; 
             let timeoutId;
 
@@ -2063,13 +2077,10 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                         console.log("Raw response from Netlify Function (getAiQualityScore):", responseText);
 
                         if (!response.ok) {
-                            // If response is not OK (e.g., 4xx or 5xx status)
-                            // Log the full response text if it's an error from the server
                             console.error(`Netlify Function returned status ${response.status}. Full response: ${responseText}`);
                             throw new Error(`Netlify Function error: ${response.status}. Details in console.`);
                         }
 
-                        // Attempt to parse JSON
                         const result = JSON.parse(responseText);
 
                         if (result.success && typeof result.response === 'string') {
@@ -2077,7 +2088,7 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                             try {
                                 const parsed = JSON.parse(jsonString);
                                 if (typeof parsed.score === 'number') {
-                                    return Math.max(0, Math.min(1, parsed.score)); // Ensure score is between 0 and 1
+                                    return { score: Math.max(0, Math.min(1, parsed.score)), category: category }; 
                                 } else {
                                     console.warn("AI returned invalid score format via Netlify Function:", parsed);
                                     throw new Error("Invalid AI score format from internal response.");
@@ -2093,27 +2104,25 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             console.error(`API call timed out for getAiQualityScore (Attempt ${attempt + 1}):`, error);
-                            // Set a specific message for the user overlay
-                            loadingMessage.textContent = "Timeout reached: AI evaluation is taking too long. Please try again with a shorter answer or later.";
-                            await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
-                            throw new Error('API call timed out. Please try again.'); 
+                            // Do not show loading message here as it's a background process
+                            throw new Error('API call timed out. Provisional score will be used.'); 
                         }
                         console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
-                        // Set a specific message for the user overlay for general errors
-                            loadingMessage.textContent = `AI evaluation error: ${error.message || 'Unknown error'}. Check console.`;
-                        await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
+                        // Do not show loading message here as it's a background process
                         attempt++;
                         if (attempt >= maxRetries) {
-                            throw new Error("Failed to get AI score after multiple attempts.");
+                            throw new Error("Failed to get AI score after multiple attempts. Provisional score will be used.");
                         }
-                        const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
+                        const delay = Math.pow(2, attempt) * 1000; 
                         await new Promise(res => setTimeout(res, delay));
                     }
                 }
             } finally {
-                if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
-                // hideLoading() is now handled by the nextButton click listener after processAnswer.
+                if (timeoutId) clearTimeout(timeoutId); 
             }
+            // Fallback if all retries fail, though the catch block should re-throw.
+            // This line should ideally not be reached if error handling is robust.
+            return { score: 0.1, category: category }; // Minimal fallback score if all else fails
         }
 
 
@@ -2142,9 +2151,14 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
             quizContainer.classList.add('hidden'); // Hide quiz container immediately
             document.querySelector('.progress-bar-container').classList.add('hidden'); // Hide global progress bar
 
-            showLoading('Calculating your overall score...'); // Initial loading message for the result calculation
+            showLoading('Finalizing your personalized results with AI...'); // New loading message, waiting for all background AI calls
 
             try {
+                // Await all pending AI score promises before calculating final scores
+                await Promise.all(pendingAiScorePromises);
+                console.log("All AI scoring promises resolved. Final user scores:", userScores);
+                pendingAiScorePromises = []; // Clear the array as all promises are settled
+
                 let totalUserScore = 0;
                 let totalMaxScore = 0;
                 for (const category in userScores) {
@@ -2219,7 +2233,7 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
          * Generates and displays detailed recommendations using a Gemini API call.
          */
         async function generateAndDisplayDetailedRecommendations() {
-            showLoading('Generating personalized recommendations...'); // Initial loading for this specific step
+            // showLoading('Generating personalized recommendations...'); // Loading handled by finishQuiz now
             allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>'; 
 
             const promptParts = [];
@@ -2244,7 +2258,7 @@ Format your response as a raw JSON array of objects, with no surrounding text, m
 1.  "title": A concise heading for the recommendation (e.g., "Nutrition Focus", "Improved Sleep Hygiene").
 2.  "recommendation": A brief and actionable explanation of the advice.
 
-The overall JSON output should contain 3-5 distinct recommendations. Focus on highlighting key areas for improvement and offering actionable, general advice across all areas combined. Crucially, your advice should emphasize identifying areas for improvement and providing concrete, actionable steps to address any challenges or weaknesses explicitly mentioned or implicitly suggested by the user's detailed answers. Do not shy from constructively highlighting where progress can be made, even if a category's overall numerical score appears high. Your tone should remain supportive and encouraging, but firmly focused on growth and optimization. The scores mentioned in the input are numerical values representing percentages. Do not explicitly use the word "percentage" or the "%" symbol in your generated recommendations, and integrate the score information naturally into the text if relevant.
+The overall JSON output should contain 3-5 distinct recommendations. Focus on providing actionable steps and insights for continuous improvement and optimization for ALL categories that were evaluated (Nutrition, Exercise, Sleep, Mental Well-being), even if the user's score in that area is already high. Address any specific challenges or weaknesses mentioned in the user's detailed answers. The recommendations should be practical and empowering. The scores mentioned in the input are numerical values representing percentages. Do not explicitly use the word "percentage" or the "%" symbol in your generated recommendations, and integrate the score information naturally into the text if relevant.
 
 Here are the user's detailed results:\n\n` + promptParts.join('\n');
 
@@ -2259,9 +2273,6 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                 }
             };
 
-            // This URL points to a Netlify Function that you need to deploy.
-            // Create a file at `netlify/functions/gemini-proxy.js` (or .ts) in your project.
-            // Example content for `netlify/functions/gemini-proxy` is provided in the previous chat response.
             const functionUrl = `${window.location.origin}/.netlify/functions/gemini-proxy`;
             
             let response;
@@ -2269,7 +2280,6 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             const maxRetries = 5;
             let attempt = 0;
             const controller = new AbortController();
-            // Increased timeout from 15000ms (15s) to 30000ms (30s)
             let timeoutDuration = 30000; 
             let timeoutId;
 
@@ -2277,31 +2287,28 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                 while (attempt < maxRetries) {
                     try {
                         timeoutId = setTimeout(() => controller.abort(), timeoutDuration); 
-                        const response = await fetch(functionUrl, {
+                        response = await fetch(functionUrl, { // Assign to outer scope response
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ prompt: prompt }),
-                            signal: controller.signal // Link the signal
+                            signal: controller.signal 
                         });
                         
-                        clearTimeout(timeoutId); // Clear timeout if fetch completes in time
+                        clearTimeout(timeoutId); 
 
                         console.log(`API call for generateAndDisplayDetailedRecommendations - Attempt ${attempt + 1}: Status ${response.status}, Content-Type: ${response.headers.get('Content-Type')}`);
                         const responseText = await response.text();
                         console.log("Raw response from Netlify Function (generateAndDisplayDetailedRecommendations):", responseText);
 
                         if (!response.ok) {
-                            // If response is not OK (e.g., 4xx or 5xx status)
                             console.error(`Netlify Function returned status ${response.status}. Full response: ${responseText}`);
                             throw new Error(`Netlify Function error: ${response.status}. Details in console.`);
                         }
 
-                        // Attempt to parse JSON
                         const parsedFunctionResponse = JSON.parse(responseText);
 
                         if (parsedFunctionResponse.success && typeof parsedFunctionResponse.response === 'string') {
                             let summaryText = parsedFunctionResponse.response;
-                            // --- NEW: Strip markdown code block wrappers from recommendations ---
                             const jsonStartMarkerRecs = '```json';
                             const jsonEndMarkerRecs = '```';
 
@@ -2311,8 +2318,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                             if (summaryText.endsWith(jsonEndMarkerRecs)) {
                                 summaryText = summaryText.substring(0, summaryText.length - jsonEndMarkerRecs.length);
                             }
-                            summaryText = summaryText.trim(); // Trim any remaining whitespace/newlines
-                            // --- END NEW ---
+                            summaryText = summaryText.trim(); 
 
                             try {
                                 const recommendations = JSON.parse(summaryText);
@@ -2335,7 +2341,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                                     feedbackItem.textContent = summaryText;
                                     allDetailedRecommendations.appendChild(feedbackItem);
                                 }
-                                break; // Exit retry loop on success
+                                break; 
                             } catch (jsonError) {
                                 console.error("Failed to parse AI's response as JSON from the function's 'response' field:", jsonError, "Raw AI response:", summaryText);
                                 throw new Error("AI response parsing error. Details in console.");
@@ -2347,30 +2353,26 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             console.error(`API call timed out for generateAndDisplayDetailedRecommendations (Attempt ${attempt + 1}):`, error);
-                             // Set a specific message for the user overlay
-                            loadingMessage.textContent = "Timeout reached: AI recommendations are taking too long. Please try again or later.";
-                            await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                             throw new Error('API call timed out. Please try again.');
                         }
                         console.error(`API call attempt ${attempt + 1} failed for generateAndDisplayDetailedRecommendations:`, error);
-                        // Set a specific message for the user overlay for general errors
-                        loadingMessage.textContent = `Error with AI recommendations: ${error.message || 'Unknown error'}. Check console.`;
-                        await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                         attempt++;
                         if (attempt >= maxRetries) {
-                            throw error; // Re-throw error if max retries reached
+                            throw error; 
                         }
                         const delay = Math.pow(2, attempt) * 1000; 
                         await new Promise(res => setTimeout(res, delay));
                     }
                 }
             } catch (error) {
-                loadingMessage.textContent = `Oops! Could not generate personalized recommendations. Error: ${error.message || 'Unknown error'}. Please try again later.`; // More specific error message
                 console.error("Error generating recommendations:", error);
-                throw error; // Re-throw to propagate to finishQuiz catch block
+                const errorItem = document.createElement('div');
+                errorItem.classList.add('recommendation-item');
+                errorItem.innerHTML = '<h4>Error Generating Recommendations</h4><p>We encountered an issue generating your personalized recommendations. Please try the quiz again later, or contact support if the problem persists. Error: ' + (error.message || 'Unknown error') + '</p>';
+                allDetailedRecommendations.appendChild(errorItem);
+                throw error; 
             } finally {
-                if (timeoutId) clearTimeout(timeoutId); // Ensure timeout is cleared even on outer error
-                // hideLoading() is called by finishQuiz() after this async call completes.
+                if (timeoutId) clearTimeout(timeoutId); 
             }
         }
 
@@ -2384,23 +2386,20 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
                 return;
             }
 
-            // Updated scroll threshold: 300px (1.5 times the previous 200px)
             const scrollThreshold = 300; 
 
             const handleScroll = () => {
                 if (window.scrollY > scrollThreshold && !hasTriggeredNewsletterModal) {
-                    hasTriggeredNewsletterModal = true; // Set flag to true
-                    newsletterGateModal.classList.add('visible'); // Show the modal
-                    subscribedConfirmCheckbox.checked = false; // Reset checkbox state
-                    viewResultsButton.disabled = true; // Disable button initially
-                    document.body.style.overflow = 'hidden'; // Disable background scrolling
+                    hasTriggeredNewsletterModal = true; 
+                    newsletterGateModal.classList.add('visible'); 
+                    subscribedConfirmCheckbox.checked = false; 
+                    viewResultsButton.disabled = true; 
+                    document.body.style.overflow = 'hidden'; 
                     
-                    // Remove the event listener after it's triggered once
                     window.removeEventListener('scroll', handleScroll);
                 }
             };
 
-            // Add the scroll listener
             window.addEventListener('scroll', handleScroll);
         }
 
@@ -2411,18 +2410,17 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
         function restartQuiz() {
             quizContainer.classList.add('hidden');
             resultContainer.classList.add('hidden');
-            newsletterGateModal.classList.remove('visible'); // Ensure modal is hidden
+            newsletterGateModal.classList.remove('visible'); 
             document.querySelector('.progress-bar-container').classList.add('hidden');
             startScreen.classList.remove('hidden');
             allDetailedRecommendations.innerHTML = '<h3>Our Personalized Recommendations</h3>';
             
-            // Re-initialize start screen for animation
             startScreen.classList.remove('exited');
             startScreen.classList.remove('entering');
-            startScreen.classList.add('entered'); // Ensure it's in the initial entered state for next start
+            startScreen.classList.add('entered'); 
             
-            hasTriggeredNewsletterModal = false; // Reset flag for new quiz session
-            document.body.style.overflow = ''; // Re-enable scrolling on the body
+            hasTriggeredNewsletterModal = false; 
+            document.body.style.overflow = ''; 
         }
 
         /**
@@ -2449,12 +2447,11 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
         function copyShareLink() {
             console.log("Attempting to copy share link.");
             const currentUrl = window.location.href;
-            const tempInput = document.getElementById('shareLinkInput'); // Get the pre-existing hidden input
+            const tempInput = document.getElementById('shareLinkInput'); 
             tempInput.value = currentUrl;
             tempInput.select();
             
             try {
-                // Attempt to execute the copy command
                 const successful = document.execCommand('copy');
                 if (successful) {
                     console.log('Copy command successful.');
@@ -2487,7 +2484,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
          * Checks the current screen orientation and displays/hides the banner.
          */
         function checkOrientationAndDisplayBanner() {
-            const isMobile = window.innerWidth <= 768; // Define your mobile breakpoint
+            const isMobile = window.innerWidth <= 768; 
             const isPortrait = window.matchMedia("(orientation: portrait)").matches;
 
             if (isMobile && isPortrait) {
@@ -2501,7 +2498,7 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
         // Initialize start screen to be "entered" on page load
         document.addEventListener('DOMContentLoaded', () => {
             startScreen.classList.add('entered');
-            checkOrientationAndDisplayBanner(); // Initial check on load
+            checkOrientationAndDisplayBanner(); 
         });
 
         // Listen for resize events (which includes orientation changes on mobile)
