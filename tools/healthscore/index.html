@@ -1031,7 +1031,7 @@
         /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            margin: -90px auto 15px auto; /* Aangepaste margin-top voor betere positionering van het logo */
+            margin: -120px auto 15px auto; /* Aangepaste margin-top voor betere positionering van het logo */
             max-width: 120px; 
             height: auto;
             border-radius: 50%;
@@ -1748,12 +1748,14 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
             const maxRetries = 3;
             let attempt = 0;
             const controller = new AbortController();
+            // Increased timeout from 15000ms (15s) to 30000ms (30s)
+            let timeoutDuration = 30000; 
             let timeoutId;
 
             try {
                 while (attempt < maxRetries) {
                     try {
-                        timeoutId = setTimeout(() => controller.abort(), 15000); 
+                        timeoutId = setTimeout(() => controller.abort(), timeoutDuration); 
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1974,12 +1976,14 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             const maxRetries = 5;
             let attempt = 0;
             const controller = new AbortController();
+            // Increased timeout from 15000ms (15s) to 30000ms (30s)
+            let timeoutDuration = 30000; 
             let timeoutId;
 
             try {
                 while (attempt < maxRetries) {
                     try {
-                        timeoutId = setTimeout(() => controller.abort(), 15000); 
+                        timeoutId = setTimeout(() => controller.abort(), timeoutDuration); 
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
