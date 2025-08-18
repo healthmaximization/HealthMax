@@ -1181,7 +1181,7 @@
     <nav class="main-nav">
         <a href="/">Home</a>
         <a href="/tools/healthscore/" class="active">Tools</a>
-        <!-- More links can go here (e.g., /blog/, /contact/) -->
+        <a href="https://store.healthmaximization.com/" target="_blank">Store</a> <!-- Nieuw toegevoegd: Store tab -->
     </nav>
 
     <main>
@@ -1492,29 +1492,29 @@
 
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
-                    hideLoading(); // Verberg de laadoverlay na het verwerken van het antwoord
+                    hideLoading(); // Hide the loading overlay after processing the answer
 
                     // Start fade out animation
                     quizContainer.classList.remove('entered');
                     quizContainer.classList.add('exiting');
 
-                    // Gebruik setTimeout om de content te wijzigen en de container opnieuw in beeld te brengen
-                    // na de verwachte duur van de exit-animatie (0.5s CSS transition).
+                    // Use setTimeout to change content and bring the container back into view
+                    // after the expected duration of the exit animation (0.5s CSS transition).
                     setTimeout(() => {
-                        quizContainer.classList.add('hidden'); // Zorg ervoor dat het volledig verborgen is voordat nieuwe content wordt gerenderd
-                        quizContainer.classList.remove('exiting'); // Ruim de 'exiting' klasse op
+                        quizContainer.classList.add('hidden'); // Ensure it's fully hidden before new content is rendered
+                        quizContainer.classList.remove('exiting'); // Clean up the 'exiting' class
 
-                        displayQuestion(); // Render de nieuwe vraag content
+                        displayQuestion(); // Render the new question content
 
-                        // Bereid voor op de fade-in animatie
+                        // Prepare for the fade-in animation
                         quizContainer.classList.remove('hidden');
                         quizContainer.classList.add('entering');
-                        // Forceer reflow om ervoor te zorgen dat de animatie opnieuw start
+                        // Force reflow to ensure the animation restarts
                         void quizContainer.offsetWidth; 
-                        // Activeer de fade-in animatie
+                        // Activate the fade-in animation
                         quizContainer.classList.remove('entering');
                         quizContainer.classList.add('entered');
-                    }, 550); // Iets langer dan de 0.5s CSS transitieduur
+                    }, 550); // Slightly longer than the 0.5s CSS transition duration
                 } else {
                     finishQuiz();
                 }
@@ -1761,8 +1761,8 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                                 throw new Error("AI response parsing error. Details in console.");
                             }
                         } else {
-                            console.error("Netlify Function did not indicate success or response was not a string:", result);
-                            throw new Error(`Netlify Function call failed: ${result.message || 'Unknown error'}. Details in console.`);
+                            console.error("Netlify Function did not indicate success or response was not a string:", parsedFunctionResponse);
+                            throw new Error(`Netlify Function call failed: ${parsedFunctionResponse.message || 'Unknown error'}. Details in console.`);
                         }
                     } catch (error) {
                         if (error.name === 'AbortError') {
