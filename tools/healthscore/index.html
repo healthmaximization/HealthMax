@@ -1012,7 +1012,7 @@
             padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
-            max-width: 500px; /* Slightly narrower for a more compact, premium look */
+            max-width: 600px; /* VERBREED DE POPUP */
             width: 100%;
             text-align: center;
             box-sizing: border-box;
@@ -1027,8 +1027,8 @@
         /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            margin: -65px auto 15px auto; /* Negative top margin and increased bottom margin to position logo above the popup */
-            max-width: 100px; /* Size of logo in popup */
+            margin: -80px auto 15px auto; /* AANGEPAST: neg top margin om logo verder te liften */
+            max-width: 120px; /* AANGEPAST: iets groter logo */
             height: auto;
             border-radius: 50%;
             object-fit: cover;
@@ -1045,30 +1045,56 @@
         .newsletter-gate-content .beehiiv-embed {
             margin: 15px auto; /* More margin to detach embed */
             width: 100%; 
-            max-width: 660px; 
-            height: 304px; 
+            height: auto; /* Allow height to adjust based on content */
+            min-height: 280px; /* AANGEPAST: grotere minimum hoogte voor de embed */
             border: none; 
-            border-radius: 0px; 
-            box-shadow: none; /* No shadow for the embed itself */
+            border-radius: 10px; /* Added border-radius to match popup style */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Added subtle shadow */
             background-color: transparent;
         }
         
         .newsletter-gate-content .terms-checkbox {
-            margin-top: 20px; 
-            margin-bottom: 20px; 
+            margin-top: 25px; /* AANGEPAST: meer ruimte boven checkbox */
+            margin-bottom: 25px; /* AANGEPAST: meer ruimte onder checkbox */
             display: flex;
             align-items: center;
             justify-content: center; 
-            font-size: 0.9em; 
-            color: #a0a0a0;
+            font-size: 1em; /* Iets grotere font-size voor leesbaarheid */
+            color: #d0d0d0; /* Lichtere kleur */
+            cursor: pointer; /* Zorgt ervoor dat de hele regel klikbaar lijkt */
         }
 
         .newsletter-gate-content .terms-checkbox input[type="checkbox"] {
-            margin-right: 8px; /* More space to the right of checkbox */
-            accent-color: #28a745; 
+            appearance: none; /* Verwijdert standaard browser stijl */
+            -webkit-appearance: none; /* Voor Safari */
+            width: 22px; /* AANGEPAST: grotere breedte */
+            height: 22px; /* AANGEPAST: grotere hoogte */
+            border: 2px solid #555; /* Donkere rand */
+            border-radius: 6px; /* AANGEPAST: iets rondere hoeken */
+            margin-right: 12px; /* AANGEPAST: meer ruimte tussen checkbox en tekst */
             cursor: pointer;
-            transform: scale(1.1); /* Slightly larger checkbox */
+            position: relative;
+            flex-shrink: 0; /* Voorkomt dat de checkbox kleiner wordt */
+            transition: background-color 0.2s, border-color 0.2s;
         }
+
+        .newsletter-gate-content .terms-checkbox input[type="checkbox"]:checked {
+            background-color: #28a745; /* Groen als aangevinkt */
+            border-color: #28a745; /* Groene rand als aangevinkt */
+        }
+
+        /* Checkmark */
+        .newsletter-gate-content .terms-checkbox input[type="checkbox"]:checked::after {
+            content: '✓'; /* Vinkje symbool */
+            font-size: 16px; /* Grootte van het vinkje */
+            color: #fff; /* Kleur van het vinkje */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            line-height: 1; /* Zorgt dat het vinkje goed gecentreerd is */
+        }
+
 
         .newsletter-gate-content button {
             background-color: #28a745;
@@ -1118,6 +1144,27 @@
             }
         }
 
+        /* Styling for the emphasized 'Free' text - NU WEER GOUD */
+        .highlight-free {
+            font-weight: 800; /* Extra bold */
+            text-transform: uppercase; /* Hoofdletters */
+            color: #ffd700; /* Goudkleur */
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5); /* Subtle glow */
+            animation: pulse-free 2s infinite alternate; /* Gentle pulse effect */
+        }
+        
+        /* Keyframe animation for the 'Free' pulse */
+        @keyframes pulse-free {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.03); opacity: 0.95; }
+        }
+
+        .intro-text p strong {
+            /* Zorgt dat de woorden die al sterk waren bold blijven */
+            font-weight: 700;
+        }
+
+
     </style>
 </head>
 <body>
@@ -1134,7 +1181,7 @@
             <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo-modal">
 
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 304px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);"></iframe>
             <!-- END BEEHIIV FORM CODE -->
 
             <div class="terms-checkbox">
@@ -1173,7 +1220,8 @@
         <div id="startScreen" class="start-screen entered">
             <div class="intro-text">
                 <h2>Your Health Score Journey Starts Here!</h2>
-                <p>Discover your personalized health score. This insightful, **completely free and accurate** quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
+                <!-- Aangepaste nadruk op gratis: geen sterretjes, 'FREE' in hoofdletters en extra vet, met lichte schaduw -->
+                <p>Discover your personalized health score. This insightful, <span class="highlight-free">FREE</span> and accurate quiz uses smart questions for a tailored analysis of your nutrition, exercise, sleep, and mental well-being.</p>
             </div>
 
             <button id="startQuizBtn" class="next-button">Get My Score</button>
@@ -1184,7 +1232,8 @@
                 <ul>
                     <li><span class="icon-emoji">💡</span> <span class="normal-text">Get truly personalized insights into your unique health profile.</span></li>
                     <li><span class="icon-emoji">📈</span> <span class="normal-text">Receive actionable steps and concrete advice for improvement.</span></li>
-                    <li><span class="icon-emoji">✅</span> <span class="normal-text">Enjoy a completely free analysis with no hidden costs.</span></li>
+                    <!-- Nadruk op gratis in de voordelen sectie, met nieuwe klasse -->
+                    <li><span class="icon-emoji">✅</span> <span class="normal-text">Enjoy a <span class="highlight-free">FREE</span> analysis with no hidden costs.</span></li>
                     <li><span class="icon-emoji">🚀</span> <span class="normal-text">It's quick and easy, providing results in just a few minutes.</span></li>
                 </ul>
             </div>
@@ -1436,7 +1485,7 @@
         const mentalPointsSpan = document.getElementById('mentalPoints');
         const nutritionProgressBarFill = document.getElementById('nutritionProgressBarFill');
         const exerciseProgressBarFill = document.getElementById('exerciseProgressBarFill');
-        const mentalProgressBarFill = document.getElementById('mentalProgressBarFill'); // Corrected this line
+        const mentalProgressBarFill = document.getElementById('mentalProgressBarFill'); 
         const allDetailedRecommendations = document.getElementById('allDetailedRecommendations');
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         const copyMessage = document.getElementById('copyMessage');
@@ -1756,7 +1805,7 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
                         }
                         console.error(`API call attempt ${attempt + 1} failed for getAiQualityScore:`, error);
                         // Set a specific message for the user overlay for general errors
-                        loadingMessage.textContent = `AI evaluation error: ${error.message || 'Unknown error'}. Check console.`;
+                            loadingMessage.textContent = `AI evaluation error: ${error.message || 'Unknown error'}. Check console.`;
                         await new Promise(res => setTimeout(res, 3000)); // Keep message visible for 3 seconds
                         attempt++;
                         if (attempt >= maxRetries) {
@@ -1930,8 +1979,8 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             try {
                 while (attempt < maxRetries) {
                     try {
-                        timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
-                        response = await fetch(functionUrl, {
+                        timeoutId = setTimeout(() => controller.abort(), 15000); 
+                        const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ prompt: prompt }),
