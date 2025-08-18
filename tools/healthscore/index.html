@@ -1031,7 +1031,7 @@
         /* New: Logo above the popup */
         .newsletter-gate-content .logo-modal {
             display: block;
-            margin: -30px auto 15px auto; /* Aangepaste margin-top voor betere positionering van het logo */
+            margin: -60px auto 15px auto; /* Aangepaste margin-top voor betere positionering van het logo */
             max-width: 120px; 
             height: auto;
             border-radius: 50%;
@@ -1049,6 +1049,7 @@
         .newsletter-gate-content .beehiiv-embed {
             margin: 0 auto; /* Zorgt voor centrering */
             width: 100%; /* Zorgt dat de embed de volledige breedte van de parent inneemt */
+            max-width: 660px; /* NEW: Added max-width to explicitly control embed size */
             height: auto; /* Zorgt ervoor dat de hoogte zich aanpast aan de inhoud van de embed */
             min-height: 280px; /* Minimum hoogte voor de embed */
             border: none; 
@@ -1185,7 +1186,7 @@
 
             <!-- Removed fixed title and description, as Beehiiv embed handles its own text -->
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); max-width: 660px;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
 
             <div class="terms-checkbox">
