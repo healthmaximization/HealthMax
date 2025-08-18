@@ -1012,7 +1012,7 @@
             padding: 25px; /* More padding for a roomier look */
             border-radius: 15px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; /* Deeper shadow and subtle inset border */
-            max-width: 600px; /* Max-width voor de popup */
+            max-width: 700px; /* Increased max-width for better fit of Beehiiv embed */
             width: 90%; /* Zorgt ervoor dat de popup responsief is op kleinere schermen */
             text-align: center;
             box-sizing: border-box;
@@ -1020,8 +1020,7 @@
             transition: transform 0.4s ease-out; /* Smooth transformation */
             position: relative; 
             overflow: visible; /* Zorgt ervoor dat het logo niet afgekapt wordt */
-            /* Removed max-height and overflow-y: auto to eliminate scrollbar and allow content to dictate height */
-            /* max-height: calc(100vh - 40px); */
+            overflow-x: hidden; /* Prevent horizontal scrollbar on the modal content itself */
 
             display: flex; 
             flex-direction: column;
@@ -1042,23 +1041,6 @@
             position: relative;
             z-index: 10; 
         }
-
-        /* Fixed: Removed specific styles for h2 and p.modal-description because the Beehiiv embed provides its own text. */
-        /* .newsletter-gate-content h2 { 
-            color: #f0f0f0;
-            margin-top: 15px; 
-            margin-bottom: 10px;
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-
-        .newsletter-gate-content p.modal-description { 
-            color: #c0c0c0;
-            font-size: 1.1em;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            padding: 0 15px; 
-        } */
 
         .newsletter-gate-modal.visible .newsletter-gate-content {
             transform: translateY(0); /* Slide up to final position */
@@ -1164,13 +1146,6 @@
             .newsletter-gate-content .terms-checkbox {
                 font-size: 0.8em; 
             }
-            /* Fixed: Removed font size adjustments for h2 and p.modal-description for mobile */
-            /* .newsletter-gate-content h2 {
-                font-size: 1.5em;
-            }
-            .newsletter-gate-content p.modal-description {
-                font-size: 1em;
-            } */
         }
 
         /* Styling for the emphasized 'Free' text */
