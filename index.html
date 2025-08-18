@@ -21,13 +21,13 @@
     </script>
 
     <style>
-        /* General styling for the body */
+        /* Algemene styling voor de body */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364); /* Green-blue gradient */
-            background-size: 400% 400%; /* Slightly smaller size for more noticeable movement */
-            animation: gradientAnimation 15s ease infinite; /* Faster animation for more dynamism */
-            color: #e0e0e0; /* Light gray text */
+            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364); /* Groen-blauwe gradiënt */
+            background-size: 400% 400%; /* Iets kleiner formaat voor meer merkbare beweging */
+            animation: gradientAnimation 15s ease infinite; /* Snellere animatie voor meer dynamiek */
+            color: #e0e0e0; /* Lichtgrijze tekst */
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -36,10 +36,10 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: hidden; /* Voorkom horizontaal scrollen */
         }
 
-        /* Keyframe animation for the background gradient - more dynamic movement */
+        /* Keyframe animatie voor de achtergrondgradiënt - dynamischere beweging */
         @keyframes gradientAnimation {
             0% {
                 background-position: 0% 50%;
@@ -52,13 +52,13 @@
             }
         }
 
-        /* Container styling consistent with quiz */
+        /* Container styling consistent met quiz */
         .page-section {
             background-color: #1e1e1e;
-            padding: 40px; /* Increased padding for more space */
+            padding: 40px; /* Meer padding voor meer ruimte */
             border-radius: 15px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7); /* Deeper shadow for more presence */
-            max-width: 650px; /* Slightly wider */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7); /* Diepere schaduw voor meer aanwezigheid */
+            max-width: 650px; /* Iets breder */
             width: 100%;
             text-align: center;
             box-sizing: border-box;
@@ -68,12 +68,12 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth transition for hover */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Vloeiende overgang voor hover */
         }
 
         .page-section:hover {
-            transform: translateY(-8px); /* Lift effect on hover */
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9); /* More intense shadow on hover */
+            transform: translateY(-8px); /* Lift effect bij hover */
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9); /* Intensere schaduw bij hover */
         }
 
         /* Header styling */
@@ -92,34 +92,34 @@
             height: auto;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); /* Enhanced logo shadow */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); /* Verbeterde logo schaduw */
         }
 
         h1 {
             color: #f0f0f0;
             margin-bottom: 5px;
-            font-size: 3.2em; /* Larger title */
-            font-weight: 800; /* Bolder title */
-            letter-spacing: 0.08em; /* More letter spacing */
-            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); /* Stronger text shadow */
+            font-size: 3.2em; /* Grotere titel */
+            font-weight: 800; /* Vettere titel */
+            letter-spacing: 0.08em; /* Meer letterafstand */
+            text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); /* Sterkere tekstschaduw */
         }
 
         .subtitle {
-            color: #b0b0b0; /* Slightly brighter subtitle */
-            font-size: 1.1em; /* Larger subtitle */
-            margin-top: 10px; /* More space above subtitle */
-            margin-bottom: 25px; /* More space below subtitle */
-            font-weight: 500; /* Medium weight */
+            color: #b0b0b0; /* Iets helderdere ondertitel */
+            font-size: 1.1em; /* Grotere ondertitel */
+            margin-top: 10px; /* Meer ruimte boven ondertitel */
+            margin-bottom: 25px; /* Meer ruimte onder ondertitel */
+            font-weight: 500; /* Medium gewicht */
             letter-spacing: 0.02em;
         }
 
-        /* Navigation styling */
+        /* Navigatie styling */
         .main-nav {
             background-color: #1a1a1a;
             width: 100%;
             max-width: 600px;
             border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Enhanced nav shadow */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Verbeterde nav schaduw */
             margin-bottom: 30px;
             padding: 15px 0;
             display: flex;
@@ -134,13 +134,13 @@
             font-weight: 500;
             padding: 10px 20px;
             border-radius: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Added transform to transition */
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Transform toegevoegd aan overgang */
         }
 
         .main-nav a:hover {
-            background-color: #0d2a4f; /* Darker blue on hover */
+            background-color: #0d2a4f; /* Donkerder blauw bij hover */
             color: #ffffff;
-            transform: translateY(-3px); /* Subtle lift on hover */
+            transform: translateY(-3px); /* Subtiele lift bij hover */
         }
         
         .main-nav a.active {
@@ -157,24 +157,24 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
-            padding: 20px; /* Increased padding around the embed */
+            padding: 20px; /* Meer padding rond de embed */
             box-sizing: border-box;
         }
 
-        /* Styling for the Beehiiv iframe itself - keep minimal to avoid glitches */
+        /* Styling voor de Beehiiv iframe zelf - minimaal houden om glitches te voorkomen */
         .embed-container iframe {
             width: 100%;
-            max-width: 814px; /* Max-width from Beehiiv for optimal display */
-            height: 420px; /* Height from Beehiiv */
+            max-width: 814px; /* Max-width van Beehiiv voor optimale weergave */
+            height: 420px; /* Hoogte van Beehiiv */
             border: none;
             border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Reverted box-shadow for stability */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Box-shadow teruggedraaid voor stabiliteit */
             background-color: transparent;
             margin: 0 auto; 
             display: block;
         }
 
-        /* Media queries for responsiveness */
+        /* Media queries voor responsiviteit */
         @media (max-width: 768px) {
             h1 { font-size: 2.5em; }
             .subtitle { font-size: 1em; }
@@ -206,6 +206,7 @@
     <nav class="main-nav">
         <a href="/" class="active">Home</a>
         <a href="/tools/healthscore/">Tools</a>
+        <a href="https://store.healthmaximization.com/" target="_blank">Store</a> <!-- Aangepast naar "Store" (kleine letter 's') -->
         <!-- Meer links kunnen hier komen (bijv. /blog/, /contact/) -->
     </nav>
 
