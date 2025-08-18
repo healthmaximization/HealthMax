@@ -1168,10 +1168,36 @@
             font-weight: 700;
         }
 
-
+        /* New: Orientation Banner for Mobile */
+        #orientationBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0a1a2f; /* Dark blue background */
+            color: #ffffff; /* White text */
+            text-align: center;
+            padding: 10px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            z-index: 1002; /* Higher than modal */
+            display: none; /* Hidden by default, shown via JS and media query */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        /* Show banner only on mobile in portrait */
+        @media (max-width: 768px) and (orientation: portrait) {
+            #orientationBanner {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- New: Orientation Banner for Mobile -->
+    <div id="orientationBanner">
+        Draai je telefoon voor de beste ervaring! 📱
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
@@ -1492,6 +1518,7 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const loadingMessage = document.getElementById('loadingMessage');
         const quizTip = document.getElementById('quizTip'); // Get the tip element
+        const orientationBanner = document.getElementById('orientationBanner'); // Get the new banner element
 
         // Event Listener for the single Start Quiz button
         document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
@@ -2167,10 +2194,39 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             }, 3000); 
         }
 
+        /**
+         * Checks the current screen orientation and displays/hides the banner.
+         */
+        function checkOrientationAndDisplayBanner() {
+            const isMobile = window.innerWidth <= 768; // Define your mobile breakpoint
+            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+
+            if (isMobile && isPortrait) {
+                orientationBanner.style.display = 'block';
+            } else {
+                orientationBanner.style.display = 'none';
+            }
+        }
+
+
         // Initialize start screen to be "entered" on page load
         document.addEventListener('DOMContentLoaded', () => {
             startScreen.classList.add('entered');
+            checkOrientationAndDisplayBanner(); // Initial check on load
         });
+
+        // Listen for resize events (which includes orientation changes on mobile)
+        window.addEventListener('resize', checkOrientationAndDisplayBanner);
+
+        // Also listen for orientationchange for older mobile browsers
+        if (window.matchMedia("(orientation: portrait)").addEventListener) {
+            window.matchMedia("(orientation: portrait)").addEventListener("change", checkOrientationAndDisplayBanner);
+            window.matchMedia("(orientation: landscape)").addEventListener("change", checkOrientationAndDisplayBanner);
+        } else if (window.onorientationchange) {
+            window.onorientationchange = checkOrientationAndDisplayBanner;
+        }
+
     </script>
 </body>
 </html>
+
