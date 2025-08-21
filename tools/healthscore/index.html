@@ -2526,6 +2526,13 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
             window.onorientationchange = checkOrientationAndDisplayBanner;
         }
 
+        // Add the Beehiiv attribution script
+        const beehiivAttributionScript = document.createElement('script');
+        beehiivAttributionScript.type = 'text/javascript';
+        beehiivAttributionScript.async = true;
+        beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
+        document.head.appendChild(beehiivAttributionScript);
+
     </script>
 </body>
 </html>
