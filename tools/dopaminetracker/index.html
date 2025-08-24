@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dopamine Habits Visualizer</title>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
+    <!-- End Google Tag Manager -->
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Favicon Link -->
+    <link rel="icon" type="image/png" href="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WR8QD6X56N');
+    </script>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* General body styling consistent with Health Score Quiz */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
+            background-size: 600% 600%;
+            animation: gradientAnimation 20s ease infinite;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align to top */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Container styling consistent with Health Score Quiz */
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Heading styles consistent with Health Score Quiz */
+        h1, h2, h3 {
+            color: #f0f0f0;
+            font-weight: 700;
+            text-align: center; /* Ensure headings are centered */
+        }
+        h1 {
+            font-size: 2.8em;
+            letter-spacing: 0.05em;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px; /* Adjusted margin */
+        }
+        h2 {
+            font-size: 2.2em;
+            margin-bottom: 25px;
+        }
+        h3 {
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 1.6;
+            color: #c0c0c0;
+            font-weight: 400;
+        }
+        /* Subtitle style from Health Score Quiz */
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            font-weight: 400;
+            text-align: center;
+        }
+        /* Logo placeholder styling from Health Score Quiz */
+        .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            max-width: 150px;
+            height: auto;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        /* Top stars from Health Score Quiz */
+        .top-stars {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            animation: pulse 1.5s infinite alternate;
+            text-align: center;
+            width: 100%;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+        /* Main navigation from Health Score Quiz */
+        .main-nav {
+            background-color: #1a1a1a;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .main-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .main-nav a:hover {
+            background-color: #0a1a2f;
+            color: #ffffff;
+        }
+        .main-nav a.active {
+            background-color: #0a1a2f;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Input and select styling */
+        input[type="time"], select {
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            border: 1px solid #444444;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="time"]:focus, select:focus {
+            border-color: #0a1a2f;
+            box-shadow: 0 0 0 2px #0a1a2f;
+            outline: none;
+        }
+
+        /* Button styling */
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            min-width: 150px;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+        button:disabled {
+            background-color: #444444;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Specific button colors for consistency */
+        #addHabitButton {
+            background-color: #28a745;
+            background-image: linear-gradient(to right, #28a745, #218838);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4);
+            color: #ffffff;
+        }
+        #addHabitButton:hover {
+             background-color: #218838;
+             background-image: linear-gradient(to right, #218838, #28a745);
+             box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5);
+        }
+
+        .remove-habit-button {
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 10px 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .remove-habit-button:hover {
+            background-color: #c82333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Section styling */
+        .habit-input-section {
+            background-color: #2a2a2a;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Habit item styling */
+        .habit-item {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .habit-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        .habit-item-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align text to the left */
+        }
+        .habit-item-info .habit-name {
+            color: #f0f0f0;
+            font-size: 1.2em; /* Slightly larger for habit name */
+            font-weight: 600; /* Bold */
+            margin-bottom: 2px; /* Small space below name */
+            display: flex;
+            align-items: center;
+        }
+        .habit-item-info .habit-name .emoji {
+            margin-right: 8px; /* Space between emoji and name */
+            font-size: 1.3em; /* Larger emoji */
+        }
+        .habit-item-info .habit-time-details {
+            color: #c0c0c0; /* Slightly lighter for time/details */
+            font-size: 0.95em; /* Smaller font for details */
+            font-weight: 400; /* Regular weight */
+        }
+
+        /* Canvas (chart) styling */
+        canvas {
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+            width: 100%; /* Ensure canvas takes full width of its parent */
+            height: 300px; /* Adjusted fixed height for consistency and compactness */
+            max-height: 50vh; /* Max height relative to viewport height */
+        }
+
+        /* Help section styling */
+        .help-section {
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: left;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        }
+        .help-section h3 {
+            color: #f0f0f0;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+            font-weight: 700;
+            text-align: center;
+        }
+        .help-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .help-section li {
+            margin-bottom: 10px;
+            color: #d0d0d0;
+            font-size: 1.1em;
+            line-height: 1.4;
+            display: flex; /* Use flexbox for layout */
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-start; /* Align text to the left */
+        }
+        .help-section li .list-item-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px; /* Space between header and text */
+        }
+        .help-section li strong {
+            color: #f0f0f0;
+            margin-right: 8px; /* Space between icon and text in header */
+        }
+        .help-section li .bullet-icon {
+            font-size: 1.2em;
+            color: #63b3ed;
+            margin-right: 10px;
+            min-width: 1.2em;
+            text-align: center;
+        }
+
+        /* New styles for slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #444;
+            outline: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #63b3ed;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #4a90e2;
+            border-color: #f0f0f0;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #63b3ed;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #4a90e2;
+            border-color: #f0f0f0;
+        }
+
+        /* Style for slider value display */
+        .slider-value {
+            text-align: center;
+            font-size: 1.1em;
+            color: #f0f0f0;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Style for AM/PM radio buttons */
+        .am-pm-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .am-pm-toggle label {
+            background-color: #444444;
+            color: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            font-weight: 500;
+        }
+        .am-pm-toggle input[type="radio"] {
+            display: none; /* Hide native radio button */
+        }
+        .am-pm-toggle input[type="radio"]:checked + label {
+            background-color: #0a1a2f;
+            box-shadow: 0 0 0 2px #63b3ed; /* Highlight active choice */
+            color: #ffffff;
+        }
+        .am-pm-toggle label:hover {
+            background-color: #555555;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            h3 {
+                font-size: 1.3em;
+            }
+            button {
+                font-size: 1em;
+                padding: 12px 20px;
+            }
+            .habit-input-section .grid {
+                grid-template-columns: 1fr;
+            }
+            .habit-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .habit-item button {
+                width: 100%;
+            }
+            .help-section li {
+                font-size: 1em;
+            }
+            .main-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .main-nav a {
+                width: calc(100% - 40px);
+            }
+            canvas {
+                height: 250px; /* Adjust height for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PJ2XGPWB"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <header style="text-align: center; width: 100%;"> <!-- Added text-align: center to header -->
+        <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
+        <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <h1>Unleash Your Dopamine. Master Your Motivation. Conquer Every Day.</h1>
+        <p class="subtitle">Visualize Your Habits' Impact on Your Energy & Focus in Real-Time!</p>
+    </header>
+
+    <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/tools/healthscore/" class="active">Tools</a> <!-- Set Tools as active -->
+        <a href="https://store.healthmaximization.com/" target="_blank">Store</a>
+    </nav>
+
+    <div id="mainApp" class="container"> 
+        <h2 class="font-bold mb-6 text-center">Your Dopamine Day</h2>
+
+        <!-- Habit Input Form - Simplified for habit selection -->
+        <div class="habit-input-section mb-8">
+            <h3 class="font-semibold mb-4 text-center">Add a New Habit</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="predefinedHabit" class="block text-gray-300 text-sm font-medium mb-1">Select Habit:</label>
+                    <select id="predefinedHabit" class="w-full">
+                        <!-- Options will be dynamically populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <div style="flex-grow: 1;">
+                        <label for="habitHourSlider" class="block text-gray-300 text-sm font-medium mb-1">Hour:</label>
+                        <input type="range" id="habitHourSlider" min="1" max="12" value="9">
+                        <div class="slider-value"><span id="hourValue">9</span>:00 <span id="amPmValue">AM</span></div>
+                    </div>
+                    <div style="flex-grow: 0; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <label for="amPmRadioGroup" class="block text-gray-300 text-sm font-medium mb-1" style="visibility: hidden;">AM/PM:</label> <!-- Hidden label to align buttons -->
+                        <div class="am-pm-toggle" id="amPmRadioGroup">
+                            <input type="radio" id="amRadio" name="amPm" value="AM" checked>
+                            <label for="amRadio">AM</label>
+                            <input type="radio" id="pmRadio" name="amPm" value="PM">
+                            <label for="pmRadio">PM</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="addHabitButton" class="w-full font-bold py-3 px-4 rounded-lg shadow-md">
+                Add Habit
+            </button>
+        </div>
+
+        <!-- List of Habits -->
+        <div class="mb-8">
+            <h3 class="font-semibold mb-4 text-center">Your Habits:</h3>
+            <div id="habitsList" class="space-y-3">
+                <!-- Habits will be dynamically added here -->
+                <p id="noHabitsMessage" class="text-gray-400 italic text-center">No habits added yet. Add some to see your graph!</p>
+            </div>
+        </div>
+
+        <!-- Dopamine Graph -->
+        <div class="habit-input-section">
+            <h3 class="font-semibold mb-4 text-center">Your Dopamine Levels Throughout the Day</h3>
+            <canvas id="dopamineChart"></canvas>
+            <p class="text-sm text-gray-400 mt-4 text-center">
+                This graph is a simplified simulation to illustrate how habits *might* impact dopamine.
+                Individual responses can vary significantly.
+            </p>
+        </div>
+
+        <div class="help-section text-left">
+            <h3 class="font-semibold mb-3">Understanding Your Habit Impact:</h3>
+            <ul>
+                <li>
+                    <div class="list-item-header">
+                        <span class="bullet-icon">📈</span> <strong>Positive Habits (Health Boost):</strong>
+                    </div>
+                    These habits, like exercise or meditation, promote a sustained sense of well-being and natural motivation. They contribute to better mood, focus, and long-term physical and mental health.
+                </li>
+                <li>
+                    <div class="list-item-header">
+                        <span class="bullet-icon">📉</span> <strong>Negative Habits (Health Drain):</strong>
+                    </div>
+                    Habits such as excessive social media or junk food can provide quick, intense gratification but often lead to energy crashes, reduced focus, and negative impacts on your overall health and mood.
+                </li>
+                <li>
+                    <div class="list-item-header">
+                        <span class="bullet-icon">📊</span> <strong>Visualize Your Day:</strong>
+                    </div>
+                    Observe how different habits affect your simulated energy and focus levels throughout a 24-hour period. This can help you make more conscious choices for improved mental and physical health.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const mainApp = document.getElementById('mainApp');
+        const predefinedHabitSelect = document.getElementById('predefinedHabit'); 
+        const habitHourSlider = document.getElementById('habitHourSlider'); // Slider for hours
+        const hourValueSpan = document.getElementById('hourValue'); // Display current hour
+        const amPmValueSpan = document.getElementById('amPmValue'); // Display current AM/PM
+        const amRadio = document.getElementById('amRadio');
+        const pmRadio = document.getElementById('pmRadio');
+        const addHabitButton = document.getElementById('addHabitButton');
+        const habitsList = document.getElementById('habitsList');
+        const noHabitsMessage = document.getElementById('noHabitsMessage');
+        const dopamineChartCanvas = document.getElementById('dopamineChart');
+
+        let habits = [];
+        let dopamineChart;
+
+        // Predefined habits with their intrinsic type and magnitude, now with emojis
+        const predefinedHabitsData = [
+            // --- Positive Habits ---
+            { name: "Meditation", emoji: "🧘", type: "positive", magnitude: "medium" },
+            { name: "Exercise", emoji: "🏋️", type: "positive", magnitude: "high" },
+            { name: "Cold Showers", emoji: "🧊", type: "positive", magnitude: "high" }, 
+            { name: "Reading/Learning", emoji: "📚", type: "positive", magnitude: "low" },
+            { name: "Social Connection", emoji: "💬", type: "positive", magnitude: "medium" },
+            { name: "Healthy Meal", emoji: "🥗", type: "positive", magnitude: "medium" },
+            { name: "Gratitude Journaling", emoji: "🙏", type: "positive", magnitude: "low" },
+            { name: "Time Blocking", emoji: "📅", type: "positive", magnitude: "medium" },
+            { name: "Nature Walk", emoji: "🌳", type: "positive", magnitude: "medium" },
+            { name: "Learning a New Skill", emoji: "🧠", type: "positive", magnitude: "low" },
+            { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
+
+            // --- Negative Habits ---
+            { name: "Junk Food", emoji: "🍔", type: "negative", magnitude: "high" },
+            { name: "Excessive Social Media", emoji: "📱", type: "negative", magnitude: "medium" },
+            { name: "Too Much Coffee", emoji: "☕", type: "negative", magnitude: "low" },
+            { name: "Procrastination", emoji: "⏱️", type: "negative", magnitude: "medium" }, 
+            { name: "Poor Sleep", emoji: "😴", type: "negative", magnitude: "high" },
+            { name: "Late-Night Screen Time", emoji: "💻", type: "negative", magnitude: "medium" },
+            { name: "Excessive News Consumption", emoji: "📰", type: "negative", magnitude: "low" },
+            { name: "Skipping Breakfast", emoji: "🥣", type: "negative", magnitude: "medium" },
+            { name: "Energy Drinks", emoji: "⚡", type: "negative", magnitude: "high" },
+            { name: "Gossip", emoji: "🗣️", type: "negative", magnitude: "low" },
+        ];
+
+        // Map magnitude values to numerical impact for chart calculation - ADJUSTED FOR MORE VOLATILITY
+        const magnitudeMap = {
+            'low': 10,    // Base impact
+            'medium': 25,  // Base impact
+            'high': 35    // Base impact
+        };
+
+        // Helper function to format HH:MM to h:MM AM/PM
+        function formatTimeToAmPm(timeString) {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM
+            return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        // Populate the predefined habits dropdown
+        function populatePredefinedHabits() {
+            predefinedHabitSelect.innerHTML = ''; 
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "Select a habit...";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            predefinedHabitSelect.appendChild(defaultOption);
+
+            // Group options by type for better readability
+            const positiveGroup = document.createElement('optgroup');
+            positiveGroup.label = 'Good Habits';
+            const negativeGroup = document.createElement('optgroup');
+            negativeGroup.label = 'Bad Habits';
+
+            predefinedHabitsData.forEach(habit => {
+                const option = document.createElement('option');
+                option.value = habit.name; 
+                option.textContent = `${habit.emoji} ${habit.name}`; // Display emoji + name
+                if (habit.type === 'positive') {
+                    positiveGroup.appendChild(option);
+                } else {
+                    negativeGroup.appendChild(option);
+                }
+            });
+
+            predefinedHabitSelect.appendChild(positiveGroup);
+            predefinedHabitSelect.appendChild(negativeGroup);
+        }
+
+        // Update slider display
+        habitHourSlider.addEventListener('input', () => {
+            hourValueSpan.textContent = habitHourSlider.value;
+            updateAmPmDisplay(); // Update AM/PM display as well, in case hour change implies AM/PM change (e.g. 12 AM/PM)
+        });
+
+        amRadio.addEventListener('change', () => {
+            amPmValueSpan.textContent = 'AM';
+        });
+        pmRadio.addEventListener('change', () => {
+            amPmValueSpan.textContent = 'PM';
+        });
+
+        // Function to update the AM/PM display (e.g., if changing from 12 AM to 1 PM)
+        function updateAmPmDisplay() {
+            amPmValueSpan.textContent = document.querySelector('input[name="amPm"]:checked').value;
+        }
+
+        // Event listener for adding a habit
+        addHabitButton.addEventListener('click', () => {
+            const selectedHabitName = predefinedHabitSelect.value;
+            const selectedHour = parseInt(habitHourSlider.value);
+            const selectedAmPm = document.querySelector('input[name="amPm"]:checked').value;
+
+            if (!selectedHabitName || !selectedHour || !selectedAmPm) {
+                alert('Please select a habit, hour, and AM/PM.');
+                return;
+            }
+
+            const selectedHabitData = predefinedHabitsData.find(h => h.name === selectedHabitName);
+
+            if (!selectedHabitData) {
+                alert('Selected habit data not found. Please try again.');
+                return;
+            }
+
+            let hours24 = selectedHour;
+            if (selectedAmPm === 'PM' && hours24 !== 12) {
+                hours24 += 12;
+            } else if (selectedAmPm === 'AM' && hours24 === 12) {
+                hours24 = 0; // 12 AM is 00 in 24-hour format
+            }
+            const timeString24 = `${hours24.toString().padStart(2, '0')}:00`; // Assuming :00 for simplicity
+
+            const [hours, minutes] = timeString24.split(':').map(Number);
+            const timeInMinutes = hours * 60 + minutes;
+
+            habits.push({
+                name: selectedHabitData.name,
+                emoji: selectedHabitData.emoji, // Include emoji
+                time: timeString24, // Store in HH:MM format for internal calculations
+                timeInMinutes: timeInMinutes,
+                type: selectedHabitData.type,
+                magnitude: selectedHabitData.magnitude
+            });
+            habits.sort((a, b) => a.timeInMinutes - b.timeInMinutes); 
+
+            renderHabits();
+            clearHabitForm();
+            updateDopamineChart(); 
+        });
+
+        // Function to clear the habit form
+        function clearHabitForm() {
+            predefinedHabitSelect.selectedIndex = 0; 
+            habitHourSlider.value = 9; // Reset slider
+            hourValueSpan.textContent = 9;
+            amRadio.checked = true; // Reset AM/PM to AM
+            amPmValueSpan.textContent = 'AM';
+        }
+
+        // Function to render the list of added habits
+        function renderHabits() {
+            habitsList.innerHTML = '';
+            if (habits.length === 0) {
+                noHabitsMessage.classList.remove('hidden');
+            } else {
+                noHabitsMessage.classList.add('hidden');
+                habits.forEach((habit, index) => {
+                    const habitItem = document.createElement('div');
+                    habitItem.classList.add('habit-item');
+                    habitItem.innerHTML = `
+                        <div class="habit-item-info">
+                            <div class="habit-name">
+                                <span class="emoji">${habit.emoji}</span> <strong>${habit.name}</strong>
+                            </div>
+                            <div class="habit-time-details">
+                                ${formatTimeToAmPm(habit.time)} (${habit.type === 'positive' ? 'Boost' : 'Drain'} - ${habit.magnitude})
+                            </div>
+                        </div>
+                        <button data-index="${index}" class="remove-habit-button">Remove</button>
+                    `;
+                    habitsList.appendChild(habitItem);
+                });
+
+                document.querySelectorAll('.remove-habit-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const index = event.target.dataset.index;
+                        habits.splice(index, 1);
+                        renderHabits();
+                        updateDopamineChart(); 
+                    });
+                });
+            }
+        }
+
+        // Function to initialize the Chart.js graph
+        function initializeChart() {
+            if (dopamineChart) {
+                dopamineChart.destroy();
+            }
+
+            const ctx = dopamineChartCanvas.getContext('2d');
+            dopamineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 24 }, (_, i) => formatTimeToAmPm(`${i}:00`)), // Chart labels in AM/PM
+                    datasets: [{
+                        label: 'Simulated Energy & Focus Level', 
+                        data: Array(24).fill(50), 
+                        borderColor: '#63b3ed', 
+                        backgroundColor: 'rgba(99, 179, 237, 0.2)', 
+                        tension: 0.3, 
+                        fill: true,
+                        pointBackgroundColor: '#63b3ed',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#63b3ed',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: 'Time of Day',
+                                color: '#e2e8f0'
+                            },
+                            ticks: {
+                                color: '#a0aec0'
+                            },
+                            grid: {
+                                color: 'rgba(160, 174, 192, 0.1)' 
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Overall Well-being (Simulated)', 
+                                color: '#e2e8f0'
+                            },
+                            ticks: {
+                                color: '#a0aec0'
+                            },
+                            grid: {
+                                color: 'rgba(160, 174, 192, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#4a5568',
+                            titleColor: '#f7fafc',
+                            bodyColor: '#e2e8f0',
+                            borderColor: '#718096',
+                            borderWidth: 1
+                        }
+                    }
+                }
+            });
+            updateDopamineChart(); 
+        }
+
+        // Function to calculate dopamine levels and update the chart
+        function updateDopamineChart() {
+            if (!dopamineChart) {
+                initializeChart(); 
+                return;
+            }
+
+            let minuteDeltas = Array(24 * 60).fill(0); // This stores the accumulated delta from 50 for each minute.
+            const totalMinutesInDay = 24 * 60;
+
+            habits.forEach(habit => {
+                const impactBase = magnitudeMap[habit.magnitude];
+                const startTimeIndex = habit.timeInMinutes;
+
+                if (habit.type === 'positive') {
+                    const peakDelta = impactBase * 0.7; // Aim for 50 + peakDelta = ~75-80 (halved max)
+                    const riseDuration = 30; // Minutes to reach peak
+                    const plateauDuration = 60; // Minutes to maintain peak
+                    const decayDuration = 300; // Minutes for very slow, gentle decay (5 hours)
+
+                    // Initial sharp rise to peakDelta
+                    for (let i = 0; i < riseDuration; i++) {
+                        const absoluteIndex = startTimeIndex + i;
+                        if (absoluteIndex >= totalMinutesInDay) break;
+                        minuteDeltas[absoluteIndex] += peakDelta * (i / riseDuration);
+                    }
+                    // Maintain peakDelta
+                    for (let i = riseDuration; i < riseDuration + plateauDuration; i++) {
+                        const absoluteIndex = startTimeIndex + i;
+                        if (absoluteIndex >= totalMinutesInDay) break;
+                        minuteDeltas[absoluteIndex] += peakDelta;
+                    }
+                    // Very slow, gradual decay from peakDelta towards 0
+                    for (let i = riseDuration + plateauDuration; i < riseDuration + plateauDuration + decayDuration; i++) {
+                        const absoluteIndex = startTimeIndex + i;
+                        if (absoluteIndex >= totalMinutesInDay) break;
+                        const decayProgress = (i - (riseDuration + plateauDuration)) / decayDuration; // 0 to 1 over decay
+                        minuteDeltas[absoluteIndex] += peakDelta * (1 - decayProgress); // Start at peakDelta, linearly decay to 0
+                    }
+                } else { // negative habit
+                    // Increased initial peak for better visibility
+                    const initialPeakRiseFactor = 0.5; // Stronger initial peak (e.g., high 35 -> 17.5 point boost)
+                    const deepTroughFactor = -0.7; // Deep trough (e.g., high 35 -> -24.5, meaning 50 - 24.5 = 25.5 level)
+                    
+                    const initialPeakRiseAmount = impactBase * initialPeakRiseFactor;
+                    const deepTroughAmount = impactBase * deepTroughFactor;
+
+                    const peakDuration = 30; // Longer duration for the initial peak (from 15 to 30 min)
+                    const crashDuration = 45; // Rapid, deep crash after the peak
+                    const recoveryDuration = 360; // Slow recovery (6 hours)
+
+                    let habitSpecificImpact = Array(totalMinutesInDay).fill(0);
+
+                    // 1. Initial small spike (positive delta from baseline)
+                    for (let i = 0; i < peakDuration; i++) {
+                        const currentMinute = startTimeIndex + i;
+                        if (currentMinute >= totalMinutesInDay) break;
+                        habitSpecificImpact[currentMinute] = initialPeakRiseAmount * (i / peakDuration);
+                    }
+                    
+                    // Capture the exact delta at the end of the peak phase
+                    const deltaAtEndOfPeak = (startTimeIndex + peakDuration - 1 < totalMinutesInDay && startTimeIndex + peakDuration - 1 >= 0) ?
+                                             habitSpecificImpact[startTimeIndex + peakDuration - 1] : initialPeakRiseAmount; // Fallback for edge cases
+
+                    // 2. Sharp, deep crash from `deltaAtEndOfPeak` towards `deepTroughAmount`
+                    for (let i = 0; i < crashDuration; i++) {
+                        const currentMinute = startTimeIndex + peakDuration + i;
+                        if (currentMinute >= totalMinutesInDay) break;
+                        const crashProgress = i / crashDuration; // 0 to 1 over crash duration
+                        habitSpecificImpact[currentMinute] = deltaAtEndOfPeak * (1 - crashProgress) + deepTroughAmount * crashProgress;
+                    }
+
+                    // Capture the exact delta at the end of the crash phase (deepest point)
+                    const deltaAtEndOfCrash = (startTimeIndex + peakDuration + crashDuration - 1 < totalMinutesInDay && startTimeIndex + peakDuration + crashDuration - 1 >= 0) ?
+                                               habitSpecificImpact[startTimeIndex + peakDuration + crashDuration - 1] : deepTroughAmount; // Fallback for edge cases
+
+                    // 3. Slow recovery from `deltaAtEndOfCrash` towards 0 delta
+                    for (let i = 0; i < recoveryDuration; i++) {
+                        const currentMinute = startTimeIndex + peakDuration + crashDuration + i;
+                        if (currentMinute >= totalMinutesInDay) break;
+                        const recoveryProgress = i / recoveryDuration; // 0 to 1 over recovery duration
+                        habitSpecificImpact[currentMinute] = deltaAtEndOfCrash * (1 - recoveryProgress);
+                    }
+
+                    // Add this habit's specific impact to the overall minuteDeltas
+                    for (let i = 0; i < totalMinutesInDay; i++) {
+                        minuteDeltas[i] += habitSpecificImpact[i];
+                    }
+                }
+            });
+
+            // Calculate final dopamine levels from baseline (50) and accumulated deltas, then clamp
+            let finalDopamineLevelsPerMinute = Array(totalMinutesInDay).fill(0);
+            for (let i = 0; i < totalMinutesInDay; i++) {
+                // Ensure levels don't go below 20 for negative habits if the delta pulls it too far
+                finalDopamineLevelsPerMinute[i] = Math.max(20, Math.min(100, 50 + minuteDeltas[i]));
+            }
+
+            // Aggregate minute data to hourly for the chart
+            const hourlyDopamine = [];
+            for (let h = 0; h < 24; h++) {
+                let sum = 0;
+                for (let m = 0; m < 60; m++) {
+                    sum += finalDopamineLevelsPerMinute[h * 60 + m];
+                }
+                hourlyDopamine.push(sum / 60);
+            }
+
+            dopamineChart.data.datasets[0].data = hourlyDopamine; 
+            dopamineChart.update();
+        }
+
+        // Initial rendering logic now on DOMContentLoaded for direct start
+        document.addEventListener('DOMContentLoaded', () => {
+            populatePredefinedHabits();
+            // No populateTimeSelect needed for slider/radio, but initial display must be set
+            hourValueSpan.textContent = habitHourSlider.value;
+            updateAmPmDisplay(); // Set initial AM/PM display
+            renderHabits();
+            initializeChart();
+        });
+
+        // Add the Beehiiv attribution script (consistent with quiz)
+        const beehiivAttributionScript = document.createElement('script');
+        beehiivAttributionScript.type = 'text/javascript';
+        beehiivAttributionScript.async = true;
+        beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
+        document.head.appendChild(beehiivAttributionScript);
+
+    </script>
+</body>
+</html>
