@@ -6,8 +6,7 @@
     <title>Dopamine Habits Visualizer</title>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
     <!-- End Google Tag Manager -->
@@ -457,66 +456,45 @@
         }
 
         /* Styling for the content that replaces the graph */
-        #emailGateContentWrapper { /* New wrapper for just the embed and button */
-            display: flex; /* Use flexbox for centering content */
-            flex-direction: column; /* Stack elements vertically */
-            justify-content: center; /* Center content vertically */
-            align-items: center; /* Center content horizontally */
-            text-align: center; /* Center text */
-            padding: 25px; /* Consistent padding */
+        #emailGateContentWrapper { 
+            display: block; 
+            text-align: center; 
+            padding: 0; 
             box-sizing: border-box;
             width: 100%;
             height: auto;
-            min-height: 650px; /* Minimum height to accommodate the embed and button */
-            background-color: #2a2a2a; /* Consistent with habit-input-section */
-            border-radius: 12px; /* Consistent with habit-input-section */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Consistent with habit-input-section */
-            gap: 0px; /* Set gap to 0 for closest proximity */
-            margin-top: 20px; /* Add margin to align with the section above */
-            margin-bottom: 20px; /* Add margin to align with the section below */
+            background-color: #2a2a2a; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+            margin-top: 20px; 
+            margin-bottom: 20px; 
+            overflow: hidden; 
         }
+
         /* Styling for the Beehiiv embed within the blocker content */
         #emailGateContentWrapper .beehiiv-embed {
-            width: 100% !important; /* Override inline width for responsiveness */
-            max-width: 550px !important; /* Made embed wider as requested */
-            height: 606px !important; /* Explicit height as requested */
-            margin: 0; /* Remove auto margin from embed itself */
+            width: 100% !important; 
+            max-width: 600px !important; 
+            height: 606px !important; 
+            margin: 0 auto !important; 
+            padding: 0 !important; 
+            display: block; 
+            vertical-align: top; 
             border: none; 
             border-radius: 10px !important; 
             background-color: transparent;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Consistent shadow */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
+            line-height: 0; 
         }
-        #emailGateContentWrapper button {
-            background-color: #63b3ed; /* Blue button */
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            margin-top: 0px; /* Set margin-top to 0 for closest proximity */
-        }
-        #emailGateContentWrapper button:hover:not(:disabled) {
-            background-color: #4a90e2;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-        }
-        #emailGateContentWrapper button:disabled {
-            background-color: #444444;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
+
+        /* Styling voor het "uur" selectiediv */
+        #habitInputHourSection {
+            margin-top: 15px; /* Voeg hier marge toe om ruimte te creëren */
         }
 
         /* Responsive adjustments for blocker content */
         @media (max-width: 480px) {
-            #emailGateContentWrapper button {
-                padding: 10px 20px;
-                font-size: 1em;
-            }
+            /* De knop is verwijderd, dus deze stijl is overbodig. */
         }
     </style>
 </head>
@@ -529,7 +507,7 @@
     <header style="text-align: center; width: 100%;"> <!-- Added text-align: center to header -->
         <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
         <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <h1>Unleash Your Dopamine. Master Your Motivation. Conquer Every Day.</h1>
+        <h1>Unleash Your Dopamine. Master Your Motivation.</h1>
         <p class="subtitle">Visualize Your Habits' Impact on Your Energy & Focus in Real-Time!</p>
     </header>
 
@@ -552,7 +530,7 @@
                         <!-- Options will be dynamically populated by JavaScript -->
                     </select>
                 </div>
-                <div class="flex gap-2">
+                <div id="habitInputHourSection" class="flex gap-2"> <!-- Nieuwe ID toegevoegd -->
                     <div style="flex-grow: 1;">
                         <label for="habitHourSlider" class="block text-gray-300 text-sm font-medium mb-1">Hour:</label>
                         <input type="range" id="habitHourSlider" min="1" max="12" value="9">
@@ -600,7 +578,7 @@
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
-            <button id="viewGraphButton" disabled>View My Dopamine Graph</button>
+            <!-- De knop "View My Dopamine Graph" is verwijderd -->
         </div>
 
         <div class="help-section text-left">
@@ -616,7 +594,7 @@
                     <div class="list-item-header">
                         <span class="bullet-icon">📉</span> <strong>Negative Habits (Health Drain):</strong>
                     </div>
-                    Habits such as excessive social media or junk food can provide quick, intense gratification but often lead to energy crashes, reduced focus, and negative impacts on your overall health and mood.
+                    Hhabits such as excessive social media or junk food can provide quick, intense gratification but often lead to energy crashes, reduced focus, and negative impacts on your overall health and mood.
                 </li>
                 <li>
                     <div class="list-item-header">
@@ -642,7 +620,7 @@
         const dopamineChartCanvas = document.getElementById('dopamineChart');
         const dopamineGraphSection = document.getElementById('dopamineGraphSection'); // Reference to the entire graph section
         const emailGateContentWrapper = document.getElementById('emailGateContentWrapper'); // Reference to the new email gate content div
-        const viewGraphButton = document.getElementById('viewGraphButton'); // Button on the email gate content
+        // const viewGraphButton is niet langer nodig, deze is verwijderd.
 
         let habits = [];
         let dopamineChart;
@@ -657,8 +635,8 @@
             { name: "Social Connection", emoji: "💬", type: "positive", magnitude: "medium" },
             { name: "Healthy Meal", emoji: "🥗", type: "positive", magnitude: "medium" },
             { name: "Gratitude Journaling", emoji: "🙏", type: "positive", magnitude: "low" },
-            { name: "Time Blocking", emoji: "�", type: "positive", magnitude: "medium" },
-            { name: "Nature Walk", emoji: "🌳", type: "positive", magnitude: "medium" },
+            { name: "Time Blocking", emoji: "📅", type: "positive", magnitude: "medium" },
+            { name: "Nature Walk", emoji: "�", type: "positive", magnitude: "medium" },
             { name: "Learning a New Skill", emoji: "🧠", type: "positive", magnitude: "low" },
             { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
 
@@ -1061,45 +1039,29 @@
             });
         }
 
-        // Function to control the display of the graph based on email submission status
+        // Functie om de weergave van de grafiek te regelen op basis van de e-mailinvoeringstatus
         function checkEmailSubmissionStatusForGraph() {
             const emailSubmitted = localStorage.getItem('emailSubmitted');
             if (emailSubmitted === 'true') {
-                emailGateContentWrapper.classList.add('hidden'); // Hide the email gate content
-                dopamineGraphSection.classList.remove('hidden'); // Show the entire graph section
+                emailGateContentWrapper.classList.add('hidden'); // Verberg de e-mailinvoer-content
+                dopamineGraphSection.classList.remove('hidden'); // Toon de grafieksectie
             } else {
-                emailGateContentWrapper.classList.remove('hidden'); // Show the email gate content
-                dopamineGraphSection.classList.add('hidden'); // Hide the entire graph section
-                viewGraphButton.disabled = true; // Disable the button by default
-
-                // Listen for changes in localStorage for 'emailSubmitted'
-                const checkEmailSubmittedInterval = setInterval(() => {
-                    if (localStorage.getItem('emailSubmitted') === 'true') {
-                        viewGraphButton.disabled = false; // Enable the button
-                        clearInterval(checkEmailSubmittedInterval); // Stop checking
-                    }
-                }, 1000); // Check every second
+                emailGateContentWrapper.classList.remove('hidden'); // Toon de e-mailinvoer-content
+                dopamineGraphSection.classList.add('hidden'); // Verberg de grafieksectie
             }
         }
 
-        // Event listener for the 'View My Dopamine Graph' button
-        viewGraphButton.addEventListener('click', () => {
-            emailGateContentWrapper.classList.add('hidden'); // Hide the email gate content
-            dopamineGraphSection.classList.remove('hidden'); // Show the entire graph section
-        });
-
-
-        // Initial rendering logic on DOMContentLoaded for direct start
+        // Initiële rendering logica bij DOMContentLoaded voor directe start
         document.addEventListener('DOMContentLoaded', () => {
             populatePredefinedHabits();
             hourValueSpan.textContent = habitHourSlider.value;
             updateAmPmDisplay(); 
             renderHabits();
             initializeChart();
-            checkEmailSubmissionStatusForGraph(); // Check immediately on load if graph should be blocked
+            checkEmailSubmissionStatusForGraph(); // Controleer onmiddellijk bij het laden of de grafiek geblokkeerd moet worden
         });
 
-        // Add the Beehiiv attribution script (consistent with quiz)
+        // Voeg het Beehiiv attribution script toe (consistent met quiz)
         const beehiivAttributionScript = document.createElement('script');
         beehiivAttributionScript.type = 'text/javascript';
         beehiivAttributionScript.async = true;
