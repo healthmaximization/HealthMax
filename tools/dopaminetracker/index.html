@@ -193,11 +193,14 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
+        /* Default disabled state, will be overridden by specific ID + :disabled */
         button:disabled {
             background-color: #444444;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
+            border: 1px solid #555555; /* Ensure a border is present */
+            color: #afafaf; /* Lighter grey text for disabled state */
         }
 
         /* Specific button colors for consistency */
@@ -465,8 +468,7 @@
         #emailGateContentWrapper { 
             display: block; 
             text-align: center; 
-            /* Let habit-input-section's padding take effect */
-            /* padding: 0; -- REMOVED THIS LINE */
+            padding: 25px; /* Added explicit padding for consistent spacing */
             box-sizing: border-box;
             width: 100%;
             height: auto;
@@ -483,7 +485,7 @@
             width: 100% !important; 
             max-width: 600px !important; 
             height: 606px !important; 
-            margin: 0 auto !important; /* Set bottom margin to 0 */
+            margin: 0 auto 0 auto !important; /* No bottom margin on embed */
             padding: 0 !important; 
             display: block; 
             vertical-align: top; 
@@ -494,36 +496,41 @@
             line-height: 0; 
         }
 
-        #emailGateContentWrapper button {
-            background-color: #63b3ed; /* Blue button */
+        /* Specific styles for the "View My Dopamine Graph" button */
+        #viewGraphButton {
+            background-color: #63b3ed; /* Default blue button */
             color: white;
             padding: 12px 25px;
-            border: none;
+            border: 1px solid #63b3ed; /* Ensure a default border */
             border-radius: 10px;
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Add border-color to transition */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            margin: 15px auto 0 auto !important; /* Added top margin, centered horizontally */
+            margin: 5px auto 0 auto !important; /* Reduced top margin to 5px for closer placement */
             display: block; /* Ensure it's a block element */
             position: relative; 
             z-index: 1; 
             min-width: 200px;
         }
-        #emailGateContentWrapper button:hover:not(:disabled) {
+        #viewGraphButton:hover:not(:disabled) {
             background-color: #4a90e2;
             transform: translateY(-2px); 
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            border-color: #4a90e2; /* Ensure border color changes on hover too */
         }
-        #emailGateContentWrapper button:disabled {
-            background-color: #444444;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
+        #viewGraphButton:disabled { /* Specific styling for when THIS button is disabled */
+            background-color: #444444 !important; /* Darker gray for disabled state */
+            background-image: none !important; /* Remove any gradient */
+            border-color: #555555 !important; /* Specific border color for disabled state */
+            color: #afafaf !important; /* Lighter grey text for disabled state */
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
         }
 
-        /* Green glow effect for the button */
+        /* Green glow effect for the button - only applies if the class is added */
         .button-glow {
             box-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.5);
         }
@@ -622,7 +629,7 @@
         <!-- This entire section will be shown/hidden based on email submission -->
         <div id="emailGateContentWrapper" class="habit-input-section"> 
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0 auto; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0 auto 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
             <button id="viewGraphButton" disabled>View My Dopamine Graph</button>
         </div>
@@ -1090,38 +1097,58 @@
         function checkEmailSubmissionStatusForGraph() {
             const emailSubmitted = localStorage.getItem('emailSubmitted');
             if (emailSubmitted === 'true') {
-                viewGraphButton.disabled = false;
-                viewGraphButton.classList.add('button-glow'); // Add glow when enabled
+                // Als e-mail is ingediend, toon de grafiek en verberg de e-mailpoort automatisch.
+                emailGateContentWrapper.classList.add('hidden');
+                dopamineGraphSection.classList.remove('hidden');
+                if (emailCheckInterval) {
+                    clearInterval(emailCheckInterval); // Stop met controleren zodra de grafiek wordt getoond
+                }
             } else {
-                viewGraphButton.disabled = true;
-                viewGraphButton.classList.remove('button-glow'); // Ensure no glow when disabled
+                // Als e-mail NIET is ingediend, toon de e-mailpoort en verberg de grafiek.
+                emailGateContentWrapper.classList.remove('hidden');
+                dopamineGraphSection.classList.add('hidden');
+
+                // Wanneer e-mail NIET is ingediend, moet de knop zijn uitgeschakeld en niet gloeien.
+                viewGraphButton.disabled = true; // Maak hem uitgeschakeld
+                viewGraphButton.classList.remove('button-glow'); // Verwijder groene gloed
             }
         }
 
-        // Event listener for the 'View My Dopamine Graph' button
+        // Event listener voor de 'View My Dopamine Graph' knop
+        // Deze knop is alleen klikbaar als emailSubmitted false is,
+        // en de gebruiker zojuist zijn e-mail heeft ingediend in de Beehiiv-embed (wat het interval triggert).
+        // Het hoofddoel is echter automatische weergave als emailSubmitted true is.
+        // Deze click handler dient effectief als een fallback of een manier om handmatig te omzeilen als de automatische weergave mislukt.
         viewGraphButton.addEventListener('click', () => {
-            emailGateContentWrapper.classList.add('hidden'); // Hide the email gate content
-            dopamineGraphSection.classList.remove('hidden'); // Show the entire graph section
-            if (emailCheckInterval) { // Stop checking once the graph is shown
+            // Deze click handler wordt nu *alleen* getriggerd als emailSubmitted false is,
+            // aangezien anders de emailGateContentWrapper verborgen zou zijn door het interval.
+            // Bij klikken verbergt het de poort en toont het de grafiek.
+            emailGateContentWrapper.classList.add('hidden'); 
+            dopamineGraphSection.classList.remove('hidden'); 
+            if (emailCheckInterval) {
                 clearInterval(emailCheckInterval);
             }
         });
 
 
-        // Initial rendering logic on DOMContentLoaded for direct start
+        // Initiële renderinglogica bij DOMContentLoaded voor directe start
         document.addEventListener('DOMContentLoaded', () => {
             populatePredefinedHabits();
             hourValueSpan.textContent = habitHourSlider.value;
             updateAmPmDisplay(); 
             renderHabits();
             initializeChart();
-            checkEmailSubmissionStatusForGraph(); // Check immediately on load if button should be enabled
+            
+            // Controleer onmiddellijk bij het laden of de grafiek moet worden getoond/knop moet worden ingeschakeld
+            checkEmailSubmissionStatusForGraph(); 
 
-            // Start an interval to check every second if the email has been submitted to enable the button
+            // Start een interval om elke seconde te controleren of de e-mail is ingediend.
+            // Dit interval zal zowel de automatische weergave van de grafiek als
+            // het zorgen voor de juiste knopstatus afhandelen als de e-mailpoort nog zichtbaar is.
             emailCheckInterval = setInterval(checkEmailSubmissionStatusForGraph, 1000); 
         });
 
-        // Add the Beehiiv attribution script (consistent with quiz)
+        // Voeg het Beehiiv attributiescript toe (consistent met quiz)
         const beehiivAttributionScript = document.createElement('script');
         beehiivAttributionScript.type = 'text/javascript';
         beehiivAttributionScript.async = true;
