@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dopamine Habits Visualizer</title>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    <script>(function(w,d,s,l,i){
+    w[l]=w[l]||[];
+    w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+    
+    var f=d.getElementsByTagName(s)[0];
+    var j=d.createElement(s);
+    
+    // Construct the src URL directly, removing the separate 'dl' variable to simplify parsing.
+    var gtmSrcUrl = 'https://www.googletagmanager.com/gtag/js?id=' + i + ((l != 'dataLayer') ? ('&l=' + l) : '');
+    
+    j.async=true;
+    j.src=gtmSrcUrl;
+    f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
     <!-- End Google Tag Manager -->
     <!-- Google Font: Inter -->
@@ -208,6 +217,26 @@
              box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5);
         }
 
+        #continueToGraphButton { /* Styling for the green button */
+            background-color: #28a745;
+            background-image: linear-gradient(to right, #28a745, #218838);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4);
+            color: #ffffff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        #continueToGraphButton:hover {
+             background-color: #218838;
+             background-image: linear-gradient(to right, #218838, #28a745);
+             box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5);
+             transform: translateY(-2px);
+        }
+
+
         .remove-habit-button {
             background-color: #dc3545;
             color: #ffffff;
@@ -406,6 +435,10 @@
             background-color: #555555;
         }
 
+        /* Utility class to hide elements */
+        .hidden {
+            display: none !important; /* Use !important to ensure it overrides other display properties */
+        }
 
         /* Responsive adjustments */
         @media (max-width: 640px) {
@@ -461,7 +494,7 @@
     <header style="text-align: center; width: 100%;"> <!-- Added text-align: center to header -->
         <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
         <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <h1>Unleash Your Dopamine. Master Your Motivation. Conquer Every Day.</h1>
+        <h1>Unleash Your Dopamine. Master Your Motivation.</h1>
         <p class="subtitle">Visualize Your Habits' Impact on Your Energy & Focus in Real-Time!</p>
     </header>
 
@@ -515,8 +548,22 @@
             </div>
         </div>
 
-        <!-- Dopamine Graph -->
-        <div class="habit-input-section">
+        <!-- Email Capture / Graph Display Section -->
+        <div id="emailGate" class="flex flex-col items-center justify-center p-8 bg-gray-800 rounded-lg shadow-xl text-center mb-8">
+            <p class="text-gray-300 mb-6">Please enter your email in the form below to receive exclusive insights and unlock the full graph. If you have already subscribed on this browser, click "Continue to Graph" below the form.</p>
+            <!-- Beehiiv Embed Code -->
+            <div id="beehiivEmbedPlaceholder" class="w-full max-w-sm">
+                <iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 420px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            </div>
+            <div class="text-center w-full max-w-sm"> <!-- Wrapper for centering the button -->
+                <button id="continueToGraphButton" class="mt-6 mx-auto block w-full">
+                    Continue to Graph
+                </button>
+            </div>
+        </div>
+
+        <!-- Dopamine Graph (Initially hidden) -->
+        <div id="dopamineGraphSection" class="habit-input-section hidden"> <!-- Added 'hidden' class -->
             <h3 class="font-semibold mb-4 text-center">Your Dopamine Levels Throughout the Day</h3>
             <canvas id="dopamineChart"></canvas>
             <p class="text-sm text-gray-400 mt-4 text-center">
@@ -562,6 +609,10 @@
         const habitsList = document.getElementById('habitsList');
         const noHabitsMessage = document.getElementById('noHabitsMessage');
         const dopamineChartCanvas = document.getElementById('dopamineChart');
+        const emailGate = document.getElementById('emailGate');
+        const dopamineGraphSection = document.getElementById('dopamineGraphSection');
+        const continueToGraphButton = document.getElementById('continueToGraphButton');
+
 
         let habits = [];
         let dopamineChart;
@@ -577,12 +628,12 @@
             { name: "Healthy Meal", emoji: "🥗", type: "positive", magnitude: "medium" },
             { name: "Gratitude Journaling", emoji: "🙏", type: "positive", magnitude: "low" },
             { name: "Time Blocking", emoji: "📅", type: "positive", magnitude: "medium" },
-            { name: "Nature Walk", emoji: "🌳", type: "positive", magnitude: "medium" },
+            { name: "Nature Walk", emoji: "🌳", type="positive", magnitude: "medium" },
             { name: "Learning a New Skill", emoji: "🧠", type: "positive", magnitude: "low" },
-            { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
+            { name: "Sunlight Exposure", emoji: "☀️", type="positive", magnitude: "medium" },
 
             // --- Negative Habits ---
-            { name: "Junk Food", emoji: "�", type: "negative", magnitude: "high" },
+            { name: "Junk Food", emoji: "🍔", type: "negative", magnitude: "high" },
             { name: "Excessive Social Media", emoji: "📱", type: "negative", magnitude: "medium" },
             { name: "Too Much Coffee", emoji: "☕", type: "negative", magnitude: "low" },
             { name: "Procrastination", emoji: "⏱️", type: "negative", magnitude: "medium" }, 
@@ -590,7 +641,7 @@
             { name: "Late-Night Screen Time", emoji: "💻", type: "negative", magnitude: "medium" },
             { name: "Excessive News Consumption", emoji: "📰", type: "negative", magnitude: "low" },
             { name: "Skipping Breakfast", emoji: "🥣", type: "negative", magnitude: "medium" },
-            { name: "Energy Drinks", emoji: "⚡", type: "negative", magnitude: "high" },
+            { name: "Energy Drinks", emoji: "⚡", type="negative", magnitude: "high" },
             { name: "Gossip", emoji: "🗣️", type: "negative", magnitude: "low" },
         ];
 
@@ -985,8 +1036,29 @@
             hourValueSpan.textContent = habitHourSlider.value;
             updateAmPmDisplay(); // Set initial AM/PM display
             renderHabits();
-            initializeChart();
+            initializeChart(); // Always initialize chart, just hide its container
+
+            // Check local storage on load to determine whether to show email gate or graph
+            if (localStorage.getItem('emailSubmitted') === 'true') {
+                emailGate.classList.add('hidden'); // Hide the entire email gate
+                dopamineGraphSection.classList.remove('hidden'); // Show the graph section
+            } else {
+                emailGate.classList.remove('hidden'); // Show the email gate
+                dopamineGraphSection.classList.add('hidden'); // Hide the graph section
+            }
         });
+
+        // Event listener for the new "Continue to Graph" button
+        continueToGraphButton.addEventListener('click', () => {
+            // Assume that if the user clicks this button, they have either
+            // just subscribed in the iframe or are acknowledging they are already subscribed.
+            // Set the flag to true to unlock the graph and remember for future visits.
+            localStorage.setItem('emailSubmitted', 'true');
+            emailGate.classList.add('hidden'); // Hide the entire email gate
+            dopamineGraphSection.classList.remove('hidden'); // Show the graph section
+            showCustomAlert('Graph unlocked! Welcome to the insights.');
+        });
+
 
         // Add the Beehiiv attribution script (consistent with quiz)
         const beehiivAttributionScript = document.createElement('script');
@@ -994,8 +1066,6 @@
         beehiivAttributionScript.async = true;
         beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
         document.head.appendChild(beehiivAttributionScript);
-
     </script>
 </body>
 </html>
-�
