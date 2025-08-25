@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thank You for Subscribing! - HealthMax</title>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
     <!-- End Google Tag Manager -->
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -181,6 +177,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin: 10px; /* Added margin for spacing with the new button */
         }
 
         .resource-button:hover {
@@ -189,6 +186,38 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255, 215, 0, 0.7);
         }
+        
+        /* New button styling for "Go Back" */
+        .go-back-button {
+            /* Styling voor de groene knop */
+            background-color: #28a745; /* Groene achtergrond */
+            background-image: linear-gradient(to right, #28a745, #218838); /* Groen verloop */
+            color: #ffffff; /* Witte tekst voor contrast */
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.3em;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            /* Glow effect */
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4); 
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            text-transform: none; /* Geen hoofdletters forceren */
+            letter-spacing: normal; /* Normale letterafstand */
+            margin: 10px; /* Marges voor ruimte */
+        }
+
+        .go-back-button:hover {
+            background-color: #218838; /* Donkerder groen op hover */
+            background-image: linear-gradient(to right, #218838, #28a745); /* Omgekeerd verloop op hover */
+            transform: translateY(-3px);
+            /* Verbeterde glow op hover */
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5); 
+        }
+
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
@@ -198,7 +227,7 @@
             .main-nav a { font-size: 1em; padding: 8px 15px; }
             .thank-you-content h2 { font-size: 2em; }
             .thank-you-content p { font-size: 1.1em; }
-            .resource-button { font-size: 1.2em; padding: 12px 25px; }
+            .resource-button, .go-back-button { font-size: 1.2em; padding: 12px 25px; }
         }
 
         @media (max-width: 480px) {
@@ -209,7 +238,7 @@
             .page-section { padding: 20px; border-radius: 10px; margin-bottom: 15px;}
             .thank-you-content h2 { font-size: 1.8em; }
             .thank-you-content p { font-size: 1em; }
-            .resource-button { font-size: 1.1em; padding: 10px 20px; }
+            .resource-button, .go-back-button { font-size: 1.1em; padding: 10px 20px; }
         }
     </style>
 </head>
@@ -233,13 +262,33 @@
 
     <main class="page-section">
         <div class="thank-you-content">
-            <h2>Thank You for Subscribing! 🎉</h2>
+            <h2>Thank You for Subscribing!</h2> <!-- Emoji verwijderd -->
             <p>You're now officially part of the HealthMax community! We're thrilled to welcome you.</p>
+            <button id="goBackButton" class="go-back-button">
+                Go Back to Previous Page
+            </button>
             <p>Click the button below to get instant access to exclusive resources that will help you achieve your health goals.</p>
-            <a href="https://www.notion.so/Succes-You-re-in-24d4c478e39a809bb48eccef7aead90c" target="_blank" class="resource-button">
-                Get Your Resources Now!
-            </a>
+            <div>
+                <a href="https://www.notion.so/Succes-You-re-in-24d4c478e39a809bb48eccef7aead90c" target="_blank" class="resource-button">
+                    Get Your Resources Now!
+                </a>
+            </div>
         </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Zet de localStorage vlag zodra deze pagina laadt, wat bevestigt dat de gebruiker heeft ingeschreven
+            localStorage.setItem('emailSubmitted', 'true');
+
+            const goBackButton = document.getElementById('goBackButton');
+            if (goBackButton) {
+                goBackButton.addEventListener('click', () => {
+                    // Ga terug naar de vorige pagina in de browsergeschiedenis
+                    history.back();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
