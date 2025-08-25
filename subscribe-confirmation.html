@@ -158,41 +158,11 @@
             color: #d0d0d0;
         }
 
-        /* Resource button styling */
-        .resource-button {
-            background-color: #ffd700; /* Gold button */
-            background-image: linear-gradient(to right, #ffd700, #ffcc00);
-            color: #1e1e1e; /* Dark text for contrast */
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.3em;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            margin: 10px; /* Added margin for spacing with the new button */
-        }
-
-        .resource-button:hover {
-            background-color: #ffcc00;
-            background-image: linear-gradient(to right, #ffcc00, #ffd700);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.7);
-        }
-        
-        /* New button styling for "Go Back" */
+        /* Resource button styling (now "Go Back" button) */
         .go-back-button {
-            /* Styling voor de groene knop */
-            background-color: #28a745; /* Groene achtergrond */
-            background-image: linear-gradient(to right, #28a745, #218838); /* Groen verloop */
-            color: #ffffff; /* Witte tekst voor contrast */
+            background-color: #28a745; /* Green button */
+            background-image: linear-gradient(to right, #28a745, #218838);
+            color: #ffffff; /* White text for contrast */
             padding: 15px 30px;
             border: none;
             border-radius: 10px;
@@ -202,22 +172,19 @@
             text-decoration: none;
             display: inline-block;
             margin-top: 20px;
-            /* Glow effect */
             box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4); 
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            text-transform: none; /* Geen hoofdletters forceren */
-            letter-spacing: normal; /* Normale letterafstand */
-            margin: 10px; /* Marges voor ruimte */
+            text-transform: none; /* No forced uppercase */
+            letter-spacing: normal; /* Normal letter spacing */
+            margin: 10px auto; /* Centered with vertical margin */
         }
 
         .go-back-button:hover {
-            background-color: #218838; /* Donkerder groen op hover */
-            background-image: linear-gradient(to right, #218838, #28a745); /* Omgekeerd verloop op hover */
+            background-color: #218838;
+            background-image: linear-gradient(to right, #218838, #28a745);
             transform: translateY(-3px);
-            /* Verbeterde glow op hover */
             box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5); 
         }
-
 
         /* Media queries for responsiveness */
         @media (max-width: 768px) {
@@ -227,7 +194,7 @@
             .main-nav a { font-size: 1em; padding: 8px 15px; }
             .thank-you-content h2 { font-size: 2em; }
             .thank-you-content p { font-size: 1.1em; }
-            .resource-button, .go-back-button { font-size: 1.2em; padding: 12px 25px; }
+            .go-back-button { font-size: 1.2em; padding: 12px 25px; }
         }
 
         @media (max-width: 480px) {
@@ -238,7 +205,7 @@
             .page-section { padding: 20px; border-radius: 10px; margin-bottom: 15px;}
             .thank-you-content h2 { font-size: 1.8em; }
             .thank-you-content p { font-size: 1em; }
-            .resource-button, .go-back-button { font-size: 1.1em; padding: 10px 20px; }
+            .go-back-button { font-size: 1.1em; padding: 10px 20px; }
         }
     </style>
 </head>
@@ -256,35 +223,31 @@
 
     <nav class="main-nav">
         <a href="/">Home</a>
-        <a href="/tools/healthscore.html">Tools</a> <!-- Corrected link to healthscore.html -->
+        <a href="/tools/healthscore.html">Tools</a>
         <a href="https://store.healthmaximization.com/" target="_blank">Store</a>
     </nav>
 
     <main class="page-section">
         <div class="thank-you-content">
-            <h2>Thank You for Subscribing!</h2> <!-- Emoji verwijderd -->
-            <p>You're now officially part of the HealthMax community! We're thrilled to welcome you.</p>
-            <button id="goBackButton" class="go-back-button">
-                Go Back to Previous Page
-            </button>
-            <p>Click the button below to get instant access to exclusive resources that will help you achieve your health goals.</p>
+            <h2>Thank You for Subscribing!</h2>
+            <p>You're now officially part of the HealthMax community! We're thrilled to welcome you. Click the button below to go back and instantly access the exclusive resources and tools that will help you achieve your health goals.</p>
             <div>
-                <a href="https://www.notion.so/Succes-You-re-in-24d4c478e39a809bb48eccef7aead90c" target="_blank" class="resource-button">
-                    Get Your Resources Now!
-                </a>
+                <button id="goBackButton" class="go-back-button">
+                    Return to Previous Page
+                </button>
             </div>
         </div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Zet de localStorage vlag zodra deze pagina laadt, wat bevestigt dat de gebruiker heeft ingeschreven
+            // Set the localStorage flag as soon as this page loads, confirming the user has subscribed
             localStorage.setItem('emailSubmitted', 'true');
 
             const goBackButton = document.getElementById('goBackButton');
             if (goBackButton) {
                 goBackButton.addEventListener('click', () => {
-                    // Ga terug naar de vorige pagina in de browsergeschiedenis
+                    // Go back to the previous page in browser history
                     history.back();
                 });
             }
