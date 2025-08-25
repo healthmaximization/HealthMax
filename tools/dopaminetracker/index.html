@@ -582,7 +582,7 @@
             { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
 
             // --- Negative Habits ---
-            { name: "Junk Food", emoji: "🍔", type: "negative", magnitude: "high" },
+            { name: "Junk Food", emoji: "�", type: "negative", magnitude: "high" },
             { name: "Excessive Social Media", emoji: "📱", type: "negative", magnitude: "medium" },
             { name: "Too Much Coffee", emoji: "☕", type: "negative", magnitude: "low" },
             { name: "Procrastination", emoji: "⏱️", type: "negative", magnitude: "medium" }, 
@@ -665,14 +665,16 @@
             const selectedAmPm = document.querySelector('input[name="amPm"]:checked').value;
 
             if (!selectedHabitName || !selectedHour || !selectedAmPm) {
-                alert('Please select a habit, hour, and AM/PM.');
+                // Using a custom modal or message box instead of alert()
+                showCustomAlert('Please select a habit, hour, and AM/PM.');
                 return;
             }
 
             const selectedHabitData = predefinedHabitsData.find(h => h.name === selectedHabitName);
 
             if (!selectedHabitData) {
-                alert('Selected habit data not found. Please try again.');
+                // Using a custom modal or message box instead of alert()
+                showCustomAlert('Selected habit data not found. Please try again.');
                 return;
             }
 
@@ -840,7 +842,8 @@
                 const startTimeIndex = habit.timeInMinutes;
 
                 if (habit.type === 'positive') {
-                    const peakDelta = impactBase * 0.7; // Aim for 50 + peakDelta = ~75-80 (halved max)
+                    // Halve the peak delta for positive habits
+                    const peakDelta = (impactBase * 0.7) / 2; // Original: 0.7, now 0.35
                     const riseDuration = 30; // Minutes to reach peak
                     const plateauDuration = 60; // Minutes to maintain peak
                     const decayDuration = 300; // Minutes for very slow, gentle decay (5 hours)
@@ -937,6 +940,44 @@
             dopamineChart.update();
         }
 
+        // Custom alert function (replaces native alert())
+        function showCustomAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #333;
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                text-align: center;
+                max-width: 90%;
+                font-family: 'Inter', sans-serif;
+            `;
+            alertDiv.innerHTML = `
+                <p style="margin-bottom: 15px;">${message}</p>
+                <button style="
+                    background-color: #63b3ed;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 1em;
+                ">OK</button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            alertDiv.querySelector('button').addEventListener('click', () => {
+                document.body.removeChild(alertDiv);
+            });
+        }
+
+
         // Initial rendering logic now on DOMContentLoaded for direct start
         document.addEventListener('DOMContentLoaded', () => {
             populatePredefinedHabits();
@@ -957,3 +998,4 @@
     </script>
 </body>
 </html>
+�
