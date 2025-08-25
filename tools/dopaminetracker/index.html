@@ -451,39 +451,42 @@
             }
         }
 
+        /* Explicit hidden class for reliability */
+        .hidden {
+            display: none !important;
+        }
+
         /* Styling for the content that replaces the graph */
-        #emailGateGraphContent { /* Renamed for clarity */
+        #emailGateContentWrapper { /* New wrapper for just the embed and button */
             display: flex; /* Use flexbox for centering content */
             flex-direction: column; /* Stack elements vertically */
             justify-content: center; /* Center content vertically */
             align-items: center; /* Center content horizontally */
             text-align: center; /* Center text */
-            padding: 20px;
+            padding: 25px; /* Consistent padding */
             box-sizing: border-box;
             width: 100%;
-            height: auto; /* Allow height to adapt to content */
+            height: auto;
             min-height: 650px; /* Minimum height to accommodate the embed and button */
-            background-color: #1a1a1a; /* Background consistent with chart area */
-            border-radius: 12px; /* Rounded corners consistent with chart area */
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3); /* Inner shadow consistent with chart area */
-            gap: 20px; /* Space between elements */
+            background-color: #2a2a2a; /* Consistent with habit-input-section */
+            border-radius: 12px; /* Consistent with habit-input-section */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Consistent with habit-input-section */
+            gap: 0px; /* Set gap to 0 for closest proximity */
             margin-top: 20px; /* Add margin to align with the section above */
-        }
-        #emailGateGraphContent.hidden {
-            display: none;
+            margin-bottom: 20px; /* Add margin to align with the section below */
         }
         /* Styling for the Beehiiv embed within the blocker content */
-        #emailGateGraphContent .beehiiv-embed {
+        #emailGateContentWrapper .beehiiv-embed {
             width: 100% !important; /* Override inline width for responsiveness */
-            max-width: 400px !important; /* Max width for the embed */
+            max-width: 550px !important; /* Made embed wider as requested */
             height: 606px !important; /* Explicit height as requested */
-            margin: 0 auto; 
+            margin: 0; /* Remove auto margin from embed itself */
             border: none; 
             border-radius: 10px !important; 
             background-color: transparent;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Consistent shadow */
         }
-        #emailGateGraphContent button {
+        #emailGateContentWrapper button {
             background-color: #63b3ed; /* Blue button */
             color: white;
             padding: 12px 25px;
@@ -494,14 +497,14 @@
             font-weight: 600;
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            margin-top: 20px; /* Space above the button */
+            margin-top: 0px; /* Set margin-top to 0 for closest proximity */
         }
-        #emailGateGraphContent button:hover:not(:disabled) {
+        #emailGateContentWrapper button:hover:not(:disabled) {
             background-color: #4a90e2;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
-        #emailGateGraphContent button:disabled {
+        #emailGateContentWrapper button:disabled {
             background-color: #444444;
             cursor: not-allowed;
             box-shadow: none;
@@ -510,7 +513,7 @@
 
         /* Responsive adjustments for blocker content */
         @media (max-width: 480px) {
-            #emailGateGraphContent button {
+            #emailGateContentWrapper button {
                 padding: 10px 20px;
                 font-size: 1em;
             }
@@ -582,7 +585,7 @@
 
         <!-- Dopamine Graph Section -->
         <!-- This entire section will be shown/hidden based on email submission -->
-        <div id="dopamineGraphSection" class="habit-input-section">
+        <div id="dopamineGraphSection" class="habit-input-section hidden">
             <h3 class="font-semibold mb-4 text-center">Your Dopamine Levels Throughout the Day</h3>
             <canvas id="dopamineChart"></canvas>
             <p class="text-sm text-gray-400 mt-4 text-center">
@@ -593,7 +596,7 @@
 
         <!-- Email Gate Content (replaces the graph section when not submitted) -->
         <!-- This entire section will be shown/hidden based on email submission -->
-        <div id="emailGateGraphContent" class="habit-input-section hidden"> 
+        <div id="emailGateContentWrapper" class="habit-input-section"> 
             <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
@@ -638,7 +641,7 @@
         const noHabitsMessage = document.getElementById('noHabitsMessage');
         const dopamineChartCanvas = document.getElementById('dopamineChart');
         const dopamineGraphSection = document.getElementById('dopamineGraphSection'); // Reference to the entire graph section
-        const emailGateGraphContent = document.getElementById('emailGateGraphContent'); // Reference to the new email gate content div
+        const emailGateContentWrapper = document.getElementById('emailGateContentWrapper'); // Reference to the new email gate content div
         const viewGraphButton = document.getElementById('viewGraphButton'); // Button on the email gate content
 
         let habits = [];
@@ -654,7 +657,7 @@
             { name: "Social Connection", emoji: "💬", type: "positive", magnitude: "medium" },
             { name: "Healthy Meal", emoji: "🥗", type: "positive", magnitude: "medium" },
             { name: "Gratitude Journaling", emoji: "🙏", type: "positive", magnitude: "low" },
-            { name: "Time Blocking", emoji: "📅", type: "positive", magnitude: "medium" },
+            { name: "Time Blocking", emoji: "�", type: "positive", magnitude: "medium" },
             { name: "Nature Walk", emoji: "🌳", type: "positive", magnitude: "medium" },
             { name: "Learning a New Skill", emoji: "🧠", type: "positive", magnitude: "low" },
             { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
@@ -664,7 +667,7 @@
             { name: "Excessive Social Media", emoji: "📱", type: "negative", magnitude: "medium" },
             { name: "Too Much Coffee", emoji: "☕", type: "negative", magnitude: "low" },
             { name: "Procrastination", emoji: "⏱️", type: "negative", magnitude: "medium" }, 
-            { name: "Poor Sleep", emoji: "�", type: "negative", magnitude: "high" },
+            { name: "Poor Sleep", emoji: "😴", type: "negative", magnitude: "high" },
             { name: "Late-Night Screen Time", emoji: "💻", type: "negative", magnitude: "medium" },
             { name: "Excessive News Consumption", emoji: "📰", type: "negative", magnitude: "low" },
             { name: "Skipping Breakfast", emoji: "🥣", type: "negative", magnitude: "medium" },
@@ -1062,10 +1065,10 @@
         function checkEmailSubmissionStatusForGraph() {
             const emailSubmitted = localStorage.getItem('emailSubmitted');
             if (emailSubmitted === 'true') {
-                emailGateGraphContent.classList.add('hidden'); // Hide the email gate content
+                emailGateContentWrapper.classList.add('hidden'); // Hide the email gate content
                 dopamineGraphSection.classList.remove('hidden'); // Show the entire graph section
             } else {
-                emailGateGraphContent.classList.remove('hidden'); // Show the email gate content
+                emailGateContentWrapper.classList.remove('hidden'); // Show the email gate content
                 dopamineGraphSection.classList.add('hidden'); // Hide the entire graph section
                 viewGraphButton.disabled = true; // Disable the button by default
 
@@ -1081,7 +1084,7 @@
 
         // Event listener for the 'View My Dopamine Graph' button
         viewGraphButton.addEventListener('click', () => {
-            emailGateGraphContent.classList.add('hidden'); // Hide the email gate content
+            emailGateContentWrapper.classList.add('hidden'); // Hide the email gate content
             dopamineGraphSection.classList.remove('hidden'); // Show the entire graph section
         });
 
