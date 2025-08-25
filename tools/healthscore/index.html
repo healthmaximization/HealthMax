@@ -6,10 +6,7 @@
     <title>Health Score Quiz</title>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],\n j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n 'https://www.googletagmanager.com/gtag/js?id='+i+dl;f.parentNode.insertBefore(j,f);\n })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
     <!-- End Google Tag Manager -->
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1066,47 +1063,8 @@
         }
         
         .newsletter-gate-content .terms-checkbox {
-            margin-top: 25px; 
-            margin-bottom: 25px; 
-            display: flex;
-            align-items: center;
-            justify-content: center; 
-            font-size: 1em; 
-            color: #d0d0d0; 
-            cursor: pointer; 
+            display: none; /* Hide the checkbox as per new logic */
         }
-
-        .newsletter-gate-content .terms-checkbox input[type="checkbox"] {
-            appearance: none; 
-            -webkit-appearance: none; 
-            width: 22px; 
-            height: 22px; 
-            border: 2px solid #555; 
-            border-radius: 6px; 
-            margin-right: 12px; 
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0; 
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .newsletter-gate-content .terms-checkbox input[type="checkbox"]:checked {
-            background-color: #28a745; 
-            border-color: #28a745; 
-        }
-
-        /* Checkmark */
-        .newsletter-gate-content .terms-checkbox input[type="checkbox"]:checked::after {
-            content: '✓'; 
-            font-size: 16px; 
-            color: #fff; 
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            line-height: 1; 
-        }
-
 
         .newsletter-gate-content button {
             background-color: #28a745;
@@ -1121,6 +1079,7 @@
             box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
             width: auto;
             min-width: 180px; 
+            margin-top: 25px; /* Add margin since checkbox is removed */
         }
 
         .newsletter-gate-content button:hover:not(:disabled) {
@@ -1451,10 +1410,7 @@
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: auto; min-height: 280px; margin: 0 auto; border-radius: 10px !important; background-color: transparent; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); max-width: 660px;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
 
-            <div class="terms-checkbox">
-                <input type="checkbox" id="subscribedConfirm">
-                <label for="subscribedConfirm">I confirm I have submitted my email above and wish to view my results.</label>
-            </div>
+            <!-- De checkbox en de bijbehorende tekst zijn verwijderd, zoals gevraagd. -->
             <button id="viewResultsButton" disabled>View My Results</button>
         </div>
     </div>
@@ -1776,7 +1732,7 @@
         const quizContainer = document.getElementById('quizContainer');
         const resultContainer = document.getElementById('resultContainer');
         const newsletterGateModal = document.getElementById('newsletterGateModal'); // New modal element
-        const subscribedConfirmCheckbox = document.getElementById('subscribedConfirm'); // New checkbox
+        // const subscribedConfirmCheckbox = document.getElementById('subscribedConfirm'); // Verwijderd
         const viewResultsButton = document.getElementById('viewResultsButton'); // New button
         const questionDisplay = document.getElementById('questionDisplay');
         const optionsContainer = document.getElementById('optionsContainer'); 
@@ -1859,16 +1815,11 @@
         // Event Listener for Copy Link Button
         copyLinkBtn.addEventListener('click', copyShareLink);
 
-        // Event Listener for Newsletter Gate: Checkbox and Button
-        subscribedConfirmCheckbox.addEventListener('change', () => {
-            viewResultsButton.disabled = !subscribedConfirmCheckbox.checked;
-        });
-
+        // Event Listener for Newsletter Gate: Button
         viewResultsButton.addEventListener('click', () => {
-            if (subscribedConfirmCheckbox.checked) {
-                newsletterGateModal.classList.remove('visible'); // Hide the modal
-                document.body.style.overflow = ''; // Re-enable scrolling on the body
-            }
+            // Bij het klikken op de knop, verberg de modal
+            newsletterGateModal.classList.remove('visible'); 
+            document.body.style.overflow = ''; // Schakel scrollen op de body weer in
         });
 
         /**
@@ -2212,11 +2163,31 @@ Provide only a raw JSON object with a single key 'score' and its numerical value
 
                 hideLoading(); // Hide loading after results are ready
 
-                // Show the result container first
-                resultContainer.classList.remove('hidden');
-                
-                // Then set up the scroll listener to trigger the modal
-                setupScrollToTriggerModal();
+                // Controleer de local container 'emailSubmitted'
+                const emailSubmitted = localStorage.getItem('emailSubmitted');
+
+                if (emailSubmitted === 'true') {
+                    // Als emailSubmitted true is, toon de resultaten direct
+                    resultContainer.classList.remove('hidden');
+                } else {
+                    // Als emailSubmitted false is, toon de modal
+                    resultContainer.classList.remove('hidden'); // Toon de resultaten, maar de modal ligt eroverheen
+                    newsletterGateModal.classList.add('visible');
+                    document.body.style.overflow = 'hidden'; // Voorkom scrollen
+                    viewResultsButton.disabled = true; // De knop is standaard uitgeschakeld
+
+                    // Nu luisteren we naar het 'emailSubmitted' item in localStorage
+                    // Dit is een simpele manier om te controleren; in een echt scenario zou je dit op een robuustere manier doen,
+                    // bijvoorbeeld door een custom event te triggeren vanuit de iframe van Beehiiv als dat mogelijk is,
+                    // of door periodiek de status te controleren na een formulierinzending.
+                    // Voor nu simuleren we de check op basis van de aanwezigheid van het item.
+                    const checkEmailSubmittedInterval = setInterval(() => {
+                        if (localStorage.getItem('emailSubmitted') === 'true') {
+                            viewResultsButton.disabled = false; // Schakel de knop in
+                            clearInterval(checkEmailSubmittedInterval); // Stop met controleren
+                        }
+                    }, 1000); // Controleer elke seconde
+                }
 
             } catch (error) {
                 console.error("Error during quiz completion or recommendation generation:", error);
@@ -2395,26 +2366,8 @@ Here are the user's detailed results:\n\n` + promptParts.join('\n');
          * The modal will appear once the user scrolls down a certain amount.
          */
         function setupScrollToTriggerModal() {
-            // Only set up if the modal hasn't been triggered yet this session
-            if (hasTriggeredNewsletterModal) {
-                return;
-            }
-
-            const scrollThreshold = 300; 
-
-            const handleScroll = () => {
-                if (window.scrollY > scrollThreshold && !hasTriggeredNewsletterModal) {
-                    hasTriggeredNewsletterModal = true; 
-                    newsletterGateModal.classList.add('visible'); 
-                    subscribedConfirmCheckbox.checked = false; 
-                    viewResultsButton.disabled = true; 
-                    document.body.style.overflow = 'hidden'; 
-                    
-                    window.removeEventListener('scroll', handleScroll);
-                }
-            };
-
-            window.addEventListener('scroll', handleScroll);
+            // Dit is niet langer nodig, de modal wordt nu direct in finishQuiz() beheerd
+            // op basis van localStorage.
         }
 
 
