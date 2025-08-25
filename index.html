@@ -17,9 +17,6 @@
     <!-- Favicon Link -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
     
-    <!-- REMOVED: Direct Google tag (gtag.js) script, as GTM now handles this -->
-    <!-- GTM's GA4 Configuration Tag will automatically load GA4 and send page_view -->
-
     <style>
         /* Algemene styling voor de body */
         body {
@@ -162,7 +159,7 @@
         }
 
         /* Styling voor de Beehiiv iframe zelf - minimaal houden om glitches te voorkomen */
-        .embed-container iframe {
+        .beehiiv-embed { /* Gebruik de class, niet direct de iframe tag hier */
             width: 100%;
             max-width: 814px; /* Max-width van Beehiiv voor optimale weergave */
             height: 420px; /* Hoogte van Beehiiv */
@@ -174,14 +171,57 @@
             display: block;
         }
 
-        /* Media queries voor responsiviteit */
+        /* Nieuwe styling voor de welkomstinhoud en knop */
+        #memberContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            height: 100%; /* Zorg ervoor dat het de beschikbare hoogte vult */
+        }
+
+        #memberContent p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #c0c0c0;
+            line-height: 1.6;
+        }
+
+        #accessResourcesButton {
+            background-color: #28a745;
+            background-image: linear-gradient(to right, #28a745, #218838);
+            color: #ffffff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-decoration: none; /* Verwijder onderstreping van de link */
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.6), 0 0 30px rgba(40, 167, 69, 0.4); /* Groene gloed */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: inline-block; /* Zodat padding en margin werken */
+        }
+
+        #accessResourcesButton:hover {
+            background-color: #218838;
+            background-image: linear-gradient(to right, #218838, #28a745);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.8), 0 0 40px rgba(40, 167, 69, 0.5); /* Intensere gloed bij hover */
+        }
+
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             h1 { font-size: 2.5em; }
             .subtitle { font-size: 1em; }
             .page-section { padding: 30px; max-width: 90%; }
             .main-nav a { font-size: 1em; padding: 8px 15px; }
-            .embed-container iframe { height: 380px; }
+            .beehiiv-embed { height: 380px; }
             .embed-container { padding: 15px; } 
+            #memberContent p { font-size: 1.1em; }
+            #accessResourcesButton { padding: 12px 25px; font-size: 1.1em; }
         }
 
         @media (max-width: 480px) {
@@ -190,8 +230,10 @@
             .main-nav { flex-direction: column; gap: 8px; }
             .main-nav a { width: calc(100% - 30px); padding: 8px 10px; }
             .page-section { padding: 20px; border-radius: 10px; margin-bottom: 15px;}
-            .embed-container iframe { height: 300px; }
+            .beehiiv-embed { height: 300px; }
             .embed-container { padding: 10px; } 
+            #memberContent p { font-size: 1em; }
+            #accessResourcesButton { padding: 10px 20px; font-size: 1em; }
         }
     </style>
 </head>
@@ -214,11 +256,67 @@
     </nav>
 
     <main class="page-section">
-        <div class="embed-container">
-            <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/740cadbc-063d-4325-9f3b-c1909384bfc7" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 814px; height: 420px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-            <!-- END BEEHIIV FORM CODE -->
+        <div id="contentWrapper" class="embed-container">
+            <!-- Content will be dynamically loaded here based on emailSubmitted status -->
         </div>
     </main>
+
+    <script>
+        const contentWrapper = document.getElementById('contentWrapper');
+        let intervalId = null; // Houdt de ID van de interval bij
+
+        function renderBeehiivEmbed() {
+            // Voeg de Beehiiv embed alleen toe als deze nog niet bestaat
+            if (!document.getElementById('beehiiv-iframe')) {
+                contentWrapper.innerHTML = `
+                    <!-- START BEEHIIV FORM CODE -->
+                    <script async src="https://subscribe-forms.beehiiv.com/embed.js"><\/script>
+                    <iframe id="beehiiv-iframe" src="https://subscribe-forms.beehiiv.com/740cadbc-063d-4325-9f3b-c1909384bfc7" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 814px; height: 420px; margin: 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+                    <!-- END BEEHIIV FORM CODE -->
+                `;
+            }
+        }
+
+        function renderMemberContent() {
+            contentWrapper.innerHTML = `
+                <div id="memberContent">
+                    <p>Welkom terug, <strong>HealthMax Member!</strong> 👋</p>
+                    <p>Fijn dat je er weer bent. Je hebt toegang tot al onze exclusieve content en tools om je reis naar optimale gezondheid voort te zetten.</p>
+                    <a href="https://www.notion.so/Resources-24d4c478e39a80f486becd5da70158f2" target="_blank" id="accessResourcesButton">Access Resources</a>
+                </div>
+            `;
+            // Stop de interval zodra de member content is geladen
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function checkEmailSubmissionStatus() {
+            const emailSubmitted = localStorage.getItem('emailSubmitted');
+            if (emailSubmitted === 'true') {
+                renderMemberContent();
+            } else {
+                renderBeehiivEmbed();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkEmailSubmissionStatus(); // Eerste controle bij het laden van de DOM
+
+            // Start de interval alleen als de e-mail nog niet is ingediend
+            if (localStorage.getItem('emailSubmitted') !== 'true') {
+                intervalId = setInterval(checkEmailSubmissionStatus, 1000); 
+            }
+        });
+
+        // Voeg het Beehiiv attributiescript toe
+        const beehiivAttributionScript = document.createElement('script');
+        beehiivAttributionScript.type = 'text/javascript';
+        beehiivAttributionScript.async = true;
+        beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
+        document.head.appendChild(beehiivAttributionScript);
+
+    </script>
 </body>
 </html>
