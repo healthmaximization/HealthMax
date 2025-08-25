@@ -5,16 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dopamine Habits Visualizer</title>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    <script>(function(w,d,s,l,i){
+    w[l]=w[l]||[];
+    w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+    var f=d.getElementsByTagName(s)[0];
+    var j=d.createElement(s);
+    var dl=(l!='dataLayer'?'&l='+l:'');
+    j.async=true;
+    j.src='https://www.googletagmanager.com/gtag/js?id='+i+dl;
+    f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
     <!-- End Google Tag Manager -->
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Favicon Link -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WR8QD6X56N');
+    </script>
     <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -51,7 +65,7 @@
             width: 100%;
             padding: 30px;
             margin-bottom: 20px;
-            box-sizing: border;
+            box-sizing: border-box;
         }
 
         /* Heading styles consistent with Health Score Quiz */
@@ -179,13 +193,14 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
+        /* Default disabled state, will be overridden by specific ID + :disabled */
         button:disabled {
             background-color: #444444;
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
-            border: 1px solid #555555;
-            color: #afafaf;
+            border: 1px solid #555555; /* Ensure a border is present */
+            color: #afafaf; /* Lighter grey text for disabled state */
         }
 
         /* Specific button colors for consistency */
@@ -470,7 +485,7 @@
             width: 100% !important; 
             max-width: 600px !important; 
             height: 606px !important; 
-            margin: 0 auto !important; /* Centered with no vertical margin */
+            margin: 0 auto 0 auto !important; /* No bottom margin on embed */
             padding: 0 !important; 
             display: block; 
             vertical-align: top; 
@@ -481,7 +496,41 @@
             line-height: 0; 
         }
 
-        /* Green glow effect for the button - kept for other buttons if needed, but not for viewGraphButton */
+        /* Specific styles for the "View My Dopamine Graph" button */
+        #viewGraphButton {
+            background-color: #63b3ed; /* Default blue button */
+            color: white;
+            padding: 12px 25px;
+            border: 1px solid #63b3ed; /* Ensure a default border */
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease; /* Add border-color to transition */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            margin: 5px auto 0 auto !important; /* Reduced top margin to 5px for closer placement */
+            display: block; /* Ensure it's a block element */
+            position: relative; 
+            z-index: 1; 
+            min-width: 200px;
+        }
+        #viewGraphButton:hover:not(:disabled) {
+            background-color: #4a90e2;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            border-color: #4a90e2; /* Ensure border color changes on hover too */
+        }
+        #viewGraphButton:disabled { /* Specific styling for when THIS button is disabled */
+            background-color: #444444 !important; /* Darker gray for disabled state */
+            background-image: none !important; /* Remove any gradient */
+            border-color: #555555 !important; /* Specific border color for disabled state */
+            color: #afafaf !important; /* Lighter grey text for disabled state */
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        /* Green glow effect for the button - only applies if the class is added */
         .button-glow {
             box-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.5);
         }
@@ -493,11 +542,11 @@
 
         /* Responsive adjustments for blocker content */
         @media (max-width: 480px) {
-            #emailGateContentWrapper button { /* This rule is now effectively unused for viewGraphButton */
+            #emailGateContentWrapper button {
                 padding: 10px 20px;
                 font-size: 1em;
-                min-width: unset;
-                width: 80%;
+                min-width: unset; /* Reset minimum breedte voor kleine schermen */
+                width: 80%; /* Breedte aanpassen voor mobiel */
             }
         }
     </style>
@@ -508,7 +557,7 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <header style="text-align: center; width: 100%;">
+    <header style="text-align: center; width: 100%;"> <!-- Added text-align: center to header -->
         <img src="https://yt3.ggpht.com/PiQLsGmEg4FHmp-_g1Fr63bi1ZgwOx268z0D7mZPSc5FchbDllJehAL4e3hdnxyz_BiZmnn6=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
         <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
         <h1>Want To Know How Your Habits Influence Your Dopamine?</h1>
@@ -517,7 +566,7 @@
 
     <nav class="main-nav">
         <a href="/">Home</a>
-        <a href="/tools/" class="active">Tools</a>
+        <a href="/tools/" class="active">Tools</a> <!-- Set Tools as active -->
         <a href="https://store.healthmaximization.com/" target="_blank">Store</a>
     </nav>
 
@@ -541,7 +590,7 @@
                         <div class="slider-value"><span id="hourValue">9</span>:00 <span id="amPmValue">AM</span></div>
                     </div>
                     <div style="flex-grow: 0; display: flex; flex-direction: column; justify-content: flex-end;">
-                        <label for="amPmRadioGroup" class="block text-gray-300 text-sm font-medium mb-1" style="visibility: hidden;">AM/PM:</label>
+                        <label for="amPmRadioGroup" class="block text-gray-300 text-sm font-medium mb-1" style="visibility: hidden;">AM/PM:</label> <!-- Hidden label to align buttons -->
                         <div class="am-pm-toggle" id="amPmRadioGroup">
                             <input type="radio" id="amRadio" name="amPm" value="AM" checked>
                             <label for="amRadio">AM</label>
@@ -580,9 +629,9 @@
         <!-- This entire section will be shown/hidden based on email submission -->
         <div id="emailGateContentWrapper" class="habit-input-section"> 
             <!-- START BEEHIIV FORM CODE -->
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0 auto 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             <!-- END BEEHIIV FORM CODE -->
-            <!-- De 'View My Dopamine Graph' knop is verwijderd -->
+            <button id="viewGraphButton" disabled>View My Dopamine Graph</button>
         </div>
 
         <div class="help-section text-left">
@@ -624,7 +673,7 @@
         const dopamineChartCanvas = document.getElementById('dopamineChart');
         const dopamineGraphSection = document.getElementById('dopamineGraphSection'); // Reference to the entire graph section
         const emailGateContentWrapper = document.getElementById('emailGateContentWrapper'); // Reference to the new email gate content div
-        // const viewGraphButton = document.getElementById('viewGraphButton'); // Button is removed
+        const viewGraphButton = document.getElementById('viewGraphButton'); // Button on the email gate content
 
         let habits = [];
         let dopamineChart;
@@ -640,7 +689,7 @@
             { name: "Social Connection", emoji: "💬", type: "positive", magnitude: "medium" },
             { name: "Healthy Meal", emoji: "🥗", type: "positive", magnitude: "medium" },
             { name: "Gratitude Journaling", emoji: "🙏", type: "positive", magnitude: "low" },
-            { name: "Time Blocking", emoji: "�", type: "positive", magnitude: "medium" },
+            { name: "Time Blocking", emoji: "📅", type: "positive", magnitude: "medium" },
             { name: "Nature Walk", emoji: "🌳", type: "positive", magnitude: "medium" },
             { name: "Learning a New Skill", emoji: "🧠", type: "positive", magnitude: "low" },
             { name: "Sunlight Exposure", emoji: "☀️", type: "positive", magnitude: "medium" },
@@ -726,7 +775,7 @@
         addHabitButton.addEventListener('click', () => {
             const selectedHabitName = predefinedHabitSelect.value;
             const selectedHour = parseInt(habitHourSlider.value);
-            const selectedAmPm = document.querySelector('input[name="amPm']:checked').value;
+            const selectedAmPm = document.querySelector('input[name="amPm"]:checked').value;
 
             if (!selectedHabitName || !selectedHour || !selectedAmPm) {
                 // Using a custom modal or message box instead of alert()
@@ -1058,8 +1107,29 @@
                 // Als e-mail NIET is ingediend, toon de e-mailpoort en verberg de grafiek.
                 emailGateContentWrapper.classList.remove('hidden');
                 dopamineGraphSection.classList.add('hidden');
+
+                // Wanneer e-mail NIET is ingediend, moet de knop zijn uitgeschakeld en niet gloeien.
+                viewGraphButton.disabled = true; // Maak hem uitgeschakeld
+                viewGraphButton.classList.remove('button-glow'); // Verwijder groene gloed
             }
         }
+
+        // Event listener voor de 'View My Dopamine Graph' knop
+        // Deze knop is alleen klikbaar als emailSubmitted false is,
+        // en de gebruiker zojuist zijn e-mail heeft ingediend in de Beehiiv-embed (wat het interval triggert).
+        // Het hoofddoel is echter automatische weergave als emailSubmitted true is.
+        // Deze click handler dient effectief als een fallback of een manier om handmatig te omzeilen als de automatische weergave mislukt.
+        viewGraphButton.addEventListener('click', () => {
+            // Deze click handler wordt nu *alleen* getriggerd als emailSubmitted false is,
+            // aangezien anders de emailGateContentWrapper verborgen zou zijn door het interval.
+            // Bij klikken verbergt het de poort en toont het de grafiek.
+            emailGateContentWrapper.classList.add('hidden'); 
+            dopamineGraphSection.classList.remove('hidden'); 
+            if (emailCheckInterval) {
+                clearInterval(emailCheckInterval);
+            }
+        });
+
 
         // Initiële renderinglogica bij DOMContentLoaded voor directe start
         document.addEventListener('DOMContentLoaded', () => {
@@ -1069,11 +1139,12 @@
             renderHabits();
             initializeChart();
             
-            // Controleer onmiddellijk bij het laden of de grafiek moet worden getoond
+            // Controleer onmiddellijk bij het laden of de grafiek moet worden getoond/knop moet worden ingeschakeld
             checkEmailSubmissionStatusForGraph(); 
 
             // Start een interval om elke seconde te controleren of de e-mail is ingediend.
-            // Dit interval zal de automatische weergave van de grafiek afhandelen.
+            // Dit interval zal zowel de automatische weergave van de grafiek als
+            // het zorgen voor de juiste knopstatus afhandelen als de e-mailpoort nog zichtbaar is.
             emailCheckInterval = setInterval(checkEmailSubmissionStatusForGraph, 1000); 
         });
 
@@ -1087,4 +1158,3 @@
     </script>
 </body>
 </html>
-�
