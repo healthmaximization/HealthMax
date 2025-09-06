@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Health Score — Color Analysis</title>
+
+    <!-- If you already have a Gemini API key embedded, keep it as a meta tag like below.
+         The script will look for: window.GEMINI_API_KEY or <meta name="gemini-api-key" content="...">
+         If you already have a different method, it will still fall back to client-side extraction. -->
+    <!-- <meta name="gemini-api-key" content="YOUR_KEY_HERE"> -->
+
+    <!-- Favicon (kept as in your uploaded file) -->
+    <link rel="icon" type="image/png" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo">
+
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- keep the style closely matching your uploaded design (dark, premium) --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
+            background-size: 600% 600%;
+            animation: gradientAnimation 20s ease infinite;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header{ text-align:center; margin-bottom: 10px; }
+        .logo { display:block; margin: 0 auto 10px auto; max-width:120px; border-radius:50%; }
+        h1 { font-size:2.6em; margin: 6px 0; color:#f0f0f0; }
+        .subtitle { color:#a0a0a0; margin-bottom:16px; }
+
+        .main-nav {
+            background-color: #1a1a1a;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .main-nav a { color:#f0f0f0; text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:500; }
+        .main-nav a.active { background:#0a1a2f; }
+
+        main { width:100%; max-width:900px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+
+        .panel {
+            background-color: #1e1e1e;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            width: 100%;
+            box-sizing: border-box;
+            color: #e0e0e0;
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed #333;
+            padding: 30px;
+            border-radius: 12px;
+            text-align:center;
+            cursor: pointer;
+            transition: background-color .2s, border-color .2s;
+        }
+        .upload-area.dragover { background-color: rgba(255,255,255,0.02); border-color: #0a1a2f; }
+        .upload-area input[type="file"] { display:none; }
+
+        .preview-img {
+            max-width: 220px;
+            max-height: 220px;
+            border-radius: 12px;
+            object-fit: cover;
+            display:block;
+            margin: 14px auto;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .controls { display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+
+        .btn {
+            background-color: #28a745;
+            color:white;
+            border:none;
+            padding:12px 18px;
+            border-radius:10px;
+            font-weight:600;
+            cursor:pointer;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.4);
+        }
+        .btn.secondary {
+            background: #0a1a2f;
+        }
+        .btn:disabled { background:#444; cursor:not-allowed; box-shadow:none; }
+
+        /* Palette grid */
+        .palette-grid {
+            display:grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .swatch {
+            background:#222;
+            border-radius:10px;
+            padding: 12px;
+            text-align:center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+        .swatch .color {
+            height:80px;
+            border-radius:8px;
+            box-shadow: inset 0 -2px 6px rgba(0,0,0,0.3);
+            margin-bottom:8px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+        .swatch .hex { font-family:monospace; font-size:0.95em; color:#e6e6e6; }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed; inset:0;
+            display:none;
+            align-items:center;
+            justify-content:center;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            color:white;
+            flex-direction:column;
+            gap:14px;
+        }
+        .loading-overlay.visible { display:flex; }
+        .spinner { border:4px solid rgba(255,255,255,0.15); border-top:4px solid #0a1a2f; border-radius:50%; width:44px; height:44px; animation:spin 1s linear infinite; }
+        @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+
+        /* newsletter gate modal (kept from your file but simplified classnames preserved) */
+        .newsletter-gate-modal {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background-color: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
+            display:flex; justify-content:center; align-items:center; z-index:1001;
+            opacity:0; visibility:hidden; transition: opacity .4s, visibility .4s;
+            padding:20px; box-sizing:border-box;
+        }
+        .newsletter-gate-modal.visible { opacity:1; visibility:visible; }
+        .newsletter-gate-content {
+            background:#1e1e1e; padding:26px; border-radius:14px; width:100%; max-width:700px; position:relative; text-align:center;
+            padding-top:85px;
+        }
+        .logo-modal-top { position:absolute; top:-60px; left:50%; transform:translateX(-50%); max-width:120px; border-radius:50%; border:4px solid #0a1a2f; }
+        .beehiiv-embed { width:100%; max-width:660px; height:auto; min-height:260px; border:none; border-radius:10px; }
+
+        .view-results-btn {
+            margin-top:18px;
+            background:#28a745; color:#fff; border:none; padding:12px 22px; border-radius:10px; font-weight:700; cursor:pointer;
+        }
+        .view-results-btn:disabled { background:#444; cursor:not-allowed; }
+
+        /* small */
+        .muted { color:#a0a0a0; font-size:0.95em; }
+        @media (max-width:640px) {
+            .palette-grid { grid-template-columns: repeat(2, 1fr); }
+            .swatch .color { height:66px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loadingText">Analyzing photo — generating palette...</div>
+    </div>
+
+    <!-- Newsletter Gate Modal (kept from your file; Beehiiv embed included) -->
+    <div id="newsletterGateModal" class="newsletter-gate-modal" aria-hidden="true">
+        <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo" class="logo-modal-top">
+        <div class="newsletter-gate-content">
+            <!-- Beehiiv embed should remain as you had it; keeps popup UI identical -->
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+            <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no"></iframe>
+
+            <button id="viewResultsButton" class="view-results-btn" disabled>View My Palette</button>
+            <p class="muted">Subscribe to unlock your personalized color palette. We’ll keep your email safe.</p>
+        </div>
+    </div>
+
+    <header>
+        <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo" class="logo">
+        <h1>Personal Color Palette</h1>
+        <p class="subtitle">Upload a photo — get a tailored 3×4 color palette (hair, eyes, skin, and complementary accents).</p>
+    </header>
+
+    <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/tools/" class="active">Tools</a>
+        <a href="https://store.ascentimprovement.com/" target="_blank">Store</a>
+    </nav>
+
+    <main>
+        <!-- Upload + controls panel -->
+        <section class="panel" id="uploadPanel">
+            <div id="uploadArea" class="upload-area" tabindex="0">
+                <p><strong>Upload a clear photo of your face</strong> (natural lighting recommended).</p>
+                <p class="muted">Drag & drop or click to choose an image (jpg/png). Background doesn't need to be removed.</p>
+                <input id="fileInput" type="file" accept="image/*">
+                <img id="previewImage" class="preview-img" alt="preview" style="display:none;">
+            </div>
+
+            <div class="controls">
+                <button id="analyzeBtn" class="btn" disabled>Analyze Photo</button>
+                <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+            </div>
+
+            <p class="muted" style="margin-top:12px;">Your palette will remain hidden until you subscribe (Beehiiv). We keep your email secure.</p>
+        </section>
+
+        <!-- Results panel (palette) -->
+        <section class="panel" id="resultsPanel" style="display:none;">
+            <h2>Your Personalized Palette</h2>
+            <div id="paletteContainer" class="palette-grid"></div>
+            <div style="display:flex; gap:12px; justify-content:center; margin-top:16px;">
+                <button id="downloadBtn" class="btn">Download Palette as PNG</button>
+                <button id="regenerateBtn" class="btn secondary">Re-run Analysis</button>
+            </div>
+            <p class="muted" style="margin-top:12px;">You can download and keep this palette for reference when shopping or choosing makeup / clothing colors.</p>
+        </section>
+    </main>
+
+    <!-- Hidden input used by copy or other ops (kept for parity) -->
+    <input type="text" id="shareLinkInput" style="position:absolute; left:-9999px; top:-9999px; opacity:0;">
+
+    <script>
+    /* ============================
+       Configuration & helpers
+       ============================ */
+
+    // If you have a dedicated Gemini endpoint and key, set these in your environment or inline.
+    // The script will attempt to use, in order:
+    // 1) window.GEMINI_API_URL and window.GEMINI_API_KEY
+    // 2) meta[name="gemini-api-key"]
+    // 3) If none, it will perform client-side color extraction (fallback).
+    //
+    // Example server-side endpoint expected JSON body:
+    // { "image_base64": "...", "prompt": "..." }
+    // And respond with strict JSON like:
+    // {
+    //   "hairColor":"#AABBCC",
+    //   "eyeColor":"#DDEEFF",
+    //   "skinColor":"#FFEEDD",
+    //   "undertone":"warm",
+    //   "palette":["#HEX1","#HEX2",...,"#HEX12"]
+    // }
+    //
+    // NOTE: If you already included a Gemini call earlier in your uploaded HTML, set
+    // window.GEMINI_API_URL and window.GEMINI_API_KEY accordingly so this page will use it.
+
+    const GEMINI_API_URL = window.GEMINI_API_URL || null;
+    const GEMINI_API_KEY = window.GEMINI_API_KEY || (document.querySelector('meta[name="gemini-api-key"]') || {}).content || null;
+
+    // DOM
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const previewImage = document.getElementById('previewImage');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const paletteContainer = document.getElementById('paletteContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const regenerateBtn = document.getElementById('regenerateBtn');
+
+    const newsletterGateModal = document.getElementById('newsletterGateModal');
+    const viewResultsButton = document.getElementById('viewResultsButton');
+
+    let currentImageBase64 = null;
+    let lastPalette = null; // array of hex strings
+
+    /* ============================
+       Drag & drop + file handling
+       ============================ */
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault(); uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault(); uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault(); uploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            fileInput.files = e.dataTransfer.files;
+            handleFile(fileInput.files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (ev) => {
+        if (ev.target.files && ev.target.files[0]) handleFile(ev.target.files[0]);
+    });
+
+    resetBtn.addEventListener('click', resetAll);
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            currentImageBase64 = e.target.result.split(',')[1]; // base64 without data: prefix
+            analyzeBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /* ============================
+       UI: show/hide loading, modal, enable button
+       ============================ */
+    function showLoading(text = 'Analyzing photo — generating palette...') {
+        loadingText.textContent = text;
+        loadingOverlay.classList.add('visible');
+    }
+    function hideLoading() {
+        loadingOverlay.classList.remove('visible');
+    }
+
+    function openNewsletterGate() {
+        newsletterGateModal.classList.add('visible');
+        newsletterGateModal.setAttribute('aria-hidden', 'false');
+        // Set viewResultsButton enabled only if localStorage emailsubmitted is true
+        updateViewResultsButton();
+    }
+    function closeNewsletterGate() {
+        newsletterGateModal.classList.remove('visible');
+        newsletterGateModal.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateViewResultsButton() {
+        const submitted = localStorage.getItem('emailsubmitted') === 'true';
+        viewResultsButton.disabled = !submitted;
+    }
+
+    // Listen to storage events to enable view results if subscription completed in another tab
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'emailsubmitted') updateViewResultsButton();
+    });
+
+    // Local hook: if Beehiiv embed triggers a callback to set localStorage 'emailsubmitted' = 'true',
+    // the modal's View button will become enabled automatically.
+
+    viewResultsButton.addEventListener('click', () => {
+        if (localStorage.getItem('emailsubmitted') === 'true') {
+            closeNewsletterGate();
+            showPalette(lastPalette);
+        } else {
+            // keep modal open until subscribed
+            alert('Please complete the subscription form to view your palette.');
+        }
+    });
+
+    /* ============================
+       Analyze flow: Gemini call or fallback
+       ============================ */
+
+    analyzeBtn.addEventListener('click', async () => {
+        if (!currentImageBase64) return alert('Please upload a photo first.');
+        analyzeBtn.disabled = true;
+        showLoading();
+
+        try {
+            // Try remote Gemini first if configured
+            let result = null;
+            if (GEMINI_API_URL && GEMINI_API_KEY) {
+                // Construct a careful prompt asking for strict JSON
+                const prompt = `You are a professional personal-color-analysis assistant. The user uploaded a single face photo (base64). Analyze the face image and return EXACT JSON with:
+1) hairColor, 2) eyeColor, 3) skinColor (dominant colors as hex).
+4) undertone: "warm"|"cool"|"neutral"
+5) palette: an array of 12 hex color codes (strings) that best complement the user's features and undertone.
+Return the response strictly in this JSON shape, nothing else:
+{
+  "hairColor":"#HEX",
+  "eyeColor":"#HEX",
+  "skinColor":"#HEX",
+  "undertone":"warm|cool|neutral",
+  "palette":["#HEX1", "#HEX2", ..., "#HEX12"]
+}
+Do not include additional text.`;
+
+                // Post to your Gemini proxy endpoint (expected to handle auth & forward to Gemini)
+                // The endpoint should accept JSON with fields: image_base64 and prompt (or you can adapt).
+                const res = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // If your endpoint expects the key in header:
+                        // 'Authorization': `Bearer ${GEMINI_API_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        image_base64: currentImageBase64,
+                        prompt: prompt
+                    }),
+                });
+
+                if (!res.ok) {
+                    console.warn('Gemini endpoint returned error', res.status, await res.text());
+                    throw new Error('Remote analysis failed');
+                }
+                const json = await res.json();
+
+                // Accept result either as the final JSON or nested inside 'output' etc.
+                // If the remote returns a string, try to parse it.
+                if (typeof json === 'string') {
+                    result = JSON.parse(json);
+                } else if (json && json.palette && Array.isArray(json.palette)) {
+                    result = json;
+                } else if (json && json.output && typeof json.output === 'string') {
+                    // sometimes services wrap text in output
+                    result = JSON.parse(json.output);
+                } else {
+                    // Try to find the first object with palette
+                    result = json;
+                }
+            } else {
+                // No Gemini configured — run client-side fallback analysis
+                result = await clientSideColorAnalysis(currentImageBase64);
+            }
+
+            // Validate result object structure
+            if (!result || !Array.isArray(result.palette) || result.palette.length < 4) {
+                console.warn('Invalid palette result, falling back to client-side extraction.', result);
+                result = await clientSideColorAnalysis(currentImageBase64);
+            }
+
+            lastPalette = result.palette.slice(0, 12).map(normalizeHex);
+            // If gating: show Beehiiv modal
+            const subscribed = localStorage.getItem('emailsubmitted') === 'true';
+            hideLoading();
+            if (!subscribed) {
+                // store palette in memory and show modal
+                openNewsletterGate();
+                // Palette will only be shown once user clicks View My Palette (and localStorage is true)
+            } else {
+                showPalette(lastPalette);
+            }
+
+        } catch (err) {
+            hideLoading();
+            console.error(err);
+            alert('Sorry — analysis failed. Please try again or use a different photo.');
+        } finally {
+            analyzeBtn.disabled = false;
+        }
+    });
+
+    /* ============================
+       Client-side fallback color extraction
+       - This uses a simple color quantization approach:
+         downscales the image, samples pixels and clusters by color frequency.
+       - Produces hairColor, eyeColor, skinColor and a palette.
+       ============================ */
+    async function clientSideColorAnalysis(imageBase64) {
+        // Draw to an offscreen canvas and sample pixels
+        function dataURLtoImage(dataurl) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = 'data:image/jpeg;base64,' + imageBase64;
+            });
+        }
+
+        const img = await dataURLtoImage(imageBase64);
+        const canvas = document.createElement('canvas');
+        const maxDim = 300;
+        let w = img.width, h = img.height;
+        if (Math.max(w, h) > maxDim) {
+            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; } else { w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const imageData = ctx.getImageData(0, 0, w, h).data;
+
+        // Sample pixels with step to speed up
+        const step = 4; // sample every 4th pixel (RGBA stride)
+        const colorCount = {};
+        for (let i = 0; i < imageData.length; i += 4 * step) {
+            const r = imageData[i], g = imageData[i+1], b = imageData[i+2], a = imageData[i+3];
+            if (a < 128) continue;
+            // Optionally ignore extreme background pixels (very bright or very dark)
+            const hex = rgbToHex(r,g,b);
+            colorCount[hex] = (colorCount[hex] || 0) + 1;
+        }
+
+        // Sort by frequency
+        const sorted = Object.keys(colorCount).sort((a,b) => colorCount[b] - colorCount[a]);
+        // Pick top candidates
+        const top = sorted.slice(0, 20);
+
+        // Heuristic: choose hair as one of the darker tones, skin as one of the mid-tone warmish, eyes as one of mid/darker blues/greens/browns
+        const hair = findMostByBrightness(top, 'dark') || top[0] || '#6b4f3a';
+        const skin = findMostByBrightness(top, 'mid') || top[1] || '#e2c9b3';
+        const eye = findMostByChroma(top) || top[2] || '#3a5a78';
+
+        // Build a palette by taking variations: tints/shades and complements
+        const palette = buildPaletteFromFeatures(hair, eye, skin);
+
+        return {
+            hairColor: hair,
+            eyeColor: eye,
+            skinColor: skin,
+            undertone: estimateUndertone(skin),
+            palette: palette
+        };
+    }
+
+    // Helpers for client-side heuristics
+    function rgbToHex(r,g,b){
+        const h = (n) => ("0"+(n).toString(16)).slice(-2);
+        return "#" + h(r) + h(g) + h(b);
+    }
+    function hexToRgb(hex) {
+        const h = hex.replace('#','');
+        const bigint = parseInt(h, 16);
+        return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+    }
+    function brightness(hex) {
+        const {r,g,b} = hexToRgb(hex);
+        return (r*299 + g*587 + b*114) / 1000; // perceived brightness
+    }
+    function chroma(hex) {
+        const {r,g,b} = hexToRgb(hex);
+        return Math.max(r,g,b) - Math.min(r,g,b);
+    }
+    function findMostByBrightness(list, which='mid') {
+        if (!list.length) return null;
+        if (which === 'dark') return list.reduce((a,b) => brightness(a) < brightness(b) ? a : b);
+        if (which === 'light') return list.reduce((a,b) => brightness(a) > brightness(b) ? a : b);
+        // mid: closest to 128 brightness
+        return list.reduce((a,b) => Math.abs(brightness(a)-128) < Math.abs(brightness(b)-128) ? a : b);
+    }
+    function findMostByChroma(list) {
+        if (!list.length) return null;
+        return list.reduce((a,b) => chroma(a) > chroma(b) ? a : b);
+    }
+
+    function estimateUndertone(skinHex) {
+        // Simple heuristic: compare red vs blue/green balance
+        const {r,g,b} = hexToRgb(skinHex);
+        if (r - g > 10) return 'warm';
+        if (b - r > 10) return 'cool';
+        return 'neutral';
+    }
+
+    function lighten(hex, amt) {
+        const {r,g,b} = hexToRgb(hex);
+        const clamp = (v) => Math.max(0, Math.min(255, Math.round(v + amt)));
+        return rgbToHex(clamp(r), clamp(g), clamp(b));
+    }
+    function saturate(hex, amt) {
+        // naive: convert to hsl, change s, back to hex
+        const {h,s,l} = rgbToHsl(hexToRgb(hex).r, hexToRgb(hex).g, hexToRgb(hex).b);
+        const newS = Math.max(0, Math.min(1, s + amt));
+        const {r,g,b} = hslToRgb(h, newS, l);
+        return rgbToHex(Math.round(r), Math.round(g), Math.round(b));
+    }
+
+    function buildPaletteFromFeatures(hair, eye, skin) {
+        // Basic approach: include skin/eye/hair, tints & shades and accents
+        const palette = [];
+        palette.push(skin);
+        palette.push(lighten(skin, 20));
+        palette.push(lighten(skin, 40));
+        palette.push(hair);
+        palette.push(lighten(hair, 30));
+        palette.push(saturate(eye, 0.15));
+        palette.push(eye);
+        // add some complements based on undertone
+        const undertone = estimateUndertone(skin);
+        if (undertone === 'warm') {
+            palette.push('#C46A2B'); // terracotta
+            palette.push('#FFD9A6'); // soft peach
+            palette.push('#6A8E3A'); // olive
+            palette.push('#8C4B9A'); // muted purple
+        } else if (undertone === 'cool') {
+            palette.push('#5A86A8'); // dusty blue
+            palette.push('#BFD7EA'); // pale blue
+            palette.push('#7BA9A8'); // cool teal
+            palette.push('#9B6FA6'); // cool mauve
+        } else {
+            palette.push('#9A7C5E');
+            palette.push('#D8CAB8');
+            palette.push('#6C8A7E');
+            palette.push('#A58DBA');
+        }
+        // Ensure unique and limited to 12
+        const uniq = Array.from(new Set(palette.map(normalizeHex))).slice(0,12);
+        // If less than 12, pad with tints of skin
+        while (uniq.length < 12) uniq.push(lighten(skin, uniq.length * 12));
+        return uniq;
+    }
+
+    // small color conversion helpers (rgb <-> hsl)
+    function rgbToHsl(r,g,b){
+        r/=255; g/=255; b/=255;
+        const max=Math.max(r,g,b), min=Math.min(r,g,b);
+        let h=0,s=0,l=(max+min)/2;
+        if(max!==min){
+            const d=max-min;
+            s = l>0.5 ? d/(2-max-min) : d/(max+min);
+            switch(max){
+                case r: h=(g-b)/d + (g<b?6:0); break;
+                case g: h=(b-r)/d + 2; break;
+                case b: h=(r-g)/d + 4; break;
+            }
+            h /= 6;
+        }
+        return {h,s,l};
+    }
+    function hslToRgb(h,s,l){
+        if(s===0) return {r:l*255,g:l*255,b:l*255};
+        const hue2rgb = (p,q,t) => {
+            if(t<0) t+=1; if(t>1) t-=1;
+            if(t<1/6) return p+(q-p)*6*t;
+            if(t<1/2) return q;
+            if(t<2/3) return p+(q-p)*(2/3-t)*6;
+            return p;
+        };
+        const q = l < 0.5 ? l*(1+s) : l+s - l*s;
+        const p = 2*l - q;
+        const r = hue2rgb(p,q,h+1/3);
+        const g = hue2rgb(p,q,h);
+        const b = hue2rgb(p,q,h-1/3);
+        return {r:r*255,g:g*255,b:b*255};
+    }
+
+    function normalizeHex(hex) {
+        if (!hex) return '#000000';
+        hex = hex.trim();
+        if (!hex.startsWith('#')) hex = '#' + hex;
+        if (hex.length === 4) { // shorthand
+            hex = '#' + hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
+        }
+        return hex.toUpperCase();
+    }
+
+    /* ============================
+       Render palette (gated)
+       ============================ */
+    function showPalette(palette) {
+        if (!Array.isArray(palette) || palette.length === 0) {
+            alert('No palette available.');
+            return;
+        }
+        // Ensure palette is normalized and exactly 12 (pad if necessary)
+        let p = palette.map(normalizeHex);
+        while (p.length < 12) p.push('#FFFFFF');
+        p = p.slice(0,12);
+        lastPalette = p;
+
+        // If gating: if not subscribed, open modal and do not show panel
+        const subscribed = localStorage.getItem('emailsubmitted') === 'true';
+        if (!subscribed) {
+            openNewsletterGate();
+            return;
+        }
+
+        paletteContainer.innerHTML = '';
+        p.forEach(hex => {
+            const sw = document.createElement('div');
+            sw.className = 'swatch';
+            const colorBlock = document.createElement('div');
+            colorBlock.className = 'color';
+            colorBlock.style.background = hex;
+            const label = document.createElement('div');
+            label.className = 'hex';
+            label.textContent = hex;
+            sw.appendChild(colorBlock);
+            sw.appendChild(label);
+            paletteContainer.appendChild(sw);
+        });
+        resultsPanel.style.display = 'block';
+        // scroll to results
+        resultsPanel.scrollIntoView({behavior:'smooth'});
+    }
+
+    /* ============================
+       Download palette as PNG
+       ============================ */
+    downloadBtn.addEventListener('click', () => {
+        if (!lastPalette) return alert('No palette to download.');
+        const canvas = document.createElement('canvas');
+        const cols = 3, rows = 4;
+        const sw = 200, sh = 160; // swatch width/height for generated PNG
+        const pad = 20;
+        canvas.width = cols * sw + pad*2;
+        canvas.height = rows * sh + pad*2 + 40; // extra for text
+        const ctx = canvas.getContext('2d');
+
+        // background
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        ctx.font = '18px Inter, Arial';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+
+        for (let i = 0; i < 12; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const x = pad + col * sw;
+            const y = pad + row * sh;
+            // swatch rectangle
+            ctx.fillStyle = lastPalette[i];
+            ctx.fillRect(x + 10, y + 10, sw - 20, sh - 60);
+            // hex text
+            ctx.fillStyle = '#fff';
+            ctx.fillText(lastPalette[i], x + sw/2, y + sh - 30);
+        }
+
+        // title
+        ctx.fillStyle = '#fff';
+        ctx.font = '24px Inter, Arial';
+        ctx.fillText('Personal Color Palette', canvas.width/2, canvas.height - 10);
+
+        const link = document.createElement('a');
+        link.download = 'color-palette.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+
+    regenerateBtn.addEventListener('click', () => {
+        // user wants to re-analyze — show upload area again
+        resultsPanel.style.display = 'none';
+        previewImage.style.display = 'block';
+        analyzeBtn.disabled = false;
+        // keep last image; user can click analyze again
+        if (currentImageBase64) {
+            // optionally re-run analyze immediately
+        }
+        window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    function resetAll() {
+        previewImage.src = '';
+        previewImage.style.display = 'none';
+        fileInput.value = '';
+        analyzeBtn.disabled = true;
+        currentImageBase64 = null;
+        resultsPanel.style.display = 'none';
+        paletteContainer.innerHTML = '';
+        lastPalette = null;
+    }
+
+    /* ============================
+       Attempt to enable view results button if localStorage already set
+       ============================ */
+    updateViewResultsButton();
+
+    /* ============================
+       If user has previously subscribed and a palette is stored in memory,
+       clicking View My Palette will show it.
+       ============================ */
+
+    /* ============================
+       End of script
+       ============================ */
+    </script>
+</body>
+</html>
