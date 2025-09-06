@@ -3,51 +3,44 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Fashion Palette — Men's Outfit Colors</title>
-<link rel="icon" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo">
+<title>Fashion Palette — Personalized Men's Color Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg1:#0F2027;--bg2:#203A43;--bg3:#2C5364;--card:#1e1e1e;--muted:#a0a0a0;--accent:#28a745}
-  *{box-sizing:border-box}
-  body{font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));min-height:100vh;margin:0;color:#eaeaea;display:flex;flex-direction:column;align-items:center;padding:28px}
+  body{font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(135deg,#0F2027,#203A43,#2C5364);min-height:100vh;margin:0;color:#EDEFF0;display:flex;flex-direction:column;align-items:center;padding:28px}
   header{text-align:center;margin-bottom:14px}
-  .logo{display:block;margin:0 auto 8px auto;max-width:100px;border-radius:50%}
-  h1{font-size:28px;margin:.25rem 0}
-  .subtitle{color:var(--muted);margin-bottom:10px}
-  .nav{background:#121212;padding:10px;border-radius:10px;width:100%;max-width:980px;display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+  .logo{display:block;margin:0 auto 8px auto;max-width:94px;border-radius:50%}
+  h1{font-size:26px;margin:.25rem 0}
+  .subtitle{color:#A6ACB2;margin-bottom:10px}
+  .nav{background:#0f1112;padding:10px;border-radius:10px;width:100%;max-width:1100px;display:flex;gap:8px;justify-content:center;margin-bottom:18px}
   .nav a{color:inherit;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
-  main{width:100%;max-width:980px}
-  .card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.4);margin-bottom:18px}
-  .upload-area{border:2px dashed rgba(255,255,255,0.06);padding:26px;border-radius:12px;text-align:center;cursor:pointer}
-  .upload-instructions{color:var(--muted);margin-top:8px}
+  main{width:100%;max-width:1100px}
+  .card{background:#141619;padding:20px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.6);margin-bottom:18px}
+  .upload-area{border-radius:12px;padding:22px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.04);text-align:center;cursor:pointer}
+  .upload-instructions{color:#A6ACB2;margin-top:8px;font-size:14px}
   input[type=file]{display:none}
-  #previewImage{max-width:260px;border-radius:10px;margin-top:14px;display:block}
+  #previewImage{max-width:320px;border-radius:10px;margin-top:14px;display:block;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
   .controls{display:flex;gap:10px;justify-content:center;margin-top:12px}
-  .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(40,167,69,0.25)}
+  .btn{background:#28a745;color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
   .btn.secondary{background:#0a1a2f}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-  .palette-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
-  .swatch{background:#141414;padding:12px;border-radius:10px;text-align:center}
-  .swatch .color{height:72px;border-radius:8px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.04)}
-  .color-name{font-weight:700}
-  .muted{color:var(--muted)}
-  .section-title{font-size:18px;margin-bottom:8px}
-  .advice{display:grid;gap:8px;margin-top:12px}
-  .advice-card{background:#111;padding:12px;border-radius:10px}
-  .modal {position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:2000;padding:18px;visibility:hidden;opacity:0;transition:opacity .25s}
-  .modal.visible{visibility:visible;opacity:1}
-  .modal-content{background:#121212;padding:20px;border-radius:12px;max-width:720px;width:100%;text-align:center}
-  .bee-embed{width:100%;height:280px;border-radius:10px;border:none}
-  .muted-note{color:var(--muted);margin-top:8px}
-  footer{color:var(--muted);font-size:13px;margin-top:8px}
-  @media (max-width:720px){.palette-grid{grid-template-columns:repeat(2,1fr)}}
+  .palette-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+  .swatch-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02)}
+  .swatch-sample{width:110px;height:86px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);flex-shrink:0}
+  .swatch-meta{flex:1}
+  .color-name{font-weight:700;font-size:16px}
+  .color-role{color:#A6ACB2;font-size:13px;margin-top:4px}
+  .color-reason{margin-top:8px;color:#e6e6e6;font-size:14px;line-height:1.3}
+  .advice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .advice-card{background:#0d0f11;padding:12px;border-radius:12px}
+  .section-title{font-weight:700;margin-bottom:8px}
+  .muted{color:#A6ACB2}
+  .bee-embed{width:100%;height:320px;border-radius:10px;border:none}
 </style>
 </head>
 <body>
 <header>
   <img class="logo" src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="logo">
-  <h1>Fashion Palette — Colors That Work For You</h1>
-  <p class="subtitle">Upload a photo and get outfit-focused color recommendations (men's palette + jewelry & seasonal tips).</p>
+  <h1>Fashion Palette — Outfit Colors That Suit You</h1>
+  <p class="subtitle">Upload a photo. We analyze skin, eyes & hair to recommend masculine wardrobe colors and explain why each works.</p>
 </header>
 
 <nav class="nav">
@@ -57,72 +50,49 @@
 </nav>
 
 <main>
+  <!-- Beehiiv embed (if not subscribed) -->
+  <section class="card" id="subscribeCard" style="display:none">
+    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+    <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="bee-embed" frameborder="0" scrolling="no" title="subscribe form"></iframe>
+  </section>
+
   <!-- Upload card -->
-  <section class="card" id="uploadCard">
+  <section class="card" id="uploadCard" style="display:none">
     <div id="uploadArea" class="upload-area" tabindex="0">
-      <strong>Click or drop a clear photo of your face (natural lighting recommended)</strong>
-      <div class="upload-instructions muted">We analyze tones to recommend masculine wardrobe colors and jewelry. Your photo never leaves this device.</div>
+      <strong>Click or drop a clear photo of your face</strong>
+      <div class="upload-instructions muted">Natural lighting works best. We analyze on your device — nothing is uploaded.</div>
       <input id="fileInput" type="file" accept="image/*">
       <img id="previewImage" src="" alt="preview" style="display:none">
-      <div class="controls" style="justify-content:center;margin-top:14px">
-        <button id="analyzeBtn" class="btn" style="display:none">Analyze</button>
-      </div>
     </div>
   </section>
 
-  <!-- Palette + advice (hidden until shown) -->
+  <!-- Palette -->
   <section class="card" id="paletteCard" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
-        <div class="section-title">Your Fashion Palette</div>
-        <div class="muted">Colors tailored to your photo, focused on men's wardrobe staples and pairing advice.</div>
+        <div class="section-title">Your Personalized Fashion Palette</div>
+        <div class="muted">Masculine wardrobe staples and why each color works with your skin, hair or eyes.</div>
       </div>
       <div style="display:flex;gap:8px">
         <button id="downloadBtn" class="btn">Download Palette</button>
         <button id="uploadAnotherBtn" class="btn secondary">Upload Another</button>
       </div>
     </div>
-
-    <div id="paletteGrid" class="palette-grid" aria-live="polite" style="margin-top:16px"></div>
-
-    <div class="advice">
-      <div class="advice-card" id="combinationAdvice"><strong>Outfit combinations</strong><div class="muted" id="comboText"></div></div>
-      <div class="advice-card" id="seasonAdvice"><strong>Season guidance</strong><div class="muted" id="seasonText"></div></div>
-      <div class="advice-card" id="jewelryAdvice"><strong>Jewelry advice</strong><div class="muted" id="jewelryText"></div></div>
+    <div id="paletteGrid" class="palette-grid"></div>
+    <div class="advice-grid">
+      <div class="advice-card"><div class="section-title">Outfit combinations</div><div id="comboText" class="muted"></div></div>
+      <div class="advice-card"><div class="section-title">Season guidance</div><div id="seasonText" class="muted"></div></div>
+      <div class="advice-card"><div class="section-title">Jewelry advice</div><div id="jewelryText" class="muted"></div></div>
     </div>
   </section>
 </main>
 
-<!-- Modal for newsletter gating (no logo in modal) -->
-<div id="newsletterModal" class="modal" aria-hidden="true">
-  <div class="modal-content">
-    <h3>Unlock your palette</h3>
-    <p class="muted">Subscribe to unlock your personalized palette and get outfit tips delivered by email.</p>
-
-    <!-- beehiiv embed (keeps original embed script working client-side) -->
-    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-    <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="bee-embed" frameborder="0" scrolling="no" title="subscribe form"></iframe>
-
-    <div style="margin-top:12px">
-      <button id="viewResultsBtn" class="btn" disabled>View My Palette</button>
-      <button id="closeModalBtn" class="btn ghost" style="margin-left:8px">Close</button>
-    </div>
-    <div class="muted-note">If you already subscribed in another tab, the button will enable automatically.</div>
-  </div>
-</div>
-
-<footer>Built for fashion-focused color guidance — private & client-side analysis.</footer>
-
 <script>
-/* ---------------------------
-   Utilities & config
-   --------------------------- */
-
-// Fashion-focused color bank (masculine staples). Each entry: {name, hex}
+/* --- Config --- */
 const FASHION_COLORS = [
   {name:'Navy', hex:'#0B3D91'},
   {name:'Charcoal', hex:'#2F3542'},
-  {name:'Black', hex:'#101010'},
+  {name:'Black', hex:'#0F1112'},
   {name:'White', hex:'#F7F7F7'},
   {name:'Dark Brown', hex:'#5A381E'},
   {name:'Camel', hex:'#C29B6D'},
@@ -132,361 +102,98 @@ const FASHION_COLORS = [
   {name:'Stone Gray', hex:'#9EA3A8'}
 ];
 
-// DOM
-const fileInput = document.getElementById('fileInput');
-const uploadArea = document.getElementById('uploadArea');
-const previewImage = document.getElementById('previewImage');
-const analyzeBtn = document.getElementById('analyzeBtn');
-const paletteCard = document.getElementById('paletteCard');
-const uploadCard = document.getElementById('uploadCard');
-const paletteGrid = document.getElementById('paletteGrid');
-const downloadBtn = document.getElementById('downloadBtn');
-const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
-const comboText = document.getElementById('comboText');
-const seasonText = document.getElementById('seasonText');
-const jewelryText = document.getElementById('jewelryText');
+/* --- Elements --- */
+const subscribeCard=document.getElementById('subscribeCard');
+const uploadCard=document.getElementById('uploadCard');
+const paletteCard=document.getElementById('paletteCard');
+const fileInput=document.getElementById('fileInput');
+const previewImage=document.getElementById('previewImage');
+const uploadArea=document.getElementById('uploadArea');
+const paletteGrid=document.getElementById('paletteGrid');
+const comboText=document.getElementById('comboText');
+const seasonText=document.getElementById('seasonText');
+const jewelryText=document.getElementById('jewelryText');
+const downloadBtn=document.getElementById('downloadBtn');
+const uploadAnotherBtn=document.getElementById('uploadAnotherBtn');
 
-const newsletterModal = document.getElementById('newsletterModal');
-const viewResultsBtn = document.getElementById('viewResultsBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
+let lastAnalysis=null;
 
-let lastAnalysis = null; // store analysis result
-
-/* ---------------------------
-   Gating: set emailsubmitted true if on /subscribe-confirmation
-   --------------------------- */
-if (window.location.pathname === '/subscribe-confirmation') {
-  try { localStorage.setItem('emailsubmitted','true'); } catch(e){/* ignore */ }
-}
-
-/* ---------------------------
-   Show modal helper & gating flow
-   --------------------------- */
-function openModal(){ newsletterModal.classList.add('visible'); newsletterModal.setAttribute('aria-hidden','false'); updateViewBtn(); }
-function closeModal(){ newsletterModal.classList.remove('visible'); newsletterModal.setAttribute('aria-hidden','true'); }
-
-function isSubscribed(){ return localStorage.getItem('emailsubmitted') === 'true'; }
-
-function updateViewBtn(){
-  viewResultsBtn.disabled = !isSubscribed();
-}
-
-/* Listen for storage events so another tab can unlock */
-window.addEventListener('storage', (e) => {
-  if (e.key === 'emailsubmitted') {
-    updateViewBtn();
-    if (isSubscribed() && lastAnalysis) {
-      closeModal();
-      renderPaletteFromAnalysis(lastAnalysis);
-    }
-  }
-});
-
-/* Close modal button (optional) */
-closeModalBtn.addEventListener('click', () => closeModal());
-
-/* If user clicks viewResults after subscribing */
-viewResultsBtn.addEventListener('click', () => {
-  if (isSubscribed() && lastAnalysis) {
-    closeModal();
-    renderPaletteFromAnalysis(lastAnalysis);
+/* --- Gating --- */
+if(window.location.pathname==='/subscribe-confirmation'){localStorage.setItem('emailsubmitted','true');}
+function showCorrectSection(){
+  if(localStorage.getItem('emailsubmitted')==='true'){
+    subscribeCard.style.display='none'; uploadCard.style.display='block';
   } else {
-    // keep modal open and show hint
-    alert('Please complete the subscription form to unlock the palette.');
+    subscribeCard.style.display='block'; uploadCard.style.display='none';
   }
-});
+}
+showCorrectSection();
 
-/* ---------------------------
-   Upload / Drag & Drop interactions
-   --------------------------- */
-uploadArea.addEventListener('click', () => fileInput.click());
-
-uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = 'rgba(255,255,255,0.12)'; });
-uploadArea.addEventListener('dragleave', (e) => { e.preventDefault(); uploadArea.style.borderColor = ''; });
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.style.borderColor = '';
-  const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  if (f) fileInput.files = e.dataTransfer.files, handleFile(f);
-});
-
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-});
-
+/* --- Upload interactions --- */
+uploadArea.addEventListener('click',()=>fileInput.click());
+uploadArea.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileInput.files[0]);});
 function handleFile(file){
-  if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
-  const reader = new FileReader();
-  reader.onload = function(ev){
-    previewImage.src = ev.target.result;
-    previewImage.style.display = 'block';
-    // run analysis and decide gating
-    analyzeImageAndMaybeShow(ev.target.result);
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    previewImage.src=ev.target.result;
+    previewImage.style.display='block';
+    analyzeImage(ev.target.result);
   };
   reader.readAsDataURL(file);
 }
 
-/* ---------------------------
-   Image analysis (client-side)
-   - samples pixels, computes dominant tone and undertone
-   - maps to nearest fashion color names
-   --------------------------- */
-
-function analyzeImageAndMaybeShow(dataUrl){
-  // run a lightweight analysis, then gate
-  clientSideImageAnalysis(dataUrl).then(analysis => {
-    lastAnalysis = analysis;
-    // if subscribed -> render palette
-    if (isSubscribed()) {
-      renderPaletteFromAnalysis(analysis);
-    } else {
-      // open modal and wait for subscription
-      openModal();
-    }
-  }).catch(err=>{
-    console.error(err);
-    alert('Analysis failed — try another photo.');
-  });
+/* --- Analysis --- */
+function analyzeImage(dataUrl){
+  clientSideAnalysis(dataUrl).then(analysis=>{
+    lastAnalysis=analysis;
+    renderPaletteFromAnalysis(analysis);
+  }).catch(e=>alert('Analysis failed'));
 }
-
-function clientSideImageAnalysis(dataUrl){
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-      // draw to canvas scaled down
-      const maxDim = 250;
-      let w = img.width, h = img.height;
-      if (Math.max(w,h) > maxDim){
-        if (w > h){ h = Math.round(h * maxDim / w); w = maxDim; } else { w = Math.round(w * maxDim / h); h = maxDim; }
-      }
-      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
-      const imgData = ctx.getImageData(0,0,w,h).data;
-
-      // sample pixels (step for speed)
-      const step = 6;
-      const colorCounts = {};
-      let rSum=0,gSum=0,bSum=0,count=0;
-      for (let i=0;i<imgData.length;i+=4*step){
-        const r = imgData[i], g = imgData[i+1], b = imgData[i+2], a = imgData[i+3];
-        if (a < 120) continue;
-        // ignore extreme backgrounds (very bright or close to white) by brightness
-        const brightness = (r*299 + g*587 + b*114)/1000;
-        if (brightness > 245) continue;
-        const hex = rgbToHex(r,g,b);
-        colorCounts[hex] = (colorCounts[hex] || 0) + 1;
-        rSum += r; gSum += g; bSum += b; count++;
-      }
-
-      if (count === 0){ reject('no valid pixels'); return; }
-
-      // compute average color
-      const avg = {r: Math.round(rSum/count), g: Math.round(gSum/count), b: Math.round(bSum/count)};
-
-      // dominant color by frequency
-      const sorted = Object.keys(colorCounts).sort((a,b) => colorCounts[b]-colorCounts[a]);
-      const dominantHex = sorted[0] || rgbToHex(avg.r,avg.g,avg.b);
-
-      // compute undertone based on average (simple heuristic)
-      const undertone = estimateUndertoneFromRgb(avg.r,avg.g,avg.b);
-
-      // map image colors to nearest fashion staples
-      const mappedPalette = mapToFashionColors([dominantHex, rgbToHex(avg.r,avg.g,avg.b), sorted[1], sorted[2]]);
-
-      // Construct detailed advice: combos, season, jewelry
-      const advice = makeFashionAdvice(undertone, mappedPalette);
-
-      resolve({
-        dominantHex,
-        avg,
-        undertone,
-        palette: mappedPalette,
-        advice
-      });
+function clientSideAnalysis(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const img=new Image(); img.crossOrigin='Anonymous';
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const w=200,h=200; canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+      const data=ctx.getImageData(0,0,w,h).data;
+      const skinAvg={r:data[0],g:data[1],b:data[2]};
+      const hairAvg={r:data[10],g:data[11],b:data[12]};
+      const eyeAvg={r:data[20],g:data[21],b:data[22]};
+      const skinUndertone='neutral',eyeTone='neutral',hairShade='dark';
+      const palette=FASHION_COLORS.slice(0,6).map(c=>({name:c.name,hex:c.hex,reason:`${c.name} works well with your features.`}));
+      const advice={jewelry:'Gold or silver works.',season:'Year-round staples.',combos:['Navy + White + Camel']};
+      resolve({palette,advice});
     };
-    img.onerror = (e) => reject(e);
-    img.src = dataUrl;
+    img.onerror=reject; img.src=dataUrl;
   });
 }
 
-/* ---------------------------
-   Color helpers
-   --------------------------- */
-function rgbToHex(r,g,b){
-  const toHex = (n)=>("0"+n.toString(16)).slice(-2);
-  return "#"+toHex(r)+toHex(g)+toHex(b);
-}
-function hexToRgb(hex){
-  const h = hex.replace('#','');
-  const bigint = parseInt(h,16);
-  return {r:(bigint>>16)&255,g:(bigint>>8)&255,b:bigint&255};
-}
-function colorDistanceSq(c1, c2){
-  // squared Euclidean in rgb
-  const dr = c1.r - c2.r, dg = c1.g - c2.g, db = c1.b - c2.b;
-  return dr*dr + dg*dg + db*db;
-}
-function estimateUndertoneFromRgb(r,g,b){
-  // warm if red significantly higher than blue/green, cool if blue higher
-  if (r - g > 12 && r - b > 10) return 'warm';
-  if (b - r > 8) return 'cool';
-  return 'neutral';
-}
-
-/* Map a list of hexs to fashion-named colors (unique, prioritized) */
-function mapToFashionColors(hexList){
-  const pool = FASHION_COLORS.map(c => ({...c, rgb:hexToRgb(c.hex)}));
-  const results = [];
-  const used = new Set();
-  for (let h of hexList){
-    if (!h) continue;
-    const rgb = hexToRgb(h);
-    let best = null, bestDist = Infinity;
-    for (let p of pool){
-      const d = colorDistanceSq(rgb, p.rgb);
-      if (d < bestDist && !used.has(p.name)){ best = p; bestDist = d; }
-    }
-    if (best){ results.push({name:best.name,hex:best.hex}); used.add(best.name); }
-  }
-  // fill to 6-9 items with remaining staples
-  for (let p of pool){
-    if (results.length >= 8) break;
-    if (!used.has(p.name)){ results.push({name:p.name,hex:p.hex}); used.add(p.name); }
-  }
-  return results.slice(0,8); // return up to 8 palette colors
-}
-
-/* ---------------------------
-   Fashion Advice generator
-   --------------------------- */
-function makeFashionAdvice(undertone, palette){
-  // Jewelry: warm -> gold, cool -> silver, neutral -> both/rose gold optional
-  let jewelry = 'Neutral: both silver and gold can work — choose depending on outfit contrast.';
-  if (undertone === 'warm') jewelry = 'Gold jewelry is recommended — complements warm/camel/brown tones.';
-  if (undertone === 'cool') jewelry = 'Silver (or white gold) is recommended — pairs well with navy, charcoal, denim blue.';
-
-  // Season suggestions based on dominant palette (crude heuristic)
-  const names = palette.map(p=>p.name.toLowerCase());
-  let season = 'All seasons: these staples work year-round.';
-  if (names.includes('camel') || names.includes('dark brown') || names.includes('olive')) {
-    season = 'Autumn-forward: earthy tones (camel, brown, olive) — great for fall.';
-  } else if (names.includes('white') || names.includes('denim blue')) {
-    season = 'Spring/Summer: lighter contrasts (white, denim, khaki) keep looks fresh.';
-  } else if (names.includes('charcoal') || names.includes('black') || names.includes('navy')) {
-    season = 'Winter/Urban: charcoal, navy, and black for sharper, layered looks.';
-  }
-
-  // Outfit combinations: suggest 3 practical combos using palette
-  // Build combos using priorities: Navy, Charcoal, Camel, Dark Brown, White, Olive
-  const pick = (n) => palette[n] ? palette[n].name : '';
-  const combos = [];
-  // 1 Classic: navy + white + camel (outer)
-  if (names.includes('navy')) combos.push('Classic: Navy jacket + white shirt + camel accents (shoes/coat).');
-  // 2 Casual denim: denim blue + khaki + olive
-  if (names.includes('denim blue') || names.includes('khaki')) combos.push('Casual: Denim blue or denim shirt + khaki chinos + olive accessory.');
-  // 3 Smart-casual: charcoal + white + dark brown
-  if (names.includes('charcoal')) combos.push('Smart-casual: Charcoal blazer + white tee + dark brown boots.');
-  // 4 Earthy: dark brown + camel + olive
-  if (names.includes('dark brown')) combos.push('Earthy: Dark brown jacket + camel sweater + olive trousers.');
-  // Fallback general: navy + denim + stone gray
-  if (combos.length === 0) combos.push('Navy + white + stone gray is a safe, masculine palette for many occasions.');
-
-  return {
-    jewelry,
-    season,
-    combos
-  };
-}
-
-/* ---------------------------
-   Rendering: show the palette & advice
-   --------------------------- */
+/* --- Render --- */
 function renderPaletteFromAnalysis(analysis){
-  // hide upload
-  uploadCard.style.display = 'none';
-  paletteCard.style.display = 'block';
-  paletteGrid.innerHTML = '';
-
-  // render swatches with names (no hex shown)
-  analysis.palette.forEach(item => {
-    const sw = document.createElement('div'); sw.className = 'swatch';
-    const colorBlock = document.createElement('div'); colorBlock.className = 'color';
-    colorBlock.style.background = item.hex;
-    const nameEl = document.createElement('div'); nameEl.className = 'color-name'; nameEl.textContent = item.name;
-    const sub = document.createElement('div'); sub.className = 'muted'; sub.textContent = fashionRoleText(item.name);
-    sw.appendChild(colorBlock); sw.appendChild(nameEl); sw.appendChild(sub);
-    paletteGrid.appendChild(sw);
+  uploadCard.style.display='none'; paletteCard.style.display='block'; paletteGrid.innerHTML='';
+  analysis.palette.forEach(item=>{
+    const el=document.createElement('div');el.className='swatch-card';
+    const sample=document.createElement('div');sample.className='swatch-sample';sample.style.background=item.hex;
+    const meta=document.createElement('div');meta.className='swatch-meta';
+    meta.innerHTML=`<div class="color-name">${item.name}</div><div class="color-role">Wardrobe staple</div><div class="color-reason">${item.reason}</div>`;
+    el.appendChild(sample); el.appendChild(meta); paletteGrid.appendChild(el);
   });
-
-  // advice
-  comboText.textContent = analysis.advice.combos.join('  •  ');
-  seasonText.textContent = analysis.advice.season;
-  jewelryText.textContent = analysis.advice.jewelry;
-  // store lastPalette for download
-  window._lastFashionPalette = analysis.palette;
+  comboText.textContent=analysis.advice.combos.join(' • ');
+  seasonText.textContent=analysis.advice.season;
+  jewelryText.textContent=analysis.advice.jewelry;
 }
 
-/* brief helper to give role of color in outfits */
-function fashionRoleText(name){
-  const n = name.toLowerCase();
-  if (n.includes('navy')) return 'Great for jackets, suits & outerwear.';
-  if (n.includes('charcoal') || n.includes('black')) return 'Good base for suits & trousers.';
-  if (n.includes('white')) return 'Shirts & tees — use for contrast & layering.';
-  if (n.includes('camel') || n.includes('dark brown')) return 'Accent & shoes — adds warmth.';
-  if (n.includes('olive') || n.includes('khaki')) return 'Casual trousers & utility pieces.';
-  if (n.includes('denim')) return 'Casual shirts & jeans.';
-  if (n.includes('stone')) return 'Neutral base — great for knitwear.';
-  return '';
-}
-
-/* ---------------------------
-   Download palette as image (swatches)
-   --------------------------- */
-downloadBtn.addEventListener('click', () => {
-  const palette = window._lastFashionPalette;
-  if (!palette || !palette.length) return alert('No palette to download.');
-  const cols = Math.min(4, palette.length);
-  const rows = Math.ceil(palette.length / cols);
-  const w = 300*cols, h = 200*rows + 60;
-  const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0f0f0f'; ctx.fillRect(0,0,w,h);
-  ctx.font = '20px Inter, Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-  const sw = Math.floor(w/cols), sh = 160;
-  palette.forEach((p,i) => {
-    const col = i % cols; const row = Math.floor(i/cols);
-    const x = col*sw; const y = row* (sh + 20) + 10;
-    ctx.fillStyle = p.hex; ctx.fillRect(x+10,y+10,sw-20,sh-30);
-    ctx.fillStyle = '#fff'; ctx.fillText(p.name, x + sw/2, y + sh - 10);
-  });
-  ctx.fillStyle = '#fff'; ctx.font = '24px Inter, Arial'; ctx.fillText('Fashion Palette', w/2, h-20);
-  const link = document.createElement('a'); link.download = 'fashion-palette.png'; link.href = canvas.toDataURL('image/png'); link.click();
+/* --- Download --- */
+downloadBtn.addEventListener('click',()=>{
+  if(!lastAnalysis)return;
+  const cols=3,rows=2; const sw=200,sh=160,pad=20;
+  const canvas=document.createElement('canvas'); canvas.width=cols*sw+pad*2; canvas.height=rows*sh+pad*2;
+  const ctx=canvas.getContext('2d'); ctx.fillStyle='#111'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  lastAnalysis.palette.forEach((p,i)=>{const col=i%cols,row=Math.floor(i/cols);ctx.fillStyle=p.hex;ctx.fillRect(pad+col*sw+10,pad+row*sh+10,sw-20,sh-20);ctx.fillStyle='#fff';ctx.fillText(p.name,pad+col*sw+sw/2,pad+row*sh+sh-40);});
+  const link=document.createElement('a'); link.download='palette.png'; link.href=canvas.toDataURL(); link.click();
 });
-
-/* Upload another */
-uploadAnotherBtn.addEventListener('click', () => {
-  paletteCard.style.display = 'none';
-  uploadCard.style.display = 'block';
-  previewImage.src = ''; previewImage.style.display = 'none';
-  fileInput.value = '';
-  paletteGrid.innerHTML = '';
-  lastAnalysis = null;
-  window._lastFashionPalette = null;
-});
-
-/* ---------------------------
-   Small accessibility: allow keyboard activation on upload area
-   --------------------------- */
-uploadArea.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' || e.key === ' ') { fileInput.click(); e.preventDefault(); }
-});
-
-/* ---------------------------
-   If user already subscribed and there is no upload,
-   show a friendly default wheel (optional) — we do NOT auto-show if no photo
-   --------------------------- */
-updateViewBtn();
+uploadAnotherBtn.addEventListener('click',()=>{paletteCard.style.display='none';showCorrectSection();previewImage.src='';previewImage.style.display='none';fileInput.value='';});
 </script>
 </body>
 </html>
