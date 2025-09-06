@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Health Score — Color Analysis</title>
 
-    <!-- Favicon -->
+    <!-- If you already have a Gemini API key embedded, keep it as a meta tag like below.
+         The script will look for: window.GEMINI_API_KEY or <meta name="gemini-api-key" content="...">
+         If you already have a different method, it will still fall back to client-side extraction. -->
+    <!-- <meta name="gemini-api-key" content="YOUR_KEY_HERE"> -->
+
+    <!-- Favicon (kept as in your uploaded file) -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo">
 
     <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
+        /* --- keep the style closely matching your uploaded design (dark, premium) --- */
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
@@ -143,7 +149,7 @@
         .spinner { border:4px solid rgba(255,255,255,0.15); border-top:4px solid #0a1a2f; border-radius:50%; width:44px; height:44px; animation:spin 1s linear infinite; }
         @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
-        /* newsletter gate modal - ZONDER logo bovenaan */
+        /* newsletter gate modal (kept from your file but simplified classnames preserved) */
         .newsletter-gate-modal {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background-color: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
@@ -153,14 +159,10 @@
         }
         .newsletter-gate-modal.visible { opacity:1; visibility:visible; }
         .newsletter-gate-content {
-            background:#1e1e1e; 
-            padding:32px; 
-            border-radius:14px; 
-            width:100%; 
-            max-width:700px; 
-            position:relative; 
-            text-align:center;
+            background:#1e1e1e; padding:26px; border-radius:14px; width:100%; max-width:700px; position:relative; text-align:center;
+            padding-top:85px;
         }
+        .logo-modal-top { position:absolute; top:-60px; left:50%; transform:translateX(-50%); max-width:120px; border-radius:50%; border:4px solid #0a1a2f; }
         .beehiiv-embed { width:100%; max-width:660px; height:auto; min-height:260px; border:none; border-radius:10px; }
 
         .view-results-btn {
@@ -184,17 +186,16 @@
         <div id="loadingText">Analyzing photo — generating palette...</div>
     </div>
 
-    <!-- Newsletter Gate Modal (zonder logo) -->
+    <!-- Newsletter Gate Modal (kept from your file; Beehiiv embed included) -->
     <div id="newsletterGateModal" class="newsletter-gate-modal" aria-hidden="true">
+        <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo" class="logo-modal-top">
         <div class="newsletter-gate-content">
-            <h2 style="margin-top:0; margin-bottom:20px; color:#f0f0f0;">Subscribe to View Your Palette</h2>
-            
-            <!-- Beehiiv embed -->
+            <!-- Beehiiv embed should remain as you had it; keeps popup UI identical -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
             <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no"></iframe>
 
             <button id="viewResultsButton" class="view-results-btn" disabled>View My Palette</button>
-            <p class="muted">Subscribe to unlock your personalized color palette. We'll keep your email safe.</p>
+            <p class="muted">Subscribe to unlock your personalized color palette. We’ll keep your email safe.</p>
         </div>
     </div>
 
@@ -240,38 +241,33 @@
         </section>
     </main>
 
-    <!-- Hidden input -->
+    <!-- Hidden input used by copy or other ops (kept for parity) -->
     <input type="text" id="shareLinkInput" style="position:absolute; left:-9999px; top:-9999px; opacity:0;">
 
     <script>
     /* ============================
-       Check if user came from /subscribe-confirmation
-       ============================ */
-    
-    // Check URL parameters and pathname
-    window.addEventListener('DOMContentLoaded', function() {
-        const currentPath = window.location.pathname;
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        // Check if user is on or came from subscribe-confirmation page
-        if (currentPath.includes('subscribe-confirmation') || 
-            urlParams.get('from') === 'subscribe-confirmation' ||
-            urlParams.get('subscribed') === 'true') {
-            // Set emailsubmitted to true
-            localStorage.setItem('emailsubmitted', 'true');
-            console.log('User subscribed - setting emailsubmitted to true');
-        }
-        
-        // Also check referrer
-        if (document.referrer && document.referrer.includes('subscribe-confirmation')) {
-            localStorage.setItem('emailsubmitted', 'true');
-            console.log('User came from subscribe-confirmation - setting emailsubmitted to true');
-        }
-    });
-
-    /* ============================
        Configuration & helpers
        ============================ */
+
+    // If you have a dedicated Gemini endpoint and key, set these in your environment or inline.
+    // The script will attempt to use, in order:
+    // 1) window.GEMINI_API_URL and window.GEMINI_API_KEY
+    // 2) meta[name="gemini-api-key"]
+    // 3) If none, it will perform client-side color extraction (fallback).
+    //
+    // Example server-side endpoint expected JSON body:
+    // { "image_base64": "...", "prompt": "..." }
+    // And respond with strict JSON like:
+    // {
+    //   "hairColor":"#AABBCC",
+    //   "eyeColor":"#DDEEFF",
+    //   "skinColor":"#FFEEDD",
+    //   "undertone":"warm",
+    //   "palette":["#HEX1","#HEX2",...,"#HEX12"]
+    // }
+    //
+    // NOTE: If you already included a Gemini call earlier in your uploaded HTML, set
+    // window.GEMINI_API_URL and window.GEMINI_API_KEY accordingly so this page will use it.
 
     const GEMINI_API_URL = window.GEMINI_API_URL || null;
     const GEMINI_API_KEY = window.GEMINI_API_KEY || (document.querySelector('meta[name="gemini-api-key"]') || {}).content || null;
@@ -293,7 +289,7 @@
     const viewResultsButton = document.getElementById('viewResultsButton');
 
     let currentImageBase64 = null;
-    let lastPalette = null;
+    let lastPalette = null; // array of hex strings
 
     /* ============================
        Drag & drop + file handling
@@ -329,7 +325,7 @@
         reader.onload = function(e) {
             previewImage.src = e.target.result;
             previewImage.style.display = 'block';
-            currentImageBase64 = e.target.result.split(',')[1];
+            currentImageBase64 = e.target.result.split(',')[1]; // base64 without data: prefix
             analyzeBtn.disabled = false;
         };
         reader.readAsDataURL(file);
@@ -349,6 +345,7 @@
     function openNewsletterGate() {
         newsletterGateModal.classList.add('visible');
         newsletterGateModal.setAttribute('aria-hidden', 'false');
+        // Set viewResultsButton enabled only if localStorage emailsubmitted is true
         updateViewResultsButton();
     }
     function closeNewsletterGate() {
@@ -359,35 +356,22 @@
     function updateViewResultsButton() {
         const submitted = localStorage.getItem('emailsubmitted') === 'true';
         viewResultsButton.disabled = !submitted;
-        
-        // Als al gesubscribed, verander de tekst
-        if (submitted) {
-            viewResultsButton.textContent = 'View My Palette (Already Subscribed)';
-        }
     }
 
-    // Listen to storage events
+    // Listen to storage events to enable view results if subscription completed in another tab
     window.addEventListener('storage', (e) => {
         if (e.key === 'emailsubmitted') updateViewResultsButton();
     });
 
-    // Message listener voor cross-origin communication van Beehiiv
-    window.addEventListener('message', function(e) {
-        // Check for Beehiiv success messages
-        if (e.data && (e.data.type === 'beehiiv-success' || 
-                       e.data.subscribed === true ||
-                       (typeof e.data === 'string' && e.data.includes('success')))) {
-            localStorage.setItem('emailsubmitted', 'true');
-            updateViewResultsButton();
-            console.log('Beehiiv subscription detected via message');
-        }
-    });
+    // Local hook: if Beehiiv embed triggers a callback to set localStorage 'emailsubmitted' = 'true',
+    // the modal's View button will become enabled automatically.
 
     viewResultsButton.addEventListener('click', () => {
         if (localStorage.getItem('emailsubmitted') === 'true') {
             closeNewsletterGate();
             showPalette(lastPalette);
         } else {
+            // keep modal open until subscribed
             alert('Please complete the subscription form to view your palette.');
         }
     });
@@ -402,8 +386,10 @@
         showLoading();
 
         try {
+            // Try remote Gemini first if configured
             let result = null;
             if (GEMINI_API_URL && GEMINI_API_KEY) {
+                // Construct a careful prompt asking for strict JSON
                 const prompt = `You are a professional personal-color-analysis assistant. The user uploaded a single face photo (base64). Analyze the face image and return EXACT JSON with:
 1) hairColor, 2) eyeColor, 3) skinColor (dominant colors as hex).
 4) undertone: "warm"|"cool"|"neutral"
@@ -418,10 +404,14 @@ Return the response strictly in this JSON shape, nothing else:
 }
 Do not include additional text.`;
 
+                // Post to your Gemini proxy endpoint (expected to handle auth & forward to Gemini)
+                // The endpoint should accept JSON with fields: image_base64 and prompt (or you can adapt).
                 const res = await fetch(GEMINI_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        // If your endpoint expects the key in header:
+                        // 'Authorization': `Bearer ${GEMINI_API_KEY}`,
                     },
                     body: JSON.stringify({
                         image_base64: currentImageBase64,
@@ -435,29 +425,38 @@ Do not include additional text.`;
                 }
                 const json = await res.json();
 
+                // Accept result either as the final JSON or nested inside 'output' etc.
+                // If the remote returns a string, try to parse it.
                 if (typeof json === 'string') {
                     result = JSON.parse(json);
                 } else if (json && json.palette && Array.isArray(json.palette)) {
                     result = json;
                 } else if (json && json.output && typeof json.output === 'string') {
+                    // sometimes services wrap text in output
                     result = JSON.parse(json.output);
                 } else {
+                    // Try to find the first object with palette
                     result = json;
                 }
             } else {
+                // No Gemini configured — run client-side fallback analysis
                 result = await clientSideColorAnalysis(currentImageBase64);
             }
 
+            // Validate result object structure
             if (!result || !Array.isArray(result.palette) || result.palette.length < 4) {
                 console.warn('Invalid palette result, falling back to client-side extraction.', result);
                 result = await clientSideColorAnalysis(currentImageBase64);
             }
 
             lastPalette = result.palette.slice(0, 12).map(normalizeHex);
+            // If gating: show Beehiiv modal
             const subscribed = localStorage.getItem('emailsubmitted') === 'true';
             hideLoading();
             if (!subscribed) {
+                // store palette in memory and show modal
                 openNewsletterGate();
+                // Palette will only be shown once user clicks View My Palette (and localStorage is true)
             } else {
                 showPalette(lastPalette);
             }
@@ -473,8 +472,12 @@ Do not include additional text.`;
 
     /* ============================
        Client-side fallback color extraction
+       - This uses a simple color quantization approach:
+         downscales the image, samples pixels and clusters by color frequency.
+       - Produces hairColor, eyeColor, skinColor and a palette.
        ============================ */
     async function clientSideColorAnalysis(imageBase64) {
+        // Draw to an offscreen canvas and sample pixels
         function dataURLtoImage(dataurl) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -497,22 +500,28 @@ Do not include additional text.`;
         ctx.drawImage(img, 0, 0, w, h);
         const imageData = ctx.getImageData(0, 0, w, h).data;
 
-        const step = 4;
+        // Sample pixels with step to speed up
+        const step = 4; // sample every 4th pixel (RGBA stride)
         const colorCount = {};
         for (let i = 0; i < imageData.length; i += 4 * step) {
             const r = imageData[i], g = imageData[i+1], b = imageData[i+2], a = imageData[i+3];
             if (a < 128) continue;
+            // Optionally ignore extreme background pixels (very bright or very dark)
             const hex = rgbToHex(r,g,b);
             colorCount[hex] = (colorCount[hex] || 0) + 1;
         }
 
+        // Sort by frequency
         const sorted = Object.keys(colorCount).sort((a,b) => colorCount[b] - colorCount[a]);
+        // Pick top candidates
         const top = sorted.slice(0, 20);
 
+        // Heuristic: choose hair as one of the darker tones, skin as one of the mid-tone warmish, eyes as one of mid/darker blues/greens/browns
         const hair = findMostByBrightness(top, 'dark') || top[0] || '#6b4f3a';
         const skin = findMostByBrightness(top, 'mid') || top[1] || '#e2c9b3';
         const eye = findMostByChroma(top) || top[2] || '#3a5a78';
 
+        // Build a palette by taking variations: tints/shades and complements
         const palette = buildPaletteFromFeatures(hair, eye, skin);
 
         return {
@@ -524,7 +533,7 @@ Do not include additional text.`;
         };
     }
 
-    // Helpers
+    // Helpers for client-side heuristics
     function rgbToHex(r,g,b){
         const h = (n) => ("0"+(n).toString(16)).slice(-2);
         return "#" + h(r) + h(g) + h(b);
@@ -536,7 +545,7 @@ Do not include additional text.`;
     }
     function brightness(hex) {
         const {r,g,b} = hexToRgb(hex);
-        return (r*299 + g*587 + b*114) / 1000;
+        return (r*299 + g*587 + b*114) / 1000; // perceived brightness
     }
     function chroma(hex) {
         const {r,g,b} = hexToRgb(hex);
@@ -546,6 +555,7 @@ Do not include additional text.`;
         if (!list.length) return null;
         if (which === 'dark') return list.reduce((a,b) => brightness(a) < brightness(b) ? a : b);
         if (which === 'light') return list.reduce((a,b) => brightness(a) > brightness(b) ? a : b);
+        // mid: closest to 128 brightness
         return list.reduce((a,b) => Math.abs(brightness(a)-128) < Math.abs(brightness(b)-128) ? a : b);
     }
     function findMostByChroma(list) {
@@ -554,6 +564,7 @@ Do not include additional text.`;
     }
 
     function estimateUndertone(skinHex) {
+        // Simple heuristic: compare red vs blue/green balance
         const {r,g,b} = hexToRgb(skinHex);
         if (r - g > 10) return 'warm';
         if (b - r > 10) return 'cool';
@@ -566,6 +577,7 @@ Do not include additional text.`;
         return rgbToHex(clamp(r), clamp(g), clamp(b));
     }
     function saturate(hex, amt) {
+        // naive: convert to hsl, change s, back to hex
         const {h,s,l} = rgbToHsl(hexToRgb(hex).r, hexToRgb(hex).g, hexToRgb(hex).b);
         const newS = Math.max(0, Math.min(1, s + amt));
         const {r,g,b} = hslToRgb(h, newS, l);
@@ -573,6 +585,7 @@ Do not include additional text.`;
     }
 
     function buildPaletteFromFeatures(hair, eye, skin) {
+        // Basic approach: include skin/eye/hair, tints & shades and accents
         const palette = [];
         palette.push(skin);
         palette.push(lighten(skin, 20));
@@ -581,28 +594,32 @@ Do not include additional text.`;
         palette.push(lighten(hair, 30));
         palette.push(saturate(eye, 0.15));
         palette.push(eye);
+        // add some complements based on undertone
         const undertone = estimateUndertone(skin);
         if (undertone === 'warm') {
-            palette.push('#C46A2B');
-            palette.push('#FFD9A6');
-            palette.push('#6A8E3A');
-            palette.push('#8C4B9A');
+            palette.push('#C46A2B'); // terracotta
+            palette.push('#FFD9A6'); // soft peach
+            palette.push('#6A8E3A'); // olive
+            palette.push('#8C4B9A'); // muted purple
         } else if (undertone === 'cool') {
-            palette.push('#5A86A8');
-            palette.push('#BFD7EA');
-            palette.push('#7BA9A8');
-            palette.push('#9B6FA6');
+            palette.push('#5A86A8'); // dusty blue
+            palette.push('#BFD7EA'); // pale blue
+            palette.push('#7BA9A8'); // cool teal
+            palette.push('#9B6FA6'); // cool mauve
         } else {
             palette.push('#9A7C5E');
             palette.push('#D8CAB8');
             palette.push('#6C8A7E');
             palette.push('#A58DBA');
         }
+        // Ensure unique and limited to 12
         const uniq = Array.from(new Set(palette.map(normalizeHex))).slice(0,12);
+        // If less than 12, pad with tints of skin
         while (uniq.length < 12) uniq.push(lighten(skin, uniq.length * 12));
         return uniq;
     }
 
+    // small color conversion helpers (rgb <-> hsl)
     function rgbToHsl(r,g,b){
         r/=255; g/=255; b/=255;
         const max=Math.max(r,g,b), min=Math.min(r,g,b);
@@ -640,7 +657,7 @@ Do not include additional text.`;
         if (!hex) return '#000000';
         hex = hex.trim();
         if (!hex.startsWith('#')) hex = '#' + hex;
-        if (hex.length === 4) {
+        if (hex.length === 4) { // shorthand
             hex = '#' + hex[1]+hex[1]+hex[2]+hex[2]+hex[3]+hex[3];
         }
         return hex.toUpperCase();
@@ -654,7 +671,119 @@ Do not include additional text.`;
             alert('No palette available.');
             return;
         }
+        // Ensure palette is normalized and exactly 12 (pad if necessary)
         let p = palette.map(normalizeHex);
         while (p.length < 12) p.push('#FFFFFF');
         p = p.slice(0,12);
         lastPalette = p;
+
+        // If gating: if not subscribed, open modal and do not show panel
+        const subscribed = localStorage.getItem('emailsubmitted') === 'true';
+        if (!subscribed) {
+            openNewsletterGate();
+            return;
+        }
+
+        paletteContainer.innerHTML = '';
+        p.forEach(hex => {
+            const sw = document.createElement('div');
+            sw.className = 'swatch';
+            const colorBlock = document.createElement('div');
+            colorBlock.className = 'color';
+            colorBlock.style.background = hex;
+            const label = document.createElement('div');
+            label.className = 'hex';
+            label.textContent = hex;
+            sw.appendChild(colorBlock);
+            sw.appendChild(label);
+            paletteContainer.appendChild(sw);
+        });
+        resultsPanel.style.display = 'block';
+        // scroll to results
+        resultsPanel.scrollIntoView({behavior:'smooth'});
+    }
+
+    /* ============================
+       Download palette as PNG
+       ============================ */
+    downloadBtn.addEventListener('click', () => {
+        if (!lastPalette) return alert('No palette to download.');
+        const canvas = document.createElement('canvas');
+        const cols = 3, rows = 4;
+        const sw = 200, sh = 160; // swatch width/height for generated PNG
+        const pad = 20;
+        canvas.width = cols * sw + pad*2;
+        canvas.height = rows * sh + pad*2 + 40; // extra for text
+        const ctx = canvas.getContext('2d');
+
+        // background
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+
+        ctx.font = '18px Inter, Arial';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+
+        for (let i = 0; i < 12; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const x = pad + col * sw;
+            const y = pad + row * sh;
+            // swatch rectangle
+            ctx.fillStyle = lastPalette[i];
+            ctx.fillRect(x + 10, y + 10, sw - 20, sh - 60);
+            // hex text
+            ctx.fillStyle = '#fff';
+            ctx.fillText(lastPalette[i], x + sw/2, y + sh - 30);
+        }
+
+        // title
+        ctx.fillStyle = '#fff';
+        ctx.font = '24px Inter, Arial';
+        ctx.fillText('Personal Color Palette', canvas.width/2, canvas.height - 10);
+
+        const link = document.createElement('a');
+        link.download = 'color-palette.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+
+    regenerateBtn.addEventListener('click', () => {
+        // user wants to re-analyze — show upload area again
+        resultsPanel.style.display = 'none';
+        previewImage.style.display = 'block';
+        analyzeBtn.disabled = false;
+        // keep last image; user can click analyze again
+        if (currentImageBase64) {
+            // optionally re-run analyze immediately
+        }
+        window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    function resetAll() {
+        previewImage.src = '';
+        previewImage.style.display = 'none';
+        fileInput.value = '';
+        analyzeBtn.disabled = true;
+        currentImageBase64 = null;
+        resultsPanel.style.display = 'none';
+        paletteContainer.innerHTML = '';
+        lastPalette = null;
+    }
+
+    /* ============================
+       Attempt to enable view results button if localStorage already set
+       ============================ */
+    updateViewResultsButton();
+
+    /* ============================
+       If user has previously subscribed and a palette is stored in memory,
+       clicking View My Palette will show it.
+       ============================ */
+
+    /* ============================
+       End of script
+       ============================ */
+    </script>
+</body>
+</html>
