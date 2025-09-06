@@ -4,69 +4,137 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Fashion Palette — Personalized Men's Color Guide</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  body{font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(135deg,#0F2027,#203A43,#2C5364);min-height:100vh;margin:0;color:#EDEFF0;display:flex;flex-direction:column;align-items:center;padding:28px}
+  :root{
+    --bg1:#0F2027; --bg2:#203A43; --bg3:#2C5364;
+    --card:#141619; --muted:#A6ACB2; --accent:#28a745;
+    --nav1:#0A2340; --nav2:#123b6b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:Inter,system-ui,Arial,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
+    min-height:100vh;margin:0;color:#EDEFF0;display:flex;flex-direction:column;align-items:center;padding:28px;
+  }
+
+  /* Header */
   header{text-align:center;margin-bottom:14px}
-  .logo{display:block;margin:0 auto 8px auto;max-width:94px;border-radius:50%}
-  h1{font-size:26px;margin:.25rem 0}
-  .subtitle{color:#A6ACB2;margin-bottom:10px}
-  .nav{background:#0f1112;padding:10px;border-radius:10px;width:100%;max-width:1100px;display:flex;gap:8px;justify-content:center;margin-bottom:18px}
-  .nav a{color:inherit;text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
-  main{width:100%;max-width:1100px}
-  .card{background:#141619;padding:20px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.6);margin-bottom:18px}
-  .upload-area{border-radius:12px;padding:22px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.04);text-align:center;cursor:pointer}
-  .upload-instructions{color:#A6ACB2;margin-top:8px;font-size:14px}
-  input[type=file]{display:none}
-  #previewImage{max-width:320px;border-radius:10px;margin-top:14px;display:block;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
-  .controls{display:flex;gap:10px;justify-content:center;margin-top:12px}
-  .btn{background:#28a745;color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
-  .btn.secondary{background:#0a1a2f}
-  .palette-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
-  .swatch-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02)}
-  .swatch-sample{width:110px;height:86px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);flex-shrink:0}
-  .swatch-meta{flex:1}
-  .color-name{font-weight:700;font-size:16px}
-  .color-role{color:#A6ACB2;font-size:13px;margin-top:4px}
-  .color-reason{margin-top:8px;color:#e6e6e6;font-size:14px;line-height:1.3}
-  .advice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
-  .advice-card{background:#0d0f11;padding:12px;border-radius:12px}
-  .section-title{font-weight:700;margin-bottom:8px}
-  .muted{color:#A6ACB2}
-  .bee-embed{width:100%;height:320px;border-radius:10px;border:none}
+  .logo{display:block;margin:0 auto 8px auto;max-width:100px;border-radius:50%}
+  h1{font-size:28px;margin:.25rem 0}
+  .subtitle{color:var(--muted);margin-bottom:10px}
+
+  /* Navigation (restored blue style) */
+  .main-nav{
+    background: linear-gradient(90deg,var(--nav1),var(--nav2));
+    width:100%; max-width:980px; border-radius:12px; padding:12px 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; gap:12px;
+    margin-bottom:18px;
+  }
+  .main-nav a{
+    color: #eaf4ff; text-decoration:none; padding:10px 16px; border-radius:10px; font-weight:600;
+    transition: background .15s, transform .12s;
+  }
+  .main-nav a:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.03); }
+  .main-nav a.active{ background: rgba(255,255,255,0.04); box-shadow: inset 0 -2px 6px rgba(0,0,0,0.15); }
+
+  /* Layout */
+  main{ width:100%; max-width:1100px; }
+  .card{
+    background: linear-gradient(180deg,var(--card), #0f1012);
+    padding:20px;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);margin-bottom:18px;
+  }
+
+  /* Subscribe embed card (centered) */
+  .bee-wrap{ display:flex; justify-content:center; align-items:center; padding:18px; min-height:360px; }
+  .bee-embed{ width:100%; max-width:700px; height:340px; border-radius:10px; border: none; display:block; }
+
+  /* Upload area */
+  .upload-area{
+    border-radius:12px;padding:22px;background:rgba(255,255,255,0.02);
+    border:1px dashed rgba(255,255,255,0.04);text-align:center;cursor:pointer;
+    transition: transform .16s, box-shadow .16s;
+  }
+  .upload-area:hover{ transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.45); }
+  .upload-instructions{ color:var(--muted); margin-top:8px; font-size:14px; }
+  input[type=file]{ display:none; }
+  #previewImage{ max-width:360px; border-radius:12px; margin-top:14px; box-shadow:0 8px 30px rgba(0,0,0,0.6); display:block; }
+
+  /* Buttons */
+  .controls{ display:flex; gap:10px; justify-content:center; margin-top:14px; }
+  .btn{ background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; }
+  .btn.secondary{ background:#0a1a2f; }
+  .btn.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--muted); }
+
+  /* Palette grid + swatches */
+  .palette-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; margin-top:18px; }
+  .swatch-card{ display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); transition: transform .16s, box-shadow .16s; }
+  .swatch-card:hover{ transform: translateY(-6px); box-shadow: 0 14px 40px rgba(0,0,0,0.5); }
+  .swatch-sample{ width:120px; height:86px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); flex-shrink:0; box-shadow: inset 0 -20px 40px rgba(0,0,0,0.08); }
+  .swatch-meta{ flex:1 }
+  .color-name{ font-weight:700; font-size:16px }
+  .color-role{ color:var(--muted); font-size:13px; margin-top:6px }
+  .color-reason{ margin-top:8px; color:#e6e6e6; font-size:14px; line-height:1.33 }
+
+  .advice-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:12px; margin-top:18px; }
+  .advice-card{ background:#0d0f11; padding:14px; border-radius:12px; min-height:86px; }
+  .section-title{ font-weight:700; margin-bottom:6px; }
+
+  .muted{ color:var(--muted); }
+
+  footer{ color:var(--muted); font-size:13px; margin-top:18px; text-align:center; }
+
+  @media (max-width:920px){
+    .palette-grid{ grid-template-columns: 1fr; }
+    .advice-grid{ grid-template-columns: 1fr; }
+    .bee-wrap{ min-height:280px; }
+    .swatch-sample{ width:86px; height:64px; }
+  }
 </style>
 </head>
 <body>
+
 <header>
   <img class="logo" src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="logo">
   <h1>Fashion Palette — Outfit Colors That Suit You</h1>
   <p class="subtitle">Upload a photo. We analyze skin, eyes & hair to recommend masculine wardrobe colors and explain why each works.</p>
 </header>
 
-<nav class="nav">
+<nav class="main-nav" role="navigation" aria-label="Main navigation">
   <a href="/">Home</a>
   <a href="/tools/" class="active">Tools</a>
-  <a href="https://store.ascentimprovement.com/" target="_blank">Store</a>
+  <a href="https://store.ascentimprovement.com/" target="_blank" rel="noopener">Store</a>
 </nav>
 
 <main>
-  <!-- Beehiiv embed (if not subscribed) -->
+  <!-- Subscribe embed (shown only when NOT subscribed) -->
   <section class="card" id="subscribeCard" style="display:none">
-    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-    <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="bee-embed" frameborder="0" scrolling="no" title="subscribe form"></iframe>
-  </section>
-
-  <!-- Upload card -->
-  <section class="card" id="uploadCard" style="display:none">
-    <div id="uploadArea" class="upload-area" tabindex="0">
-      <strong>Click or drop a clear photo of your face</strong>
-      <div class="upload-instructions muted">Natural lighting works best. We analyze on your device — nothing is uploaded.</div>
-      <input id="fileInput" type="file" accept="image/*">
-      <img id="previewImage" src="" alt="preview" style="display:none">
+    <div class="bee-wrap" aria-hidden="false">
+      <!-- embed script kept in case it injects anything; iframe is centered by bee-wrap -->
+      <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+      <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450"
+              class="bee-embed"
+              frameborder="0"
+              scrolling="no"
+              title="subscribe form"></iframe>
     </div>
   </section>
 
-  <!-- Palette -->
+  <!-- Upload card (shown only when subscribed) -->
+  <section class="card" id="uploadCard" style="display:none">
+    <div id="uploadArea" class="upload-area" tabindex="0" role="button" aria-label="Upload photo">
+      <strong>Click or drop a clear photo of your face</strong>
+      <div class="upload-instructions muted">Natural lighting works best. We analyze on your device — nothing is uploaded.</div>
+      <input id="fileInput" type="file" accept="image/*" aria-label="Choose photo">
+      <img id="previewImage" src="" alt="preview" style="display:none">
+      <div class="controls" style="justify-content:center;">
+        <button id="analyzeBtn" class="btn" style="display:none">Analyze Photo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Palette + advice -->
   <section class="card" id="paletteCard" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
@@ -78,17 +146,37 @@
         <button id="uploadAnotherBtn" class="btn secondary">Upload Another</button>
       </div>
     </div>
-    <div id="paletteGrid" class="palette-grid"></div>
-    <div class="advice-grid">
-      <div class="advice-card"><div class="section-title">Outfit combinations</div><div id="comboText" class="muted"></div></div>
-      <div class="advice-card"><div class="section-title">Season guidance</div><div id="seasonText" class="muted"></div></div>
-      <div class="advice-card"><div class="section-title">Jewelry advice</div><div id="jewelryText" class="muted"></div></div>
+
+    <div id="paletteGrid" class="palette-grid" aria-live="polite"></div>
+
+    <div class="advice-grid" style="margin-top:18px">
+      <div class="advice-card">
+        <div class="section-title">Outfit combinations</div>
+        <div id="comboText" class="muted"></div>
+      </div>
+      <div class="advice-card">
+        <div class="section-title">Season guidance</div>
+        <div id="seasonText" class="muted"></div>
+      </div>
+      <div class="advice-card">
+        <div class="section-title">Jewelry advice</div>
+        <div id="jewelryText" class="muted"></div>
+      </div>
     </div>
   </section>
 </main>
 
+<footer>Private, client-side analysis — tailored to men's wardrobe basics.</footer>
+
 <script>
-/* --- Config --- */
+/* ============================================================
+   Full client-side file
+   - gating: subscribeCard <-> uploadCard (NO modal)
+   - analysis: skin/hair/eye sampling -> fashion palette mapping
+   - explanations: per-color reasons, outfit/season/jewelry advice
+   ============================================================ */
+
+/* ------- config: fashion color bank ------- */
 const FASHION_COLORS = [
   {name:'Navy', hex:'#0B3D91'},
   {name:'Charcoal', hex:'#2F3542'},
@@ -102,98 +190,397 @@ const FASHION_COLORS = [
   {name:'Stone Gray', hex:'#9EA3A8'}
 ];
 
-/* --- Elements --- */
-const subscribeCard=document.getElementById('subscribeCard');
-const uploadCard=document.getElementById('uploadCard');
-const paletteCard=document.getElementById('paletteCard');
-const fileInput=document.getElementById('fileInput');
-const previewImage=document.getElementById('previewImage');
-const uploadArea=document.getElementById('uploadArea');
-const paletteGrid=document.getElementById('paletteGrid');
-const comboText=document.getElementById('comboText');
-const seasonText=document.getElementById('seasonText');
-const jewelryText=document.getElementById('jewelryText');
-const downloadBtn=document.getElementById('downloadBtn');
-const uploadAnotherBtn=document.getElementById('uploadAnotherBtn');
+/* ------- DOM ------- */
+const subscribeCard = document.getElementById('subscribeCard');
+const uploadCard = document.getElementById('uploadCard');
+const paletteCard = document.getElementById('paletteCard');
 
-let lastAnalysis=null;
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+const previewImage = document.getElementById('previewImage');
+const analyzeBtn = document.getElementById('analyzeBtn');
 
-/* --- Gating --- */
-if(window.location.pathname==='/subscribe-confirmation'){localStorage.setItem('emailsubmitted','true');}
+const paletteGrid = document.getElementById('paletteGrid');
+const comboText = document.getElementById('comboText');
+const seasonText = document.getElementById('seasonText');
+const jewelryText = document.getElementById('jewelryText');
+
+const downloadBtn = document.getElementById('downloadBtn');
+const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+
+let lastAnalysis = null;
+let currentFileDataUrl = null;
+
+/* ------- gating helpers ------- */
+function isSubscribed(){ return localStorage.getItem('emailsubmitted') === 'true'; }
+
 function showCorrectSection(){
-  if(localStorage.getItem('emailsubmitted')==='true'){
-    subscribeCard.style.display='none'; uploadCard.style.display='block';
+  if (isSubscribed()){
+    subscribeCard.style.display = 'none';
+    uploadCard.style.display = 'block';
   } else {
-    subscribeCard.style.display='block'; uploadCard.style.display='none';
+    subscribeCard.style.display = 'block';
+    uploadCard.style.display = 'none';
+    // hide potential palette if previously shown
+    paletteCard.style.display = 'none';
   }
 }
+
+/* If user lands on /subscribe-confirmation, set flag (per your flow) */
+if (window.location.pathname === '/subscribe-confirmation') {
+  try { localStorage.setItem('emailsubmitted', 'true'); } catch(e) { /* ignore */ }
+}
+
+/* Watch for cross-tab changes (user subscribes in another tab) */
+window.addEventListener('storage', (e) => {
+  if (e.key === 'emailsubmitted') {
+    showCorrectSection();
+    // If they subscribed and we have an analysis waiting, show it
+    if (isSubscribed() && lastAnalysis) {
+      renderPaletteFromAnalysis(lastAnalysis);
+    }
+  }
+});
+
+/* Poll for same-tab detection fallback (some embeds don't emit storage) */
+let lastSeenFlag = localStorage.getItem('emailsubmitted');
+setInterval(() => {
+  const now = localStorage.getItem('emailsubmitted');
+  if (now !== lastSeenFlag) {
+    lastSeenFlag = now;
+    showCorrectSection();
+    if (isSubscribed() && lastAnalysis) renderPaletteFromAnalysis(lastAnalysis);
+  }
+}, 800);
+
+/* Initial UI */
 showCorrectSection();
 
-/* --- Upload interactions --- */
-uploadArea.addEventListener('click',()=>fileInput.click());
-uploadArea.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileInput.files[0]);});
+/* ------- Upload / drag & drop ------- */
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { fileInput.click(); e.preventDefault(); } });
+
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.boxShadow = '0 12px 40px rgba(0,0,0,0.5)'; });
+uploadArea.addEventListener('dragleave', (e) => { e.preventDefault(); uploadArea.style.boxShadow = ''; });
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.style.boxShadow = '';
+  if (!isSubscribed()) return; // cannot upload until subscribed
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (!isSubscribed()) {
+    // user might have clicked the upload area while not subscribed; still prevent
+    showCorrectSection();
+    return;
+  }
+  if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
 function handleFile(file){
-  const reader=new FileReader();
-  reader.onload=(ev)=>{
-    previewImage.src=ev.target.result;
-    previewImage.style.display='block';
-    analyzeImage(ev.target.result);
+  if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    currentFileDataUrl = ev.target.result;
+    previewImage.src = currentFileDataUrl;
+    previewImage.style.display = 'block';
+    // run the analysis
+    analyzeImageAndMaybeRender(currentFileDataUrl);
   };
   reader.readAsDataURL(file);
 }
 
-/* --- Analysis --- */
-function analyzeImage(dataUrl){
-  clientSideAnalysis(dataUrl).then(analysis=>{
-    lastAnalysis=analysis;
-    renderPaletteFromAnalysis(analysis);
-  }).catch(e=>alert('Analysis failed'));
+/* ------- Image analysis (detailed) ------- */
+async function analyzeImageAndMaybeRender(dataUrl){
+  try {
+    const analysis = await clientSideImageAnalysis(dataUrl);
+    lastAnalysis = analysis;
+    // If user already subscribed -> render palette. Otherwise keep analysis cached and show embed
+    if (isSubscribed()) {
+      renderPaletteFromAnalysis(analysis);
+    } else {
+      // Ensure embed is visible (subscribeCard). User must subscribe before upload is available.
+      showCorrectSection();
+      // keep lastAnalysis so when they subscribe (other tab) we can render automatically
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Analysis failed — try another photo or different lighting.');
+  }
 }
-function clientSideAnalysis(dataUrl){
-  return new Promise((resolve,reject)=>{
-    const img=new Image(); img.crossOrigin='Anonymous';
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      const w=200,h=200; canvas.width=w; canvas.height=h;
-      const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
-      const data=ctx.getImageData(0,0,w,h).data;
-      const skinAvg={r:data[0],g:data[1],b:data[2]};
-      const hairAvg={r:data[10],g:data[11],b:data[12]};
-      const eyeAvg={r:data[20],g:data[21],b:data[22]};
-      const skinUndertone='neutral',eyeTone='neutral',hairShade='dark';
-      const palette=FASHION_COLORS.slice(0,6).map(c=>({name:c.name,hex:c.hex,reason:`${c.name} works well with your features.`}));
-      const advice={jewelry:'Gold or silver works.',season:'Year-round staples.',combos:['Navy + White + Camel']};
-      resolve({palette,advice});
+
+function clientSideImageAnalysis(dataUrl){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      // downscale to speed up sampling but keep aspect
+      const maxDim = 420;
+      let w = img.width, h = img.height;
+      if (Math.max(w,h) > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; } else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // define regions (heuristic)
+      const skinBox = { x: Math.round(w*0.25), y: Math.round(h*0.35), width: Math.round(w*0.5), height: Math.round(h*0.28) };
+      const hairBox = { x: 0, y: 0, width: w, height: Math.round(h*0.20) };
+      const eyeBox = { x: Math.round(w*0.25), y: Math.round(h*0.27), width: Math.round(w*0.5), height: Math.round(h*0.12) };
+
+      const skinAvg = sampleRegionAvg(ctx, skinBox);
+      const hairAvg = sampleRegionAvg(ctx, hairBox);
+      const eyeAvg = sampleRegionAvg(ctx, eyeBox);
+
+      const skinUndertone = estimateUndertone(skinAvg);
+      const eyeTone = classifyEye(eyeAvg);
+      const hairShade = classifyHairShade(hairAvg);
+
+      const mapped = mapToFashionPalette([skinAvg, hairAvg, eyeAvg]);
+
+      // generate per-color reasons
+      const paletteWithReasons = mapped.map(c => ({
+        name: c.name,
+        hex: c.hex,
+        reason: generateReasonText(c, skinUndertone, eyeTone, hairShade)
+      }));
+
+      const advice = generateAdvice(skinUndertone, paletteWithReasons.map(p => p.name));
+
+      resolve({
+        skinAvg, hairAvg, eyeAvg,
+        skinUndertone, eyeTone, hairShade,
+        palette: paletteWithReasons,
+        advice
+      });
     };
-    img.onerror=reject; img.src=dataUrl;
+    img.onerror = (e) => reject(e);
+    img.src = dataUrl;
   });
 }
 
-/* --- Render --- */
+/* Sample region average (with stepping for speed) */
+function sampleRegionAvg(ctx, box){
+  const w = ctx.canvas.width, h = ctx.canvas.height;
+  const x0 = Math.max(0, Math.min(w-1, box.x));
+  const y0 = Math.max(0, Math.min(h-1, box.y));
+  const bw = Math.max(1, Math.min(box.width, w - x0));
+  const bh = Math.max(1, Math.min(box.height, h - y0));
+  try {
+    const data = ctx.getImageData(x0, y0, bw, bh).data;
+    let r=0,g=0,b=0,count=0;
+    const step = 5;
+    for (let i=0; i<data.length; i+=4*step){
+      const a = data[i+3];
+      if (a < 100) continue;
+      const rr = data[i], gg = data[i+1], bb = data[i+2];
+      const bright = (rr*299 + gg*587 + bb*114)/1000;
+      if (bright > 252) continue;
+      r += rr; g += gg; b += bb; count++;
+    }
+    if (count === 0) return {r:180,g:160,b:140};
+    return { r: Math.round(r/count), g: Math.round(g/count), b: Math.round(b/count) };
+  } catch (e) {
+    // cross-origin or other error -> fallback neutral
+    return { r:180,g:160,b:140 };
+  }
+}
+
+/* color utilities */
+function rgbToHex(r,g,b){
+  const toHex = n => ("0"+Math.max(0,Math.min(255,Math.round(n))).toString(16)).slice(-2);
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  const bigint = parseInt(h,16);
+  return { r:(bigint>>16)&255, g:(bigint>>8)&255, b:bigint&255 };
+}
+function colorDistSq(c1,c2){ const dr=c1.r-c2.r, dg=c1.g-c2.g, db=c1.b-c2.b; return dr*dr + dg*dg + db*db; }
+
+/* classifiers */
+function estimateUndertone(rgb){
+  if (rgb.r - rgb.g > 12 && rgb.r - rgb.b > 10) return 'warm';
+  if (rgb.b - rgb.r > 8) return 'cool';
+  return 'neutral';
+}
+function classifyEye(rgb){
+  const {r,g,b} = rgb;
+  if (b > r + 15 && b > g + 10) return 'blue';
+  if (g > r + 12 && g > b + 8) return 'green';
+  if (r > g && r > b) return 'brown';
+  return 'neutral';
+}
+function classifyHairShade(rgb){
+  const bright = (rgb.r*299 + rgb.g*587 + rgb.b*114)/1000;
+  if (bright < 60) return 'very dark';
+  if (bright < 110) return 'dark';
+  if (bright < 170) return 'light';
+  return 'very light';
+}
+
+/* mapping to fashion palette (nearest staples with priority) */
+function mapToFashionPalette(sampleRgbs){
+  const pool = FASHION_COLORS.map(c => ({...c, rgb: hexToRgb(c.hex)}));
+  const picked = [];
+  const used = new Set();
+  for (let s of sampleRgbs){
+    if (!s) continue;
+    let best=null, bestD=Infinity;
+    for (let p of pool){
+      if (used.has(p.name)) continue;
+      const d = colorDistSq(s, p.rgb);
+      if (d < bestD){ best = p; bestD = d; }
+    }
+    if (best) { picked.push({name:best.name, hex:best.hex}); used.add(best.name); }
+  }
+  // fill rest with staples
+  for (let p of pool){
+    if (picked.length >= 8) break;
+    if (!used.has(p.name)){ picked.push({name:p.name, hex:p.hex}); used.add(p.name); }
+  }
+  return picked.slice(0,8);
+}
+
+/* generate per-color explanation text */
+function generateReasonText(colorObj, skinUndertone, eyeTone, hairShade){
+  const name = colorObj.name.toLowerCase();
+  const reasons = [];
+  // skin
+  if (skinUndertone === 'warm') {
+    if (name.includes('camel') || name.includes('dark brown') || name.includes('olive')) reasons.push('Matches your warm undertone and adds natural warmth.');
+    else if (name.includes('navy') || name.includes('denim')) reasons.push('Creates a flattering contrast against warm skin.');
+  } else if (skinUndertone === 'cool') {
+    if (name.includes('navy') || name.includes('charcoal') || name.includes('denim')) reasons.push('Complements your cool undertone for a clean, sharp look.');
+    else if (name.includes('stone') || name.includes('khaki')) reasons.push('Acts as a soft neutral that balances cool skin.');
+  } else {
+    reasons.push('Neutral undertone — this is a versatile staple that pairs easily with others.');
+  }
+  // eyes
+  if (eyeTone === 'blue' && name.includes('navy')) reasons.push('Navy subtly enhances blue eyes.');
+  if (eyeTone === 'green' && (name.includes('brown') || name.includes('camel') || name.includes('olive'))) reasons.push('Earth tones bring out green in your eyes.');
+  if (eyeTone === 'brown' && (name.includes('camel') || name.includes('denim') || name.includes('stone'))) reasons.push('These tones complement brown eyes and create cohesion.');
+  // hair contrast
+  if (hairShade.includes('dark') && (name.includes('camel') || name.includes('stone') || name.includes('white'))) reasons.push('Lighter accents create refined contrast with dark hair.');
+  if (hairShade.includes('light') && (name.includes('charcoal') || name.includes('navy') || name.includes('black'))) reasons.push('Darker neutrals anchor lighter hair for a polished look.');
+
+  if (reasons.length === 0) reasons.push('A reliable wardrobe staple suitable for jackets, trousers, and accents.');
+  return reasons.join(' ');
+}
+
+/* generate advice: combinations, season, jewelry */
+function generateAdvice(skinUndertone, paletteNames){
+  let jewelry = 'Neutral: both silver and gold can work — pick based on overall outfit contrast.';
+  if (skinUndertone === 'warm') jewelry = 'Gold jewelry recommended — it warms up camel/brown tones.';
+  if (skinUndertone === 'cool') jewelry = 'Silver (or white gold) recommended — pairs well with navy/charcoal.';
+  const lower = paletteNames.map(n=>n.toLowerCase());
+  let season = 'These staples work year-round.';
+  if (lower.includes('camel') || lower.includes('dark brown') || lower.includes('olive')) season = 'Autumn-forward: earthy tones are ideal for fall.';
+  else if (lower.includes('white') || lower.includes('denim blue') || lower.includes('khaki')) season = 'Spring/Summer: lighter contrasts and denim keep looks fresh.';
+  else if (lower.includes('charcoal') || lower.includes('navy') || lower.includes('black')) season = 'Winter/Urban: darker neutrals for layering and tailoring.';
+  const combos = [];
+  if (lower.includes('navy')) combos.push('Navy blazer + white tee + camel coat or shoes.');
+  if (lower.includes('denim blue') || lower.includes('khaki')) combos.push('Denim shirt + khaki chinos + olive jacket.');
+  if (lower.includes('charcoal')) combos.push('Charcoal blazer + dark denim + brown boots.');
+  if (combos.length === 0) combos.push('Navy + white + stone gray is a safe, masculine baseline.');
+  return { jewelry, season, combos };
+}
+
+/* UI role text helper */
+function roleText(name){
+  const n = name.toLowerCase();
+  if (n.includes('navy')) return 'Great for jackets, suits & outerwear.';
+  if (n.includes('charcoal') || n.includes('black')) return 'Strong base for suits & trousers.';
+  if (n.includes('white')) return 'Shirts & tees — creates crisp contrast.';
+  if (n.includes('camel') || n.includes('dark brown')) return 'Accents, shoes & knitwear — adds warmth.';
+  if (n.includes('olive') || n.includes('khaki')) return 'Casual trousers & utility pieces.';
+  if (n.includes('denim')) return 'Jeans & casual shirts.';
+  if (n.includes('stone')) return 'Neutral knitwear & layering.';
+  return 'Versatile wardrobe staple.';
+}
+
+/* ------- render palette ------- */
 function renderPaletteFromAnalysis(analysis){
-  uploadCard.style.display='none'; paletteCard.style.display='block'; paletteGrid.innerHTML='';
-  analysis.palette.forEach(item=>{
-    const el=document.createElement('div');el.className='swatch-card';
-    const sample=document.createElement('div');sample.className='swatch-sample';sample.style.background=item.hex;
-    const meta=document.createElement('div');meta.className='swatch-meta';
-    meta.innerHTML=`<div class="color-name">${item.name}</div><div class="color-role">Wardrobe staple</div><div class="color-reason">${item.reason}</div>`;
-    el.appendChild(sample); el.appendChild(meta); paletteGrid.appendChild(el);
+  uploadCard.style.display = 'none';
+  subscribeCard.style.display = 'none';
+  paletteCard.style.display = 'block';
+  paletteGrid.innerHTML = '';
+
+  analysis.palette.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'swatch-card';
+    const sample = document.createElement('div'); sample.className = 'swatch-sample';
+    sample.style.background = item.hex;
+    const meta = document.createElement('div'); meta.className = 'swatch-meta';
+    const title = document.createElement('div'); title.className = 'color-name'; title.textContent = item.name;
+    const role = document.createElement('div'); role.className = 'color-role'; role.textContent = roleText(item.name);
+    const reason = document.createElement('div'); reason.className = 'color-reason'; reason.textContent = item.reason;
+    meta.appendChild(title); meta.appendChild(role); meta.appendChild(reason);
+    el.appendChild(sample); el.appendChild(meta);
+    paletteGrid.appendChild(el);
   });
-  comboText.textContent=analysis.advice.combos.join(' • ');
-  seasonText.textContent=analysis.advice.season;
-  jewelryText.textContent=analysis.advice.jewelry;
+
+  comboText.textContent = analysis.advice.combos.join('  •  ');
+  seasonText.textContent = analysis.advice.season;
+  jewelryText.textContent = analysis.advice.jewelry;
+
+  // store for download
+  window._lastFashionPalette = analysis.palette.map(p => ({name:p.name,hex:p.hex}));
 }
 
-/* --- Download --- */
-downloadBtn.addEventListener('click',()=>{
-  if(!lastAnalysis)return;
-  const cols=3,rows=2; const sw=200,sh=160,pad=20;
-  const canvas=document.createElement('canvas'); canvas.width=cols*sw+pad*2; canvas.height=rows*sh+pad*2;
-  const ctx=canvas.getContext('2d'); ctx.fillStyle='#111'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  lastAnalysis.palette.forEach((p,i)=>{const col=i%cols,row=Math.floor(i/cols);ctx.fillStyle=p.hex;ctx.fillRect(pad+col*sw+10,pad+row*sh+10,sw-20,sh-20);ctx.fillStyle='#fff';ctx.fillText(p.name,pad+col*sw+sw/2,pad+row*sh+sh-40);});
-  const link=document.createElement('a'); link.download='palette.png'; link.href=canvas.toDataURL(); link.click();
+/* ------- download as PNG ------- */
+downloadBtn.addEventListener('click', () => {
+  const palette = window._lastFashionPalette;
+  if (!palette || !palette.length) return alert('No palette to download.');
+  const cols = Math.min(3, palette.length); const rows = Math.ceil(palette.length / cols);
+  const sw = 300, sh = 160, pad = 20;
+  const canvas = document.createElement('canvas'); canvas.width = cols*sw + pad*2; canvas.height = rows*sh + pad*2 + 60;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0b0b0b'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.font = '20px Inter, Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  palette.forEach((p,i) => {
+    const col = i % cols, row = Math.floor(i/cols);
+    const x = pad + col*sw, y = pad + row*sh;
+    ctx.fillStyle = p.hex; ctx.fillRect(x+10, y+10, sw-20, sh-60);
+    ctx.fillStyle = '#fff'; ctx.fillText(p.name, x + sw/2, y + sh - 28);
+  });
+  ctx.fillStyle = '#fff'; ctx.font = '24px Inter, Arial'; ctx.fillText('Fashion Palette', canvas.width/2, canvas.height - 20);
+  const link = document.createElement('a'); link.download = 'fashion-palette.png'; link.href = canvas.toDataURL('image/png'); link.click();
 });
-uploadAnotherBtn.addEventListener('click',()=>{paletteCard.style.display='none';showCorrectSection();previewImage.src='';previewImage.style.display='none';fileInput.value='';});
+
+/* ------- upload another ------- */
+uploadAnotherBtn.addEventListener('click', () => {
+  paletteCard.style.display = 'none';
+  // show whichever is correct: if subscribed show upload, else show subscribe
+  showCorrectSection();
+  previewImage.src = ''; previewImage.style.display = 'none';
+  fileInput.value = '';
+  lastAnalysis = null;
+  window._lastFashionPalette = null;
+});
+
+/* ------- prevent upload while unsubscribed (UX) ------- */
+uploadArea.addEventListener('click', (e) => {
+  if (!isSubscribed()){
+    // smooth scroll to subscribe embed to make clear where to sign up
+    subscribeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+});
+
+/* Accessibility: keyboard open file when upload area focused and user presses enter/space */
+uploadArea.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && isSubscribed()) {
+    fileInput.click(); e.preventDefault();
+  }
+});
+
+/* done */
 </script>
+
 </body>
 </html>
