@@ -1,169 +1,683 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Fashion Color Palette</title>
+  <!--
+    Ascent • Fashion Color Tool
+    - Tools tab active (not Home)
+    - Large internal color pool (more variety)
+    - Results limited to 12 colors (cleaner)
+    - Advice blocks stacked vertically
+    - Beehiiv gating: show embed unless localStorage.emailSubmitted === 'true'
+    - Multi-photo upload with gallery and active selection
+    - Everything client-side
+  -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ascent • Fashion Color Tool</title>
+  <meta name="description" content="Upload a photo and get a masculine, fashion-ready color palette with outfit, season, and jewelry guidance." />
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-<style>
-:root{
-  --bg1:#0F2027; --bg2:#203A43; --bg3:#2C5364;
-  --panel:#1e1e1e; --muted:#a0a0a0; --accent:#28a745; --nav-bg:#1a1a1a;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  font-family:'Inter',sans-serif;
-  margin:0; padding:20px;
-  display:flex; flex-direction:column; align-items:center;
-  background: linear-gradient(to bottom right,var(--bg1),var(--bg2),var(--bg3));
-  color:#e0e0e0; background-size:600% 600%;
-  animation: gradientAnimation 20s ease infinite;
-}
-@keyframes gradientAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-header { text-align:center; margin-bottom:10px; width:100%; max-width:600px; }
-.logo { display:block; margin:0 auto 12px; max-width:150px; border-radius:50%; object-fit:cover; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
-h1 { font-size:2.8em; margin:6px 0; font-weight:700; color:#f0f0f0; }
-.subtitle { color:var(--muted); font-size:0.95em; margin-top:6px; }
-.main-nav{ background:var(--nav-bg); width:100%; max-width:600px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.3); margin:18px 0; padding:12px 8px; display:flex; justify-content:space-around; }
-.main-nav a{ color:#f0f0f0; text-decoration:none; font-size:1.05em; padding:10px 16px; border-radius:8px; }
-.main-nav a.active{ background:#0a1a2f; font-weight:600; }
-main{ width:100%; max-width:600px; display:flex; flex-direction:column; gap:18px; }
-.panel{ background:var(--panel); padding:24px; border-radius:14px; box-shadow:0 8px 30px rgba(0,0,0,0.4); width:100%; }
-.upload-area{ border:2px dashed #333; padding:22px; border-radius:12px; text-align:center; cursor:pointer; }
-.preview-img{ max-width:220px; border-radius:12px; display:block; margin:14px auto; }
-.controls{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
-.btn{ background:var(--accent); color:white; border:none; padding:12px 18px; border-radius:10px; font-weight:600; cursor:pointer; }
-.btn.secondary{ background:#0a1a2f; }
-.embed-wrap{ display:flex; justify-content:center; padding:12px; min-height:280px; }
-.beehiiv-embed{ width:100%; max-width:660px; height:420px; border:0; border-radius:10px; }
-.palette-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:14px; margin-top:16px; }
-.swatch{ background:#222; border-radius:10px; padding:12px; text-align:center; }
-.swatch .color{ height:80px; border-radius:8px; margin-bottom:8px; }
-.swatch .name{ font-weight:700; }
-.swatch .role{ color:var(--muted); font-size:0.9em; margin-top:6px; }
-.advice-column{ display:flex; flex-direction:column; gap:12px; margin-top:18px; }
-.advice-card{ background:#0f1112; padding:14px; border-radius:10px; }
-.section-title{ font-weight:800; margin-bottom:8px; font-size:15px; }
-.muted{ color:var(--muted); }
-footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; }
-</style>
+  <style>
+    :root{
+      --bg:#0b0f1a;
+      --panel:#0f1524;
+      --nav-bg:#0a1a2f;
+      --accent:#28a745;
+      --text:#e8eef7;
+      --muted:#94a3b8;
+      --ring:#143a64;
+      --shadow:0 10px 30px rgba(0,0,0,.45);
+      --radius:14px;
+      --radius-sm:10px;
+      --max:600px; /* keep centered narrow layout */
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 50% -200px, #0f2040 0%, #0b1020 35%, var(--bg) 65%) fixed;
+      color:var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height:1.55;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Header */
+    header{
+      width:100%; max-width:var(--max);
+      margin:28px auto 10px auto;
+      text-align:center;
+      padding:0 14px;
+    }
+
+    /* Big centered circular logo */
+    .logo{
+      width:120px; height:120px; border-radius:50%;
+      object-fit:cover; display:block; margin:0 auto 8px auto;
+      box-shadow:0 8px 28px rgba(0,0,0,.6), 0 0 0 4px #0a1a2f;
+    }
+
+    .top-stars{
+      letter-spacing:2px; margin:6px 0 2px 0; color:#ffd24d; font-size:20px; font-weight:800;
+      text-shadow:0 0 10px rgba(255,210,77,.25);
+    }
+
+    h1{ font-size:2.8em; margin:6px 0; color:#f0f4ff; font-weight:800; letter-spacing:.02em; }
+    .subtitle{ color:var(--muted); font-size:.98em; margin-top:6px; }
+
+    /* AI tag */
+    .ai-tag{ display:inline-flex; align-items:center; gap:8px; color:#b3c7e6; background:rgba(20,58,100,.25); border:1px solid var(--ring);
+      padding:6px 10px; border-radius:999px; font-weight:600; font-size:.85em; margin-top:10px; }
+    .ai-tag svg{ width:16px; height:16px; opacity:.9 }
+
+    /* Main nav (blue) — Tools active */
+    .main-nav{
+      background:var(--nav-bg);
+      width:100%; max-width:var(--max);
+      margin:18px auto; padding:12px 8px;
+      border-radius:10px; display:flex; justify-content:space-around; align-items:center;
+      box-shadow:0 8px 30px rgba(0,0,0,.35);
+    }
+    .main-nav a{
+      color:#e9f1ff; text-decoration:none; font-weight:600; padding:10px 16px; border-radius:8px; font-size:1.05em;
+      transition:background .15s, transform .12s;
+    }
+    .main-nav a:hover{ background:#0d2646; transform:translateY(-1px); }
+    .main-nav a.active{ background:#0d2646; color:#fff; }
+
+    main{ width:100%; max-width:var(--max); margin:0 auto 80px auto; padding:0 14px; display:flex; flex-direction:column; gap:18px; }
+
+    .panel{
+      background:var(--panel); border-radius:var(--radius);
+      padding:24px; box-shadow:var(--shadow); width:100%; color:#dfe7f4;
+      border:1px solid rgba(255,255,255,.04);
+    }
+
+    /* Beehiiv embed wrapper — perfectly centered */
+    .embed-wrap{
+      display:flex; align-items:center; justify-content:center;
+      padding:12px; min-height:280px;
+    }
+    .beehiiv-embed{
+      display:block; margin:0 auto; width:100%; max-width:767px; height:420px;
+      border-radius:0 !important; border:0; background:transparent; box-shadow:0 0 #0000;
+    }
+
+    /* Upload area with multi-photo support */
+    .upload-area{
+      border:2px dashed #1e2a44; border-radius:12px; padding:18px; text-align:center; cursor:pointer;
+      transition:background .18s, border-color .18s, transform .12s;
+    }
+    .upload-area:hover{ background:rgba(255,255,255,.02); border-color:#16365d; }
+    .upload-area.dragover{ background:rgba(22,54,93,.18); border-color:#2b6cb0; transform:translateY(-3px); }
+
+    .muted{ color:var(--muted); }
+
+    .controls{ display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+    .btn{
+      background:var(--accent); color:white; border:none; padding:12px 18px; border-radius:10px;
+      font-weight:700; cursor:pointer; box-shadow:0 8px 24px rgba(40,167,69,.35); transition:transform .12s, filter .15s;
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.02); }
+    .btn.secondary{ background:#0d2646; box-shadow:0 8px 24px rgba(13,38,70,.35); }
+    .btn:disabled{ background:#3b4559; cursor:not-allowed; box-shadow:none; }
+
+    /* Gallery of selected images (multi-upload) */
+    .thumbs{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:14px; }
+    .thumb{
+      position:relative; border-radius:10px; overflow:hidden; aspect-ratio:1/1; border:2px solid transparent; cursor:pointer;
+      box-shadow:0 6px 20px rgba(0,0,0,.5);
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb.active{ border-color:#2b6cb0; }
+    .thumb .x{
+      position:absolute; top:6px; right:6px; background:rgba(0,0,0,.55); color:#fff;
+      border:none; border-radius:8px; padding:4px 7px; font-size:12px; cursor:pointer;
+    }
+
+    /* Results */
+    .section-head{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .section-title{ font-weight:800; letter-spacing:.02em; font-size:1.15em; color:#eaf2ff; }
+    .palette-grid{
+      margin-top:14px;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+    }
+    .swatch{
+      background: rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06);
+      border-radius:12px; overflow:hidden; box-shadow:0 10px 26px rgba(0,0,0,.45);
+    }
+    .swatch .color{ height:86px; }
+    .swatch .label{ padding:8px 10px; font-weight:700; font-size:.95em; color:#f3f7ff; }
+
+    /* Advice stacked vertically (cleaner) */
+    .advice-col{ display:flex; flex-direction:column; gap:14px; margin-top:16px; }
+    .advice-card{
+      background: rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06);
+      border-radius:12px; padding:14px; box-shadow:0 10px 26px rgba(0,0,0,.35);
+    }
+
+    footer{
+      margin:10px auto 50px; text-align:center; color:#8fa6c7; font-size:.95em;
+      width:100%; max-width:var(--max);
+    }
+
+    @media (max-width:640px){
+      .palette-grid{ grid-template-columns:repeat(2,1fr); }
+      .thumbs{ grid-template-columns:repeat(3,1fr); }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <img class="logo" src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo">
-  <h1>Want to know which colors suit you best?</h1>
-  <div class="subtitle">Upload a photo and get your AI tailored wardrobe palette and style guidance.</div>
-</header>
 
-<nav class="main-nav">
-  <a href="/">Home</a>
-  <a href="/tools/" class="active">Tools</a>
-  <a href="https://store.ascentimprovement.com/" target="_blank">Store</a>
-</nav>
-
-<main>
-  <section class="panel" id="interactionPanel">
-    <div id="embedWrap" class="embed-wrap">
-      <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-      <iframe src="https://subscribe-forms.beehiiv.com/2ec63069-4b7e-45b2-be4b-18e8c4d306d9" class="beehiiv-embed"></iframe>
-      <script async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
+  <!-- Header -->
+  <header>
+    <img class="logo" src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Ascent logo" />
+    <div class="top-stars">★★★★★</div>
+    <h1>Ascent Fashion Color Tool</h1>
+    <p class="subtitle">Upload a photo to get a masculine, outfit-ready palette plus seasonal & jewelry advice.</p>
+    <div class="ai-tag" aria-label="AI Powered">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm-2.92 14.5a.84.84 0 0 1-1.18 0L5.42 13.02a.84.84 0 0 1 0-1.18l2.48-2.48a.84.84 0 0 1 1.18 0l2.48 2.48a.84.84 0 0 1 0 1.18Zm8.92-8.5a.84.84 0 0 0-1.18 0L12 12.08 9.52 9.6a.84.84 0 1 0-1.18 1.18l3.07 3.07a.84.84 0 0 0 1.18 0l3.07-3.07a.84.84 0 0 0 0-1.18Z"/></svg>
+      <span>AI-Powered Insights</span>
     </div>
-    <div id="uploadPanel" style="display:none;">
-      <div id="uploadArea" class="upload-area" tabindex="0">
-        <strong>Upload a clear photo of your face</strong>
-        <div class="muted" style="margin-top:8px;">Natural daylight works best. Runs locally in your browser.</div>
-        <input id="fileInput" type="file" accept="image/*" style="display:none;">
-        <img id="previewImage" class="preview-img" style="display:none;">
+  </header>
+
+  <!-- NAV: Tools active (Home not selected) -->
+  <nav class="main-nav" role="navigation" aria-label="Main Navigation">
+    <a href="/">Home</a>
+    <a href="/tools/" class="active">Tools</a>
+    <a href="https://store.ascentimprovement.com/" target="_blank" rel="noopener">Store</a>
+  </nav>
+
+  <main>
+    <!-- Interaction panel: either Beehiiv embed OR upload area -->
+    <section class="panel" id="interactionPanel">
+
+      <!-- Beehiiv embed (visible when NOT subscribed). Centered, no extra text -->
+      <div id="embedWrap" class="embed-wrap" aria-hidden="false" style="display:none;">
+        <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+        <iframe
+          src="https://subscribe-forms.beehiiv.com/2ec63069-4b7e-45b2-be4b-18e8c4d306d9"
+          class="beehiiv-embed"
+          data-test-id="beehiiv-embed"
+          frameborder="0"
+          scrolling="no"
+          style="width: 767px; height: 420px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"
+        ></iframe>
+        <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
       </div>
-      <div class="controls">
-        <button id="analyzeBtn" class="btn" disabled>Analyze Photo</button>
-        <button id="resetBtn" class="btn secondary">Reset</button>
+
+      <!-- Upload area (visible when subscribed) -->
+      <div id="uploadPanel" style="display:none;">
+        <div id="uploadArea" class="upload-area" tabindex="0" role="button" aria-label="Upload photos">
+          <strong>Upload a clear photo of your face</strong>
+          <div class="muted" style="margin-top:8px;">Natural daylight works best. All analysis runs locally in your browser.</div>
+          <input id="fileInput" type="file" accept="image/*" multiple style="display:none;">
+          <img id="previewImage" class="preview-img" src="" alt="Selected preview" style="display:none; max-width:220px; max-height:220px; border-radius:12px; margin:14px auto; box-shadow:0 6px 20px rgba(0,0,0,.5); object-fit:cover;">
+          <div id="thumbs" class="thumbs" aria-live="polite"></div>
+        </div>
+
+        <div class="controls">
+          <button id="analyzeBtn" class="btn" disabled>Analyze Photo</button>
+          <button id="resetBtn" class="btn secondary" type="button">Reset</button>
+        </div>
+
+        <p class="muted" style="margin-top:12px;">Your personalized palette will appear below after analysis.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="panel" id="resultsPanel" style="display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div>
-        <div class="section-title">Your Personalized Fashion Palette</div>
-        <div class="muted">8 wardrobe colors chosen for your features.</div>
+    <!-- Results panel -->
+    <section class="panel" id="resultsPanel" style="display:none;">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Your Personalized Fashion Palette</div>
+          <div class="muted">12 wardrobe colors tuned to your features (masculine focus). Includes outfit, season & jewelry guidance.</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="downloadBtn" class="btn">Download Palette</button>
+          <button id="uploadAnotherBtn" class="btn secondary" type="button">Upload More</button>
+        </div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button id="downloadBtn" class="btn">Download Palette</button>
-        <button id="uploadAnotherBtn" class="btn secondary">Upload Another</button>
+
+      <div id="paletteGrid" class="palette-grid" aria-live="polite"></div>
+
+      <!-- Advice stacked vertically -->
+      <div class="advice-col">
+        <div class="advice-card">
+          <div class="section-title">Outfit Recommendations</div>
+          <div id="outfitText" class="muted"></div>
+        </div>
+        <div class="advice-card">
+          <div class="section-title">Season Guidance</div>
+          <div id="seasonText" class="muted"></div>
+        </div>
+        <div class="advice-card">
+          <div class="section-title">Jewelry & Accessories</div>
+          <div id="jewelryText" class="muted"></div>
+        </div>
       </div>
-    </div>
-    <div id="paletteGrid" class="palette-grid"></div>
-    <div class="advice-column">
-      <div class="advice-card">
-        <div class="section-title">Outfit Recommendations</div>
-        <div id="outfitText" class="muted"></div>
-      </div>
-      <div class="advice-card">
-        <div class="section-title">Season Guidance</div>
-        <div id="seasonText" class="muted"></div>
-      </div>
-      <div class="advice-card">
-        <div class="section-title">Jewelry & Accessories</div>
-        <div id="jewelryText" class="muted"></div>
-      </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 
-<footer>Private & client-side — images never leave your browser.</footer>
+  <footer>Private & client-side — images never leave your browser.</footer>
 
-<script>
-// Elements
-const embedWrap=document.getElementById('embedWrap');
-const uploadPanel=document.getElementById('uploadPanel');
-const fileInput=document.getElementById('fileInput');
-const previewImage=document.getElementById('previewImage');
-const analyzeBtn=document.getElementById('analyzeBtn');
-const resetBtn=document.getElementById('resetBtn');
-const resultsPanel=document.getElementById('resultsPanel');
-const paletteGrid=document.getElementById('paletteGrid');
-const downloadBtn=document.getElementById('downloadBtn');
-const uploadAnotherBtn=document.getElementById('uploadAnotherBtn');
-const outfitText=document.getElementById('outfitText');
-const seasonText=document.getElementById('seasonText');
-const jewelryText=document.getElementById('jewelryText');
+  <script>
+    /**
+     * Gate behavior:
+     * - Use localStorage key EXACTLY 'emailSubmitted'.
+     * - If falsey => show Beehiiv embed and hide upload/results.
+     * - If true   => show upload area, hide Beehiiv embed.
+     * - If path contains '/subscribe-confirmation', set the flag to true (for your post-subscribe page).
+     *
+     * Upload:
+     * - Multiple images supported. Thumbnails shown; click a thumb to select the active image for analysis.
+     * - "Upload More" shows the upload area and allows adding more photos.
+     *
+     * Palette:
+     * - Large internal color pool; only 12 swatches are shown per analysis for cleaner results.
+     * - Advice is tailored (outfit combos, season, jewelry) with short reasoning based on inferred undertone/contrast.
+     */
 
-let currentImageDataUrl=null;
+    // --- Elements ---
+    const embedWrap = document.getElementById('embedWrap');
+    const uploadPanel = document.getElementById('uploadPanel');
+    const uploadArea  = document.getElementById('uploadArea');
+    const fileInput   = document.getElementById('fileInput');
+    const previewImage= document.getElementById('previewImage');
+    const thumbsEl    = document.getElementById('thumbs');
 
-// Larger pool, but fewer displayed
-const COLOR_POOL=[ /* zelfde uitgebreide lijst */ ];
-const DISPLAY_COUNT=8;
+    const analyzeBtn  = document.getElementById('analyzeBtn');
+    const resetBtn    = document.getElementById('resetBtn');
+    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
 
-// Gating
-function isSubscribed(){return localStorage.getItem('emailSubmitted')==='true';}
-function applyGateUI(){
-  if(isSubscribed()){embedWrap.style.display='none';uploadPanel.style.display='block';}
-  else{embedWrap.style.display='flex';uploadPanel.style.display='none';resultsPanel.style.display='none';}
-}
-if(location.pathname==='/subscribe-confirmation'){localStorage.setItem('emailSubmitted','true');}
-applyGateUI();
-window.addEventListener('storage',e=>{if(e.key==='emailSubmitted')applyGateUI();});
-setInterval(()=>{if(isSubscribed())applyGateUI();},900);
+    const resultsPanel= document.getElementById('resultsPanel');
+    const paletteGrid = document.getElementById('paletteGrid');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-// File handling
-fileInput.addEventListener('change',e=>{const f=e.target.files[0];if(f)handleFile(f);});
-function handleFile(file){const r=new FileReader();r.onload=ev=>{currentImageDataUrl=ev.target.result;previewImage.src=currentImageDataUrl;previewImage.style.display='block';analyzeBtn.disabled=false;};r.readAsDataURL(file);}
-resetBtn.addEventListener('click',()=>{previewImage.style.display='none';fileInput.value='';analyzeBtn.disabled=true;resultsPanel.style.display='none';});
-uploadAnotherBtn.addEventListener('click',()=>{resultsPanel.style.display='none';applyGateUI();previewImage.style.display='none';fileInput.value='';analyzeBtn.disabled=true;});
+    const outfitText  = document.getElementById('outfitText');
+    const seasonText  = document.getElementById('seasonText');
+    const jewelryText = document.getElementById('jewelryText');
 
-// Simplified analyze
-function analyzeImage(dataUrl){return{palette:COLOR_POOL.slice(0,DISPLAY_COUNT)};}
+    // --- State ---
+    const OUTPUT_COUNT = 12; // fewer colors in results, but still rich
+    let gallery = [];       // { dataUrl, id }
+    let activeId = null;
+    let lastAnalysis = null;
 
-analyzeBtn.addEventListener('click',()=>{if(!currentImageDataUrl)return;const analysis=analyzeImage(currentImageDataUrl);renderPalette(analysis);});
-function renderPalette(analysis){resultsPanel.style.display='block';paletteGrid.innerHTML='';analysis.palette.forEach(p=>{const d=document.createElement('div');d.className='swatch';d.innerHTML=`<div class="color" style="background:${p.hex}"></div><div class="name">${p.name}</div>`;paletteGrid.appendChild(d);});outfitText.textContent="Practical outfit suggestions...";seasonText.textContent="Seasonal guidance...";jewelryText.textContent="Jewelry advice...";}
-</script>
+    // --- Subscribe-confirmation autocheck ---
+    if (location.pathname.includes('/subscribe-confirmation')) {
+      try { localStorage.setItem('emailSubmitted', 'true'); } catch(_) {}
+    }
+
+    function isSubscribed(){
+      try{ return localStorage.getItem('emailSubmitted') === 'true'; }
+      catch(_){ return false; }
+    }
+
+    function applyGateUI(){
+      const sub = isSubscribed();
+      if (sub){
+        embedWrap.style.display = 'none';
+        uploadPanel.style.display = 'block';
+      } else {
+        resultsPanel.style.display = 'none';
+        uploadPanel.style.display = 'none';
+        embedWrap.style.display = 'flex';
+      }
+    }
+    applyGateUI();
+    // Watch for changes from another tab or after the iframe submission flow
+    window.addEventListener('storage', (e)=>{ if (e.key === 'emailSubmitted') applyGateUI(); });
+    const _gateInterval = setInterval(()=>{ if (isSubscribed()) { applyGateUI(); clearInterval(_gateInterval); } }, 1500);
+
+    // --- Upload interactions (multi) ---
+    uploadArea.addEventListener('click', ()=> fileInput.click());
+    uploadArea.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') fileInput.click(); });
+
+    uploadArea.addEventListener('dragover', (e)=>{ e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', ()=> uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', async (e)=>{
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      const files = Array.from(e.dataTransfer.files || []).filter(f=>f.type.startsWith('image/'));
+      await addFiles(files);
+    });
+    fileInput.addEventListener('change', async ()=>{
+      const files = Array.from(fileInput.files || []).filter(f=>f.type.startsWith('image/'));
+      await addFiles(files);
+      fileInput.value = '';
+    });
+
+    async function addFiles(files){
+      if (!files.length) return;
+      for (const f of files){
+        const dataUrl = await fileToDataURL(f);
+        const id = 'img_'+Math.random().toString(36).slice(2,9);
+        gallery.push({id, dataUrl});
+      }
+      if (!activeId && gallery.length) activeId = gallery[0].id;
+      renderGallery();
+      renderActivePreview();
+      analyzeBtn.disabled = !activeId;
+    }
+
+    function fileToDataURL(file){
+      return new Promise((res, rej)=>{
+        const r = new FileReader();
+        r.onload = ()=> res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+    }
+
+    function renderGallery(){
+      thumbsEl.innerHTML = '';
+      gallery.forEach(item=>{
+        const d = document.createElement('div');
+        d.className = 'thumb'+(item.id===activeId?' active':'');
+        const img = document.createElement('img');
+        img.src = item.dataUrl;
+        img.alt = 'Uploaded photo';
+        d.appendChild(img);
+
+        const x = document.createElement('button');
+        x.className = 'x'; x.textContent = '×'; x.title='Remove';
+        x.addEventListener('click', (ev)=>{
+          ev.stopPropagation();
+          gallery = gallery.filter(g=>g.id!==item.id);
+          if (activeId===item.id) activeId = gallery[0]?.id || null;
+          renderGallery(); renderActivePreview();
+          analyzeBtn.disabled = !activeId;
+        });
+        d.appendChild(x);
+
+        d.addEventListener('click', ()=>{
+          activeId = item.id;
+          document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+          d.classList.add('active');
+          renderActivePreview();
+        });
+
+        thumbsEl.appendChild(d);
+      });
+    }
+
+    function renderActivePreview(){
+      const curr = gallery.find(g=>g.id===activeId);
+      if (curr){
+        previewImage.src = curr.dataUrl;
+        previewImage.style.display = 'block';
+      } else {
+        previewImage.src = '';
+        previewImage.style.display = 'none';
+      }
+    }
+
+    resetBtn.addEventListener('click', ()=>{
+      gallery = []; activeId = null; previewImage.src=''; previewImage.style.display='none';
+      thumbsEl.innerHTML=''; analyzeBtn.disabled = true;
+      resultsPanel.style.display = 'none'; paletteGrid.innerHTML = ''; lastAnalysis = null;
+      applyGateUI();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    uploadAnotherBtn.addEventListener('click', ()=>{
+      // Keep existing gallery; just scroll back and focus upload
+      resultsPanel.style.display = 'none';
+      uploadPanel.style.display = 'block';
+      uploadArea.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+
+    // --- Color pool (masculine; broader variety; no pinks) ---
+    // Grouped by family for balance; names are wardrobe-friendly (no hex displayed to user).
+    const COLOR_POOL = [
+      // === Blues (core menswear) ===
+      {name:'Navy',hex:'#0B3D91'}, {name:'Deep Navy',hex:'#071A3A'}, {name:'Indigo',hex:'#1B2A52'},
+      {name:'Midnight',hex:'#0D1B2A'}, {name:'Cobalt',hex:'#1F4BAA'}, {name:'Denim',hex:'#2C6EB2'},
+      {name:'Petrol Blue',hex:'#13424E'}, {name:'Steel Blue',hex:'#3A6B9A'}, {name:'Slate Blue',hex:'#4B6992'},
+      {name:'Air Force',hex:'#213B64'},
+
+      // === Neutrals ===
+      {name:'Charcoal',hex:'#2F3542'}, {name:'Graphite',hex:'#1F2327'}, {name:'Gunmetal',hex:'#2A3439'},
+      {name:'Ash',hex:'#6A7179'}, {name:'Stone',hex:'#9EA3A8'}, {name:'Smoke',hex:'#7A7E87'},
+      {name:'Off-White',hex:'#F5F5F4'}, {name:'Ivory',hex:'#EFEADA'}, {name:'Bone',hex:'#E7E2D6'},
+
+      // === Browns / Earth ===
+      {name:'Espresso',hex:'#2E1B15'}, {name:'Dark Brown',hex:'#5A381E'}, {name:'Chocolate',hex:'#4B2E2A'},
+      {name:'Chestnut',hex:'#6D3C2B'}, {name:'Walnut',hex:'#7B4B35'}, {name:'Tobacco',hex:'#70412D'},
+      {name:'Camel',hex:'#C29B6D'}, {name:'Tan',hex:'#B0895B'}, {name:'Khaki',hex:'#BDB48F'},
+      {name:'Sand',hex:'#D6C7A1'}, {name:'Taupe',hex:'#8D8575'},
+
+      // === Greens ===
+      {name:'Olive',hex:'#6B8E23'}, {name:'Army Green',hex:'#4B5320'}, {name:'Forest',hex:'#1F5D3B'},
+      {name:'Moss',hex:'#556B2F'}, {name:'Sage',hex:'#8A9A7B'}, {name:'Deep Teal',hex:'#0E5F5D'},
+      {name:'Pine',hex:'#234F33'}, {name:'Bottle Green',hex:'#0F3D2E'},
+
+      // === Reds / Rust / Accents ===
+      {name:'Burgundy',hex:'#6B1E2C'}, {name:'Maroon',hex:'#540B0E'}, {name:'Rust',hex:'#A54A24'},
+      {name:'Burnt Orange',hex:'#B04A1F'}, {name:'Copper',hex:'#B66A3C'}, {name:'Mustard',hex:'#C19A2F'},
+
+      // === Cool Accents ===
+      {name:'Sea Grey',hex:'#677C89'}, {name:'Harbor',hex:'#3E5668'}, {name:'Stone Blue',hex:'#5C7A8A'}
+    ];
+
+    // --- Analyze button ---
+    analyzeBtn.addEventListener('click', async ()=>{
+      if (!activeId) return;
+      analyzeBtn.disabled = true; analyzeBtn.textContent = 'Analyzing…';
+      try{
+        const img = gallery.find(g=>g.id===activeId)?.dataUrl;
+        lastAnalysis = await analyzeImage(img);
+        renderPalette(lastAnalysis);
+        resultsPanel.style.display = 'block';
+        resultsPanel.scrollIntoView({behavior:'smooth', block:'center'});
+      }catch(err){
+        console.error(err); alert('Analysis failed — try a different photo or lighting.');
+      }finally{
+        analyzeBtn.disabled = false; analyzeBtn.textContent = 'Analyze Photo';
+      }
+    });
+
+    // --- Image analysis (simple, client-side) ---
+    async function analyzeImage(dataUrl){
+      // Draw to canvas, sample pixels, infer basic undertone/contrast
+      const img = await loadImage(dataUrl);
+      const {avg, sat, light, warmScore, contrast} = sampleImage(img, 420);
+
+      const undertone = warmScore > 0.06 ? 'warm' : (warmScore < -0.06 ? 'cool' : 'neutral');
+      const depth = light < 0.45 ? 'deep' : (light > 0.7 ? 'light' : 'medium');
+
+      // Choose OUTPUT_COUNT colors from a filtered pool
+      const picked = pickPalette(undertone, depth, contrast, OUTPUT_COUNT);
+
+      // Advice strings with reasoning (why it fits skin/eyes/hair)
+      const advice = buildAdvice(undertone, depth, contrast, picked);
+
+      return { undertone, depth, contrast, palette: picked, advice };
+    }
+
+    function loadImage(url){
+      return new Promise((res, rej)=>{
+        const img = new Image(); img.crossOrigin='anonymous'; img.onload=()=>res(img); img.onerror=rej; img.src=url;
+      });
+    }
+
+    function sampleImage(img, maxDim){
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      const scale = Math.min(1, maxDim / Math.max(w,h));
+      w = Math.round(w*scale); h = Math.round(h*scale);
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const data = ctx.getImageData(0,0,w,h).data;
+
+      let rSum=0,gSum=0,bSum=0, count=0, satSum=0, lightSum=0;
+      for (let i=0;i<data.length;i+=4*4){  // stride for speed
+        const r=data[i], g=data[i+1], b=data[i+2], a=data[i+3];
+        if (a<180) continue;
+        // skip extreme background whites
+        if (r>245 && g>245 && b>245) continue;
+
+        rSum+=r; gSum+=g; bSum+=b; count++;
+        const max=Math.max(r,g,b), min=Math.min(r,g,b);
+        satSum += max===0?0:(max-min)/max;
+        lightSum += (max+min)/510; // 0..1
+      }
+      const avgR=rSum/count, avgG=gSum/count, avgB=bSum/count;
+      const warmScore = ((avgR - avgB) + (avgG*0.1))/255; // >0 warm, <0 cool
+      const avg = {r:avgR,g:avgG,b:avgB};
+      const sat = satSum / count;
+      const light = lightSum / count;
+
+      // naive contrast proxy (saturation × inverse light distance from mid)
+      const contrast = sat * (1 - Math.abs(light-0.5)*2);
+      return {avg, sat, light, warmScore, contrast};
+    }
+
+    function pickPalette(undertone, depth, contrast, n){
+      // Filter by undertone tendency
+      const prefer = COLOR_POOL.filter(c=>{
+        const hex = c.hex.replace('#','');
+        const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+        const warm = (r - b) + (g*0.1);
+        if (undertone==='warm') return warm >= -5; // keep warm/neutral
+        if (undertone==='cool') return warm <= 20; // keep cool/neutral
+        return true; // neutral -> all
+      });
+
+      // Weight choices toward depth (deep -> deeper colors, light -> lighter/softer)
+      const scored = prefer.map(c=>{
+        const hex = c.hex.replace('#','');
+        const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+        const l = (Math.max(r,g,b)+Math.min(r,g,b))/510; // 0..1
+        let score = 1.0;
+        if (depth==='deep')   score *= (1 - Math.abs(l-0.28)); // prefer darker
+        if (depth==='light')  score *= (1 - Math.abs(l-0.72)); // prefer lighter
+        if (depth==='medium') score *= (1 - Math.abs(l-0.50));
+        // prefer higher contrast if user carries it
+        score *= (contrast>0.35 ? (1 + (0.25*Math.random())) : (0.95 + 0.2*Math.random()));
+        // tiny randomness for variety
+        score *= (0.88 + Math.random()*0.28);
+        return {c, score};
+      }).sort((a,b)=>b.score-a.score);
+
+      // Ensure variety across families by picking with spacing
+      const chosen = [];
+      const fam = f => {
+        const name = f.c.name.toLowerCase();
+        if (name.includes('navy')||name.includes('blue')||name.includes('indigo')||name.includes('cobalt')||name.includes('denim')||name.includes('midnight')||name.includes('slate')) return 'blue';
+        if (name.includes('olive')||name.includes('green')||name.includes('teal')||name.includes('moss')||name.includes('sage')||name.includes('pine')||name.includes('bottle')) return 'green';
+        if (name.includes('brown')||name.includes('camel')||name.includes('tan')||name.includes('khaki')||name.includes('sand')||name.includes('taupe')||name.includes('walnut')||name.includes('chestnut')||name.includes('tobacco')||name.includes('espresso')) return 'brown';
+        if (name.includes('burgundy')||name.includes('maroon')||name.includes('rust')||name.includes('orange')||name.includes('copper')||name.includes('mustard')) return 'red';
+        if (name.includes('charcoal')||name.includes('graphite')||name.includes('ash')||name.includes('smoke')||name.includes('gunmetal')||name.includes('stone')||name.includes('ivory')||name.includes('off')||name.includes('bone')) return 'neutral';
+        return 'other';
+      };
+      const famCount = {blue:0, green:0, brown:0, red:0, neutral:0, other:0};
+      const famCap   = {blue:3, green:3, brown:3, red:2, neutral:3, other:2}; // caps to keep balance
+
+      for (const it of scored){
+        const f = fam(it);
+        if (famCount[f] >= famCap[f]) continue;
+        chosen.push(it.c);
+        famCount[f]++;
+        if (chosen.length>=n) break;
+      }
+      // fallback if not enough picked
+      while (chosen.length<n){
+        const next = COLOR_POOL[Math.floor(Math.random()*COLOR_POOL.length)];
+        if (!chosen.includes(next)) chosen.push(next);
+      }
+      return chosen.slice(0,n);
+    }
+
+    function buildAdvice(undertone, depth, contrast, palette){
+      const primary = palette.slice(0,4).map(p=>p.name);
+      const accents = palette.slice(4).map(p=>p.name);
+
+      // Outfit combos: neutrals + one accent
+      const neutrals = palette.filter(p=>/charcoal|graphite|ash|ivory|off|stone|taupe|tan|camel|khaki|sand|smoke|gunmetal|bone/i.test(p.name));
+      const blues    = palette.filter(p=>/navy|indigo|denim|blue|cobalt|midnight|slate|air/i.test(p.name));
+      const greens   = palette.filter(p=>/olive|forest|moss|sage|teal|army|pine|bottle/i.test(p.name));
+      const reds     = palette.filter(p=>/burgundy|maroon|rust|copper|burnt|mustard/i.test(p.name));
+      const browns   = palette.filter(p=>/espresso|brown|chocolate|chestnut|walnut|tobacco|camel|tan/i.test(p.name));
+
+      const one = (arr, fallback) => (arr[0]?.name || fallback);
+
+      const outfit =
+        `• Smart-casual: ${one(neutrals,'Charcoal')} chinos + ${one(blues,'Navy')} knit + white leather sneakers.\n`+
+        `• Tailored: ${one(blues,'Navy')} suit, ${one(neutrals,'Off-White')} shirt, tie in ${one(reds,'Burgundy')}.\n`+
+        `• Weekend: ${one(neutrals,'Stone')} tee, overshirt in ${one(greens,'Olive')}, denim in ${one(blues,'Denim')}.\n`+
+        `• Rugged: ${one(browns,'Dark Brown')} boots + ${one(neutrals,'Taupe')} sweater + ${one(greens,'Moss')} field jacket.\n`+
+        `• Contrast: ${contrast>0.35?'You handle bold light/dark pairings — anchor with deep tones and one bright accent.':'Keep contrast mid — layer similar depths with one darker anchor.'}`;
+
+      const season =
+        undertone==='warm'  ? `Warm ${depth}: earthy notes (Camel, Olive, Rust) echo your warmth while ${one(blues,'Navy')} keeps looks sharp. For summer, swap to ${one(neutrals,'Stone')} and ${one(greens,'Sage')} in lighter fabrics.`
+      : undertone==='cool'  ? `Cool ${depth}: inky blues (Indigo, Navy) and crisp neutrals (Graphite, Off-White) flatter your cooler cast. Spring adds ${one(reds,'Mustard')} in small accents; winter favors ${one(neutrals,'Charcoal')}.`
+                            : `Neutral ${depth}: you flex both ways — combine deep blues with sand/taupe for balance. Warmer months: ${one(neutrals,'Ivory')} + ${one(blues,'Denim')}; colder months: ${one(neutrals,'Graphite')} + ${one(greens,'Olive')}.`;
+
+      const jewelry =
+        undertone==='warm'  ? `Prefer gold, bronze, and leather accents. Gold warms the skin; bronze and tan straps tie into Camel/Tan.`
+      : undertone==='cool'  ? `Prefer silver, steel, or gunmetal. These echo cooler undertones and pair cleanly with Navy/Slate.`
+                            : `Mix metals subtly (steel watch + warm leather strap). Keep finishes matte for versatility.`;
+
+      const why =
+        undertone==='warm'
+          ? `These picks complement the warmer bias detected in your skin tones; earthy browns/greens sit close to that hue family, while deep blues give crisp contrast.`
+          : undertone==='cool'
+            ? `Cooler blues and neutral charcoals mirror the cooler cast from your image; they brighten the eye area and keep skin from looking flushed.`
+            : `A neutral read lets you run both warm and cool cores; mid-depth tones avoid washing you out while darker anchors sharpen jawline and eyes.`;
+
+      return {
+        outfit,
+        season: `${season}`,
+        jewelry: `${jewelry}`,
+        reason: why
+      };
+    }
+
+    // --- Render palette + advice ---
+    function renderPalette(analysis){
+      const { palette, advice } = analysis;
+      paletteGrid.innerHTML = '';
+      for (const p of palette){
+        const card = document.createElement('div'); card.className='swatch';
+        const c = document.createElement('div'); c.className='color'; c.style.background = p.hex;
+        const l = document.createElement('div'); l.className='label'; l.textContent = p.name; // no hex codes shown
+        card.appendChild(c); card.appendChild(l);
+        paletteGrid.appendChild(card);
+      }
+      // Advice text + reasoning
+      outfitText.textContent  = advice.outfit;
+      seasonText.textContent  = advice.season;
+      jewelryText.textContent = advice.jewelry + ' ' + advice.reason;
+    }
+
+    // --- Download palette as simple PNG (names only) ---
+    downloadBtn.addEventListener('click', ()=>{
+      const pal = lastAnalysis?.palette; if (!pal) return alert('No palette yet.');
+      const cols = Math.min(4, pal.length), rows = Math.ceil(pal.length/cols);
+      const sw = 280, sh = 160, pad = 24;
+      const canvas = document.createElement('canvas');
+      canvas.width = cols*sw + pad*2; canvas.height = rows*sh + pad*2 + 80;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0d0f17'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.font = '18px Inter, Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+      pal.forEach((p,i)=>{
+        const col = i%cols, row = Math.floor(i/cols);
+        const x = pad + col*sw, y = pad + row*sh;
+        ctx.fillStyle = p.hex; ctx.fillRect(x+12,y+12,sw-24,sh-80);
+        ctx.fillStyle = '#fff'; ctx.fillText(p.name, x + sw/2, y + sh - 28);
+      });
+      ctx.fillStyle = '#fff'; ctx.font = '24px Inter, Arial';
+      ctx.fillText('Ascent • Fashion Palette', canvas.width/2, canvas.height-24);
+      const a = document.createElement('a'); a.download = 'palette.png'; a.href = canvas.toDataURL('image/png'); a.click();
+    });
+  </script>
 </body>
 </html>
