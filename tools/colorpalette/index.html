@@ -5,167 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Health Score — Color Analysis</title>
 
-    <!-- If you already have a Gemini API key embedded, keep it as a meta tag like below. -->
-    <!-- <meta name="gemini-api-key" content="YOUR_KEY_HERE"> -->
-
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo">
-
-    <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364);
-            background-size: 600% 600%;
-            animation: gradientAnimation 20s ease infinite;
-            color: #e0e0e0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        body {font-family: 'Inter', sans-serif; background: linear-gradient(to bottom right, #0F2027, #203A43, #2C5364); background-size: 600% 600%; animation: gradientAnimation 20s ease infinite; color: #e0e0e0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; overflow-y: auto;}
+        @keyframes gradientAnimation {0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }}
 
         header{ text-align:center; margin-bottom: 10px; }
         .logo { display:block; margin: 0 auto 10px auto; max-width:120px; border-radius:50%; }
         h1 { font-size:2.6em; margin: 6px 0; color:#f0f0f0; }
         .subtitle { color:#a0a0a0; margin-bottom:16px; }
 
-        .main-nav {
-            background-color: #1a1a1a;
-            width: 100%;
-            max-width: 900px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
+        .main-nav { background-color: #1a1a1a; width: 100%; max-width: 900px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 20px; padding: 12px 16px; display: flex; justify-content: space-around; align-items: center; }
         .main-nav a { color:#f0f0f0; text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:500; }
         .main-nav a.active { background:#0a1a2f; }
 
         main { width:100%; max-width:900px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+        .panel { background-color: #1e1e1e; padding: 24px; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); width: 100%; box-sizing: border-box; color: #e0e0e0; }
 
-        .panel {
-            background-color: #1e1e1e;
-            padding: 24px;
-            border-radius: 14px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            width: 100%;
-            box-sizing: border-box;
-            color: #e0e0e0;
-        }
-
-        .upload-area {
-            border: 2px dashed #333;
-            padding: 30px;
-            border-radius: 12px;
-            text-align:center;
-            cursor: pointer;
-            transition: background-color .2s, border-color .2s;
-        }
+        .upload-area { border: 2px dashed #333; padding: 30px; border-radius: 12px; text-align:center; cursor: pointer; transition: background-color .2s, border-color .2s; }
         .upload-area.dragover { background-color: rgba(255,255,255,0.02); border-color: #0a1a2f; }
         .upload-area input[type="file"] { display:none; }
 
-        .preview-img {
-            max-width: 220px;
-            max-height: 220px;
-            border-radius: 12px;
-            object-fit: cover;
-            display:block;
-            margin: 14px auto;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-        }
+        .preview-img { max-width: 220px; max-height: 220px; border-radius: 12px; object-fit: cover; display:block; margin: 14px auto; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
 
         .controls { display:flex; gap:12px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
-
-        .btn {
-            background-color: #28a745;
-            color:white;
-            border:none;
-            padding:12px 18px;
-            border-radius:10px;
-            font-weight:600;
-            cursor:pointer;
-            box-shadow: 0 4px 15px rgba(40,167,69,0.4);
-        }
+        .btn { background-color: #28a745; color:white; border:none; padding:12px 18px; border-radius:10px; font-weight:600; cursor:pointer; box-shadow: 0 4px 15px rgba(40,167,69,0.4); }
         .btn.secondary { background: #0a1a2f; }
         .btn:disabled { background:#444; cursor:not-allowed; box-shadow:none; }
 
-        .palette-grid {
-            display:grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 16px;
-        }
-        .swatch {
-            background:#222;
-            border-radius:10px;
-            padding: 12px;
-            text-align:center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-        }
-        .swatch .color {
-            height:80px;
-            border-radius:8px;
-            box-shadow: inset 0 -2px 6px rgba(0,0,0,0.3);
-            margin-bottom:8px;
-            border: 1px solid rgba(255,255,255,0.02);
-        }
+        .palette-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+        .swatch { background:#222; border-radius:10px; padding: 12px; text-align:center; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+        .swatch .color { height:80px; border-radius:8px; margin-bottom:8px; border: 1px solid rgba(255,255,255,0.02); }
         .swatch .hex { font-family:monospace; font-size:0.95em; color:#e6e6e6; }
 
-        .loading-overlay {
-            position: fixed; inset:0;
-            display:none;
-            align-items:center;
-            justify-content:center;
-            background: rgba(0,0,0,0.6);
-            z-index: 2000;
-            color:white;
-            flex-direction:column;
-            gap:14px;
-        }
+        .loading-overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.6); z-index: 2000; color:white; flex-direction:column; gap:14px; }
         .loading-overlay.visible { display:flex; }
         .spinner { border:4px solid rgba(255,255,255,0.15); border-top:4px solid #0a1a2f; border-radius:50%; width:44px; height:44px; animation:spin 1s linear infinite; }
         @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
-        .newsletter-gate-modal {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background-color: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
-            display:flex; justify-content:center; align-items:center; z-index:1001;
-            opacity:0; visibility:hidden; transition: opacity .4s, visibility .4s;
-            padding:20px; box-sizing:border-box;
-        }
+        .newsletter-gate-modal { position: fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(10px); display:flex; justify-content:center; align-items:center; z-index:1001; opacity:0; visibility:hidden; transition: opacity .4s, visibility .4s; padding:20px; box-sizing:border-box; }
         .newsletter-gate-modal.visible { opacity:1; visibility:visible; }
-        .newsletter-gate-content {
-            background:#1e1e1e; padding:26px; border-radius:14px; width:100%; max-width:700px; position:relative; text-align:center;
-            padding-top:40px;
-        }
+        .newsletter-gate-content { background:#1e1e1e; padding:26px; border-radius:14px; width:100%; max-width:700px; text-align:center; }
         .beehiiv-embed { width:100%; max-width:660px; height:auto; min-height:260px; border:none; border-radius:10px; }
-
-        .view-results-btn {
-            margin-top:18px;
-            background:#28a745; color:#fff; border:none; padding:12px 22px; border-radius:10px; font-weight:700; cursor:pointer;
-        }
+        .view-results-btn { margin-top:18px; background:#28a745; color:#fff; border:none; padding:12px 22px; border-radius:10px; font-weight:700; cursor:pointer; }
         .view-results-btn:disabled { background:#444; cursor:not-allowed; }
 
         .muted { color:#a0a0a0; font-size:0.95em; }
-        @media (max-width:640px) {
-            .palette-grid { grid-template-columns: repeat(2, 1fr); }
-            .swatch .color { height:66px; }
-        }
     </style>
 </head>
 <body>
@@ -174,21 +61,18 @@
         <div id="loadingText">Analyzing photo — generating palette...</div>
     </div>
 
-    <!-- Newsletter Gate Modal -->
     <div id="newsletterGateModal" class="newsletter-gate-modal" aria-hidden="true">
         <div class="newsletter-gate-content">
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-            <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no"></iframe>
-
+            <iframe src="https://subscribe-forms.beehiiv.com/d8a629a3-7339-417f-b674-2947ff9c2450" class="beehiiv-embed" frameborder="0" scrolling="no"></iframe>
             <button id="viewResultsButton" class="view-results-btn" disabled>View My Palette</button>
-            <p class="muted">Subscribe to unlock your personalized color palette. We’ll keep your email safe.</p>
         </div>
     </div>
 
     <header>
         <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo" class="logo">
         <h1>Personal Color Palette</h1>
-        <p class="subtitle">Upload a photo — get a tailored 3×4 color palette (hair, eyes, skin, and complementary accents).</p>
+        <p class="subtitle">Upload a photo — get a tailored 3×4 color palette.</p>
     </header>
 
     <nav class="main-nav">
@@ -200,18 +84,14 @@
     <main>
         <section class="panel" id="uploadPanel">
             <div id="uploadArea" class="upload-area" tabindex="0">
-                <p><strong>Upload a clear photo of your face</strong> (natural lighting recommended).</p>
-                <p class="muted">Drag & drop or click to choose an image (jpg/png).</p>
+                <p><strong>Upload a clear photo of your face</strong></p>
                 <input id="fileInput" type="file" accept="image/*">
                 <img id="previewImage" class="preview-img" alt="preview" style="display:none;">
             </div>
-
             <div class="controls">
                 <button id="analyzeBtn" class="btn" disabled>Analyze Photo</button>
                 <button id="resetBtn" class="btn secondary" type="button">Reset</button>
             </div>
-
-            <p class="muted" style="margin-top:12px;">Your palette will remain hidden until you subscribe (Beehiiv).</p>
         </section>
 
         <section class="panel" id="resultsPanel" style="display:none;">
@@ -221,20 +101,129 @@
                 <button id="downloadBtn" class="btn">Download Palette as PNG</button>
                 <button id="regenerateBtn" class="btn secondary">Re-run Analysis</button>
             </div>
-            <p class="muted" style="margin-top:12px;">You can download and keep this palette for reference.</p>
         </section>
     </main>
 
-    <input type="text" id="shareLinkInput" style="position:absolute; left:-9999px; top:-9999px; opacity:0;">
-
     <script>
-    // If user is on subscribe confirmation page, mark as subscribed
     if (window.location.pathname === '/subscribe-confirmation') {
         localStorage.setItem('emailsubmitted', 'true');
     }
-    </script>
-    <script>
-    /* Original script kept (truncated for brevity in this section) */
+
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const previewImage = document.getElementById('previewImage');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const paletteContainer = document.getElementById('paletteContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    const newsletterGateModal = document.getElementById('newsletterGateModal');
+    const viewResultsButton = document.getElementById('viewResultsButton');
+
+    let currentImageBase64 = null;
+    let lastPalette = null;
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (ev) => {
+        if (ev.target.files && ev.target.files[0]) handleFile(ev.target.files[0]);
+    });
+
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = 'block';
+            currentImageBase64 = e.target.result.split(',')[1];
+            analyzeBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+        if (!currentImageBase64) return;
+        lastPalette = ['#FF5733','#33FF57','#3357FF','#F1C40F','#9B59B6','#1ABC9C','#E67E22','#2ECC71','#3498DB','#E74C3C','#95A5A6','#34495E'];
+        const subscribed = localStorage.getItem('emailsubmitted') === 'true';
+        if (!subscribed) {
+            newsletterGateModal.classList.add('visible');
+            updateViewResultsButton();
+        } else {
+            showPalette(lastPalette);
+        }
+    });
+
+    function updateViewResultsButton() {
+        const submitted = localStorage.getItem('emailsubmitted') === 'true';
+        viewResultsButton.disabled = !submitted;
+    }
+
+    viewResultsButton.addEventListener('click', () => {
+        if (localStorage.getItem('emailsubmitted') === 'true') {
+            newsletterGateModal.classList.remove('visible');
+            showPalette(lastPalette);
+        }
+    });
+
+    function showPalette(palette) {
+        paletteContainer.innerHTML = '';
+        palette.forEach(hex => {
+            const sw = document.createElement('div');
+            sw.className = 'swatch';
+            const colorBlock = document.createElement('div');
+            colorBlock.className = 'color';
+            colorBlock.style.background = hex;
+            const label = document.createElement('div');
+            label.className = 'hex';
+            label.textContent = hex;
+            sw.appendChild(colorBlock);
+            sw.appendChild(label);
+            paletteContainer.appendChild(sw);
+        });
+        resultsPanel.style.display = 'block';
+        resultsPanel.scrollIntoView({behavior:'smooth'});
+    }
+
+    downloadBtn.addEventListener('click', () => {
+        if (!lastPalette) return;
+        const canvas = document.createElement('canvas');
+        const cols = 3, rows = 4; const sw = 200, sh = 160; const pad = 20;
+        canvas.width = cols * sw + pad*2;
+        canvas.height = rows * sh + pad*2 + 40;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#111'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.font = '18px Inter, Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+        for (let i = 0; i < 12; i++) {
+            const col = i % cols; const row = Math.floor(i / cols);
+            const x = pad + col * sw; const y = pad + row * sh;
+            ctx.fillStyle = lastPalette[i];
+            ctx.fillRect(x + 10, y + 10, sw - 20, sh - 60);
+            ctx.fillStyle = '#fff'; ctx.fillText(lastPalette[i], x + sw/2, y + sh - 30);
+        }
+        ctx.fillStyle = '#fff'; ctx.font = '24px Inter, Arial'; ctx.fillText('Personal Color Palette', canvas.width/2, canvas.height - 10);
+        const link = document.createElement('a');
+        link.download = 'color-palette.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+
+    regenerateBtn.addEventListener('click', () => {
+        resultsPanel.style.display = 'none';
+        previewImage.style.display = 'block';
+        analyzeBtn.disabled = false;
+    });
+
+    resetBtn.addEventListener('click', () => {
+        previewImage.src = '';
+        previewImage.style.display = 'none';
+        fileInput.value = '';
+        analyzeBtn.disabled = true;
+        resultsPanel.style.display = 'none';
+        paletteContainer.innerHTML = '';
+        lastPalette = null;
+    });
+
+    updateViewResultsButton();
     </script>
 </body>
 </html>
