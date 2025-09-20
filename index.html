@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Ascent</title>
-    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Favicon Link -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
     
     <style>
@@ -235,14 +231,37 @@
             #memberContent p { font-size: 1em; }
             #accessResourcesButton { padding: 10px 20px; font-size: 1em; }
         }
+
+        /* CSS for the orientation banner from user's memory */
+        #orientationBanner { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            background-color: #0a1a2f; /* Dark blue background */ 
+            color: #ffffff; /* White text */ 
+            text-align: center; 
+            padding: 10px 0; 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            z-index: 1002; /* Higher than modal */ 
+            display: none; /* Hidden by default, shown via JS and media query */ 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); 
+        } 
+        @media (max-width: 768px) and (orientation: portrait) { 
+            #orientationBanner { 
+                display: block; 
+            } 
+        }
     </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
+    <div id="orientationBanner">
+        Please rotate your device for the best viewing experience!
+    </div>
+    
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PJ2XGPWB"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
     <header>
         <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
         <h1>The Ascent</h1>
@@ -257,8 +276,7 @@
 
     <main class="page-section">
         <div id="contentWrapper" class="embed-container">
-            <!-- Content will be dynamically loaded here based on emailSubmitted status -->
-        </div>
+            </div>
     </main>
 
     <script>
@@ -269,11 +287,9 @@
             // Add the Beehiiv embed only if it doesn't exist yet
             if (!document.getElementById('beehiiv-iframe')) {
                 contentWrapper.innerHTML = `
-                    <!-- START BEEHIIV FORM CODE -->
                     <script async src="https://subscribe-forms.beehiiv.com/embed.js"><\/script>
                     <iframe id="beehiiv-iframe" src="https://subscribe-forms.beehiiv.com/740cadbc-063d-4325-9f3b-c1909384bfc7" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 814px; height: 420px; margin: 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-                    <!-- END BEEHIIV FORM CODE -->
-                `;
+                    `;
             }
         }
 
@@ -317,6 +333,22 @@
         beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
         document.head.appendChild(beehiivAttributionScript);
 
+        // JavaScript for the orientation banner from user's memory
+        function checkOrientationAndDisplayBanner() {
+            const orientationBanner = document.getElementById('orientationBanner');
+            if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+                orientationBanner.style.display = 'block';
+            } else {
+                orientationBanner.style.display = 'none';
+            }
+        } 
+        window.addEventListener('resize', checkOrientationAndDisplayBanner); 
+        document.addEventListener('DOMContentLoaded', () => { 
+            checkOrientationAndDisplayBanner(); 
+        }); 
+        if ('onorientationchange' in window) { 
+            window.onorientationchange = checkOrientationAndDisplayBanner; 
+        }
     </script>
 </body>
 </html>
