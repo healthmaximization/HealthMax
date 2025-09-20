@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Personal Color Palette</title>
 
-<!-- Inter (same as your file) -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
@@ -127,29 +126,30 @@ footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; 
   h1 { font-size:2.2em; }
   .beehiiv-embed{ height:360px; }
 }
+
+/* Added from memory */
+#orientationBanner { position: fixed; top: 0; left: 0; width: 100%; background-color: #0a1a2f; /* Dark blue background */ color: #ffffff; /* White text */ text-align: center; padding: 10px 0; font-size: 1.1em; font-weight: 600; z-index: 1002; /* Higher than modal */ display: none; /* Hidden by default, shown via JS and media query */ box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); } @media (max-width: 768px) and (orientation: portrait) { #orientationBanner { display: block; } }
+
 </style>
 </head>
 <body>
-  <!-- Header -->
+  <div id="orientationBanner"> Please rotate your device for the best viewing experience! </div>
+
   <header>
     <img class="logo" src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="Logo">
-    <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+    <div class="top-stars">★★★★★</div>
     <h1>Discover Which Colors Suit You The Best</h1>
     <div class="subtitle">Upload a photo and get an AI-tailored wardrobe palette (hair, eyes, skin, and complementary accents).</div>
   </header>
 
-  <!-- Navigation -->
   <nav class="main-nav" role="navigation" aria-label="Main Navigation">
-    <!-- CHANGE: Home not active; Tools active -->
     <a href="/">Home</a>
     <a href="/tools/" class="active">Tools</a>
     <a href="https://store.ascentimprovement.com/" target="_blank" rel="noopener">Store</a>
   </nav>
 
   <main>
-    <!-- Interaction panel: either Beehiiv embed OR upload area, then results -->
     <section class="panel" id="interactionPanel">
-      <!-- Beehiiv embed shows when NOT subscribed -->
       <div id="embedWrap" class="embed-wrap" aria-hidden="false" style="display:none;">
         <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
         <iframe src="https://subscribe-forms.beehiiv.com/2ec63069-4b7e-45b2-be4b-18e8c4d306d9"
@@ -160,7 +160,6 @@ footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; 
         <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
       </div>
 
-      <!-- Upload area shows when subscribed -->
       <div id="uploadPanel" style="display:none;">
         <div id="uploadArea" class="upload-area" tabindex="0" role="button" aria-label="Upload a photo">
           <strong>Upload a clear photo of your face</strong>
@@ -178,7 +177,6 @@ footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; 
       </div>
     </section>
 
-    <!-- Results panel (palette + advice) -->
     <section class="panel" id="resultsPanel" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
         <div>
@@ -193,7 +191,6 @@ footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; 
 
       <div id="paletteGrid" class="palette-grid" aria-live="polite"></div>
 
-      <!-- Advice stacked vertically -->
       <div class="advice-grid">
         <div class="advice-card">
           <div class="section-title">Outfit Recommendations</div>
@@ -631,5 +628,8 @@ footer{ margin-top:10px; color:var(--muted); font-size:13px; text-align:center; 
      ---------------- */
   applyGateUI();
   </script>
+  
+  <script> function checkOrientationAndDisplayBanner() { const orientationBanner = document.getElementById('orientationBanner'); if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) { orientationBanner.style.display = 'block'; } else { orientationBanner.style.display = 'none'; } } window.addEventListener('resize', checkOrientationAndDisplayBanner); document.addEventListener('DOMContentLoaded', () => { checkOrientationAndDisplayBanner(); }); if ('onorientationchange' in window) { window.onorientationchange = checkOrientationAndDisplayBanner; } </script>
+
 </body>
 </html>
