@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dopamine Habits Visualizer</title>
-    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){
     w[l]=w[l]||[];
     w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
@@ -15,12 +14,8 @@
     j.src='https://www.googletagmanager.com/gtag/js?id='+i+dl;
     f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PJ2XGPWB');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Favicon Link -->
     <link rel="icon" type="image/png" href="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo"> 
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR8QD6X56N"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -29,7 +24,6 @@
 
       gtag('config', 'G-WR8QD6X56N');
     </script>
-    <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* General body styling consistent with Health Score Quiz */
@@ -47,6 +41,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            width: 100vw; /* Added to ensure full viewport width */
             overflow-y: auto;
         }
 
@@ -549,39 +544,56 @@
                 width: 80%; /* Breedte aanpassen voor mobiel */
             }
         }
+        /* CSS for the orientation banner from user's memory */
+        #orientationBanner { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            background-color: #0a1a2f; /* Dark blue background */ 
+            color: #ffffff; /* White text */ 
+            text-align: center; 
+            padding: 10px 0; 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            z-index: 1002; /* Higher than modal */ 
+            display: none; /* Hidden by default, shown via JS and media query */ 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); 
+        } 
+        @media (max-width: 768px) and (orientation: portrait) { 
+            #orientationBanner { 
+                display: block; 
+            } 
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
-    <!-- Google Tag Manager (noscript) -->
+    <div id="orientationBanner">
+        Please rotate your device for the best viewing experience!
+    </div>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PJ2XGPWB"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
-    <header style="text-align: center; width: 100%;"> <!-- Added text-align: center to header -->
-        <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
-        <div class="top-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+    <header style="text-align: center; width: 100%;"> <img src="https://yt3.ggpht.com/6s8JL9X0gjAA2Toh9htfTY_HnaRtDTvd6cuV5U_vuAT15WTnsa07J8CHrvG6cgHkeaD25qemDA=s600-c-k-c0x00ffffff-no-rj-rp-mo" alt="HealthMax Logo" class="logo">
+        <div class="top-stars">★★★★★</div>
         <h1>How Your Habits Influence Your Dopamine</h1>
         <p class="subtitle">Visualize Your Habits' Impact on Your Energy & Focus in Real-Time!</p>
     </header>
 
     <nav class="main-nav">
         <a href="/">Home</a>
-        <a href="/tools/" class="active">Tools</a> <!-- Set Tools as active -->
-        <a href="https://store.ascentimprovement.com/" target="_blank">Store</a>
+        <a href="/tools/" class="active">Tools</a> <a href="https://store.ascentimprovement.com/" target="_blank">Store</a>
     </nav>
 
     <div id="mainApp" class="container"> 
         <h2 class="font-bold mb-6 text-center">Your Dopamine Day</h2>
 
-        <!-- Habit Input Form - Simplified for habit selection -->
         <div class="habit-input-section mb-8">
             <h3 class="font-semibold mb-4 text-center">Add a New Habit</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="predefinedHabit" class="block text-gray-300 text-sm font-medium mb-1">Select Habit:</label>
                     <select id="predefinedHabit" class="w-full">
-                        <!-- Options will be dynamically populated by JavaScript -->
-                    </select>
+                        </select>
                 </div>
                 <div id="habitInputHourSection" class="flex gap-2"> 
                     <div style="flex-grow: 1;">
@@ -590,8 +602,7 @@
                         <div class="slider-value"><span id="hourValue">9</span>:00 <span id="amPmValue">AM</span></div>
                     </div>
                     <div style="flex-grow: 0; display: flex; flex-direction: column; justify-content: flex-end;">
-                        <label for="amPmRadioGroup" class="block text-gray-300 text-sm font-medium mb-1" style="visibility: hidden;">AM/PM:</label> <!-- Hidden label to align buttons -->
-                        <div class="am-pm-toggle" id="amPmRadioGroup">
+                        <label for="amPmRadioGroup" class="block text-gray-300 text-sm font-medium mb-1" style="visibility: hidden;">AM/PM:</label> <div class="am-pm-toggle" id="amPmRadioGroup">
                             <input type="radio" id="amRadio" name="amPm" value="AM" checked>
                             <label for="amRadio">AM</label>
                             <input type="radio" id="pmRadio" name="amPm" value="PM">
@@ -605,17 +616,13 @@
             </button>
         </div>
 
-        <!-- List of Habits -->
         <div class="mb-8">
             <h3 class="font-semibold mb-4 text-center">Your Habits:</h3>
             <div id="habitsList" class="space-y-3">
-                <!-- Habits will be dynamically added here -->
                 <p id="noHabitsMessage" class="text-gray-400 italic text-center">No habits added yet. Add some to see your graph!</p>
             </div>
         </div>
 
-        <!-- Dopamine Graph Section -->
-        <!-- This entire section will be shown/hidden based on email submission -->
         <div id="dopamineGraphSection" class="habit-input-section hidden">
             <h3 class="font-semibold mb-4 text-center">Your Dopamine Levels Throughout the Day</h3>
             <canvas id="dopamineChart"></canvas>
@@ -625,12 +632,8 @@
             </p>
         </div>
 
-        <!-- Email Gate Content (replaces the graph section when not submitted) -->
-        <!-- This entire section will be shown/hidden based on email submission -->
         <div id="emailGateContentWrapper" class="habit-input-section"> 
-            <!-- START BEEHIIV FORM CODE -->
             <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script><iframe src="https://subscribe-forms.beehiiv.com/1d198403-eabe-45c9-9207-48496c5486c2" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 400px; height: 606px; margin: 0 auto 0 auto !important; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-            <!-- END BEEHIIV FORM CODE -->
             <button id="viewGraphButton" disabled>View My Dopamine Graph</button>
         </div>
 
@@ -1155,6 +1158,22 @@
         beehiivAttributionScript.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
         document.head.appendChild(beehiivAttributionScript);
 
+        // JavaScript for the orientation banner from user's memory
+        function checkOrientationAndDisplayBanner() {
+            const orientationBanner = document.getElementById('orientationBanner');
+            if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+                orientationBanner.style.display = 'block';
+            } else {
+                orientationBanner.style.display = 'none';
+            }
+        } 
+        window.addEventListener('resize', checkOrientationAndDisplayBanner); 
+        document.addEventListener('DOMContentLoaded', () => { 
+            checkOrientationAndDisplayBanner(); 
+        }); 
+        if ('onorientationchange' in window) { 
+            window.onorientationchange = checkOrientationAndDisplayBanner; 
+        }
     </script>
 </body>
 </html>
